@@ -1,1 +1,4 @@
 exportPattern("^[[:alpha:]]+")
+import('UniProt.ws')
+import('rentrez')
+import('KEGGREST')
