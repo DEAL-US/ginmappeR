@@ -1,3 +1,4 @@
 import('UniProt.ws')
 import('rentrez')
 import('KEGGREST')
+import('XML')
