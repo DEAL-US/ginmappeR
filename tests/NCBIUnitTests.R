@@ -1,5 +1,9 @@
 library(RUnit)
 
+#####################################
+# NCBI databases inter-translations #
+#####################################
+
 ### Test getNCBIGene2NCBIProtein
 
 # Positive case
@@ -50,7 +54,33 @@ checkException(getNCBINucleotide2NCBIGene('test'))
 # No translation case
 checkException(getNCBINucleotide2NCBIGene('KF513177'))
 
+#####################################
+# NCBI databases auxiliar functions #
+#####################################
 
+### Test .getNCBI2UniProtDT
+
+# Positive case
+checkEquals(.getNCBI2UniProtDT('AEJ08681'), 'F8TCS6')
+# ID not registered case
+checkEquals(.getNCBI2UniProtDT('test'), NULL)
+
+### Test getNCBIIdenticalProteins
+
+# Positive cases
+checkEquals(getNCBIIdenticalProteins('AHA80958', format = 'ids'), list('WP_063864654.1','AHA80958.1'))
+dummyDf <- data.frame(Id=c(45721358, 45721358), Source=c('RefSeq','INSDC'),
+                      Nucleotide.Accession=c('NG_050043.1','KF513177.1'),
+                      Start=c(1,1),Stop=c(861,861),Strand=c('+','+'),
+                      Protein=c('WP_063864654.1','AHA80958.1'),
+                      Protein.Name=c('class A beta-lactamase SHV-172','beta-lactamase SHV-172'),
+                      Organism=c('Klebsiella pneumoniae','Klebsiella pneumoniae'),
+                      Strain=c(845332,845332),Assembly=c(NA,NA))
+checkEquals(getNCBIIdenticalProteins('AHA80958', format = 'dataframe'), dummyDf)
+# Incorrect format request case
+checkException(getNCBIIdenticalProteins('AHA80958', format='test'))
+# No identical proteins found case
+checkException(getNCBIIdenticalProteins('test'))
 
 
 

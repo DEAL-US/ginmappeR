@@ -19,7 +19,7 @@ getNCBIGene2NCBIProtein <- function(id){
     }
     # Handle no possible translations case
     if(length(result)==0){
-        warning("The given NCBI Gene ID has no translation to NCBI Protein database")
+        stop("The given NCBI Gene ID has no translation to NCBI Protein database")
     }
     return(result)
 }
@@ -29,7 +29,7 @@ getNCBIProtein2NCBIGene <- function(id){
     query <- .getNCBIDatabasesLinks(dbFrom='protein', id=id, dbTo='gene')
     # Handle no possible translations case
     if(length(query[['links']][['protein_gene']])==0){
-        warning("The given NCBI Protein ID has no translation to NCBI Gene database")
+        stop("The given NCBI Protein ID has no translation to NCBI Gene database")
     }
     return(as.list(query[['links']][['protein_gene']]))
 }
@@ -47,7 +47,7 @@ getNCBIProtein2NCBINucleotide <- function(id){
     }
     # Handle no possible translations case
     if(length(result)==0){
-        warning("The given NCBI Protein ID has no translation to NCBI Nucleotide database")
+        stop("The given NCBI Protein ID has no translation to NCBI Nucleotide database")
     }
     return(result)
 
@@ -66,7 +66,7 @@ getNCBINucleotide2NCBIProtein <- function(id){
     }
     # Handle no possible translations case
     if(length(result)==0){
-        warning("The given NCBI Nucleotide ID has no translation to NCBI Protein database")
+        stop("The given NCBI Nucleotide ID has no translation to NCBI Protein database")
     }
     return(result)
 }
@@ -84,7 +84,7 @@ getNCBIGene2NCBINucleotide <- function(id){
     }
     # Handle no possible translations case
     if(length(result)==0){
-        warning("The given NCBI Gene ID has no translation to NCBI Nucleotide database")
+        stop("The given NCBI Gene ID has no translation to NCBI Nucleotide database")
     }
     return(result)
 }
@@ -94,7 +94,7 @@ getNCBINucleotide2NCBIGene <- function(id){
     query <- .getNCBIDatabasesLinks(dbFrom='nucleotide', id=id, dbTo='gene')
     # Handle no possible translations case
     if(length(query[['links']][['nuccore_gene']])==0){
-        warning("The given NCBI Nucleotide ID has no translation to NCBI Gene database")
+        stop("The given NCBI Nucleotide ID has no translation to NCBI Gene database")
     }
     return(as.list(query[['links']][['nuccore_gene']]))
 }
@@ -103,21 +103,53 @@ getNCBINucleotide2NCBIGene <- function(id){
 # NCBI databases to UniProt #
 #####################################
 
-# # Direct translation method
-# .getNCBI2UniProtDT <- function(ncbiId, database='EMBL-GenBank-DDBJ_CDS'){
-#
-#     return(suppressWarnings(mapUniProt(
-#         from=database,
-#         to='UniProtKB',
-#         query=c(ncbiId),
-#         columns=c('accession')
-#     ))$Entry)
-# }
-#
-# # Identical NCBI proteins
-# getNCBIIdenticalProteins <- function(ncbiId){
-#     return(NULL)
-# }
+# Direct translation method
+.getNCBI2UniProtDT <- function(ncbiId, database='EMBL-GenBank-DDBJ_CDS'){
+    query <- NULL
+    tryCatch(
+        {
+        invisible(capture.output(query <- mapUniProt(
+            from=database,
+            to='UniProtKB',
+            query=c(ncbiId),
+            columns=c('accession')
+            )))
+        },
+        warning=function(w){}
+    )
+    return(query$Entry)
+}
+
+# Identical NCBI proteins
+getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
+    if(!format %in% c('ids','dataframe')){
+        stop('Incorrect format requested')
+    }
+
+    # Retrieve intermediate ID
+    auxId <- NA
+    while(identical(auxId,NA)){
+        auxId <- entrez_search(db = "ipg", term=paste(ncbiId,'[ACCN] OR ', ncbiId, '[UID]',sep=''))
+    }
+
+    # Check if intermediate ID has been retrieved (shows us if there are or not identical proteins registered)
+    if(length(auxId$ids)==0){
+        stop('The given NCBI ID has no similar proteins registered')
+    }else{
+        auxId <- auxId$ids[[1]]
+        identicalProteins <- NA
+        while(identical(identicalProteins,NA)){
+            identicalProteins <- entrez_fetch(db = 'ipg', id = auxId, rettype = 'native')
+        }
+        identicalProteins <- read.csv(text=identicalProteins, sep = '\t')
+        identicalProteins <- identicalProteins[which(identicalProteins$Source=='RefSeq' | identicalProteins$Source=='INSDC'),]
+        switch(format,
+               'ids'= return(as.list(identicalProteins$Protein)),
+               'dataframe' = return(identicalProteins))
+    }
+}
+
+
 #
 # # Identical proteins translation method
 # .getNCBI2UniProtIP <- function(ncbiId){
@@ -138,4 +170,7 @@ getNCBINucleotide2NCBIGene <- function(id){
 #     }
 #     return(translatedId)
 # }
+
+# TODO: en los métodos de NCBIxxx a UniProt, primero hay que comprobar que el ID exista en NCBIxxx
+
 
