@@ -82,6 +82,22 @@ checkException(getNCBIIdenticalProteins('AHA80958', format='test'))
 # No identical proteins found case
 checkException(getNCBIIdenticalProteins('test'))
 
+### Test .getNCBI2UniProtBatch
+
+# Positive case
+dummyDf <- getNCBIIdenticalProteins('CAA76794', format = 'dataframe')
+checkEquals(.getNCBI2UniProtBatch(dummyDf[which(dummyDf$Source=='RefSeq'),] ,'RefSeq_Protein' ),
+            data.frame(From=c('WP_063864899.1'), Entry=c('Q8GP08')))
+checkEquals(.getNCBI2UniProtBatch(dummyDf[which(dummyDf$Source=='INSDC'),] ,'EMBL-GenBank-DDBJ_CDS' ),
+            data.frame(From=c('AAC06040.1','AAN61404.1','CAA76794.1'),
+            Entry=c('O68642','Q8GP08','Q9R747')))
+# No translations possible case
+dummyDf <- getNCBIIdenticalProteins('WP_041918279', format = 'dataframe')
+checkEquals(.getNCBI2UniProtBatch(dummyDf[which(dummyDf$Source=='RefSeq'),] ,'RefSeq_Protein' ),
+            data.frame(From=logical(),Entry=logical()))
+checkEquals(.getNCBI2UniProtBatch(dummyDf[which(dummyDf$Source=='INSDC'),] ,'EMBL-GenBank-DDBJ_CDS' ),
+            data.frame(From=logical(),Entry=logical()))
+
 
 
 

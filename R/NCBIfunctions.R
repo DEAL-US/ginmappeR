@@ -120,7 +120,7 @@ getNCBINucleotide2NCBIGene <- function(id){
     return(query$Entry)
 }
 
-# Identical NCBI proteins
+# Get identical NCBI proteins
 getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
     if(!format %in% c('ids','dataframe')){
         stop('Incorrect format requested')
@@ -149,13 +149,55 @@ getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
     }
 }
 
+# Translate a batch of NCBI IDs to UniProt
+.getNCBI2UniProtBatch <- function(proteins, database){
 
-#
+    makeQuery <- function(proteinsQuery, database){
+        query <- mapUniProt(
+            from=database,
+            to='UniProtKB',
+            query=c(proteinsQuery),
+            columns=c('accession')
+        )
+        return(query)
+    }
+
+    resultDf <- NA
+
+    chunk <- 99999
+    n <- nrow(proteins)
+    r  <- rep(1:ceiling(n/chunk),each=chunk)[1:n]
+    d <- split(proteins,r)
+
+    for(i in 1:length(d)){
+        if(i==1){
+            resultDf <- makeQuery(unique(d[[i]]$Protein), database)
+        }else{
+            resultDf <- rbind(resultDf, makeQuery(unique(d[[i]]$Protein), database))
+        }
+    }
+    return(resultDf)
+}
+
+
+
 # # Identical proteins translation method
 # .getNCBI2UniProtIP <- function(ncbiId){
-#     return(ncbiId)
-# }
 #
+#     identicalProteins <- getNCBIIdenticalProteins(ncbiId, format="dataframe")
+#
+#     if(nrow(identicalProteins)>0){
+#         translationsRefSeq <- .getNCBI2UniProtBatch(filter(identicalProteins, Source=="RefSeq") ,"RefSeq_Protein" )
+#         translationsCds <- .getNCBI2UniProtBatch(filter(identicalProteins, Source=="INSDC"),"EMBL-GenBank-DDBJ_CDS" )
+#         translations <- unique(rbind(translationsRefSeq, translationsCds)$From)
+## TODO: Comprobar que haya algún mapeo
+## TODO: Manejar el error de que no tenga proteínas idénticas y que no le pases un dataframe vacío a .getNCBI2UniProtBatch
+## TODO: Manejar que de .getNCBI2UniProtBatch no se haya podido traducir nada y te venga un dataframe vacío
+#     }
+#
+#     return(translations)
+# }
+
 # # NCBI GenBank to UniProt translation
 # getNCBIGenBank2UniProt <- function(ncbiId){
 #     .checkNotNull(ncbiId, 'The NCBI id given is NULL')
