@@ -1,4 +1,10 @@
 library(RUnit)
+source('../R/NCBIFunctions.R')
+source('../R/utilsFunctions.R')
+library('UniProt.ws')
+library('rentrez')
+library('KEGGREST')
+library('XML')
 
 #####################################
 # NCBI databases inter-translations #
