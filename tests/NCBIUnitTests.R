@@ -69,7 +69,7 @@ checkException(getNCBINucleotide2NCBIGene('KF513177'))
 # Positive case
 checkEquals(.getNCBI2UniProtDT('AEJ08681'), 'F8TCS6')
 # ID not registered case
-checkEquals(.getNCBI2UniProtDT('test'), NULL)
+checkEquals(.getNCBI2UniProtDT('test'), logical())
 
 ### Test getNCBIIdenticalProteins
 
@@ -103,6 +103,15 @@ checkEquals(.getNCBI2UniProtBatch(dummyDf[which(dummyDf$Source=='RefSeq'),] ,'Re
             data.frame(From=logical(),Entry=logical()))
 checkEquals(.getNCBI2UniProtBatch(dummyDf[which(dummyDf$Source=='INSDC'),] ,'EMBL-GenBank-DDBJ_CDS' ),
             data.frame(From=logical(),Entry=logical()))
+
+### Test .getNCBI2UniProtIP
+
+# Positive case
+checkEquals(.getNCBI2UniProtIP('WP_010896559.1'), list('Q7AJZ0','Q9RC37'))
+# No identical proteins found case
+checkEquals(.getNCBI2UniProtIP('test'), NULL)
+# Identical proteins found, but no possible translation
+checkEquals(.getNCBI2UniProtIP('AMR06225.1'), NULL)
 
 
 

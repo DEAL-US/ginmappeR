@@ -105,18 +105,12 @@ getNCBINucleotide2NCBIGene <- function(id){
 
 # Direct translation method
 .getNCBI2UniProtDT <- function(ncbiId, database='EMBL-GenBank-DDBJ_CDS'){
-    query <- NULL
-    tryCatch(
-        {
-        invisible(capture.output(query <- mapUniProt(
+    query <- suppressWarnings(mapUniProt(
             from=database,
             to='UniProtKB',
             query=c(ncbiId),
             columns=c('accession')
-            )))
-        },
-        warning=function(w){}
-    )
+            ))
     return(query$Entry)
 }
 
@@ -153,12 +147,12 @@ getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
 .getNCBI2UniProtBatch <- function(proteins, database){
 
     makeQuery <- function(proteinsQuery, database){
-        query <- mapUniProt(
+        query <- suppressWarnings(mapUniProt(
             from=database,
             to='UniProtKB',
             query=c(proteinsQuery),
             columns=c('accession')
-        )
+        ))
         return(query)
     }
 
@@ -179,27 +173,34 @@ getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
     return(resultDf)
 }
 
+# Identical proteins translation method
+.getNCBI2UniProtIP <- function(ncbiId){
 
+    identicalProteins <- data.frame()
+    tryCatch({
+        identicalProteins <- getNCBIIdenticalProteins(ncbiId, format="dataframe")
+    },error=function(e){})
 
-# # Identical proteins translation method
-# .getNCBI2UniProtIP <- function(ncbiId){
-#
-#     identicalProteins <- getNCBIIdenticalProteins(ncbiId, format="dataframe")
-#
-#     if(nrow(identicalProteins)>0){
-#         translationsRefSeq <- .getNCBI2UniProtBatch(filter(identicalProteins, Source=="RefSeq") ,"RefSeq_Protein" )
-#         translationsCds <- .getNCBI2UniProtBatch(filter(identicalProteins, Source=="INSDC"),"EMBL-GenBank-DDBJ_CDS" )
-#         translations <- unique(rbind(translationsRefSeq, translationsCds)$From)
-## TODO: Comprobar que haya algún mapeo
-## TODO: Manejar el error de que no tenga proteínas idénticas y que no le pases un dataframe vacío a .getNCBI2UniProtBatch
-## TODO: Manejar que de .getNCBI2UniProtBatch no se haya podido traducir nada y te venga un dataframe vacío
-#     }
-#
-#     return(translations)
-# }
+    if(nrow(identicalProteins)>0){
+        translationsRefSeq <- .getNCBI2UniProtBatch(identicalProteins[which(identicalProteins$Source=='RefSeq'),] ,"RefSeq_Protein" )
+        translationsCds <- .getNCBI2UniProtBatch(identicalProteins[which(identicalProteins$Source=='INSDC'),],"EMBL-GenBank-DDBJ_CDS" )
+        if(nrow(translationsRefSeq)>0 & nrow(translationsCds)>0){
+            translations <- unique(rbind(translationsRefSeq, translationsCds)$Entry)
+            return(as.list(translations))
+        }else{
+            return(NULL)
+        }
+    }else{
+        return(NULL)
+    }
+}
+
+# getNCBINucleotide2UniProt <- function(ncbiId){
+# getNCBIProtein2UniProt <- function(ncbiId){
+
 
 # # NCBI GenBank to UniProt translation
-# getNCBIGenBank2UniProt <- function(ncbiId){
+# getNCBIGene2UniProt <- function(ncbiId){
 #     .checkNotNull(ncbiId, 'The NCBI id given is NULL')
 #     .checkNCBIIdExists(ncbiId)
 #
@@ -213,6 +214,6 @@ getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
 #     return(translatedId)
 # }
 
-# TODO: en los métodos de NCBIxxx a UniProt, primero hay que comprobar que el ID exista en NCBIxxx
-
+# [ TODO ]: en los métodos de NCBIxxx a UniProt, primero hay que comprobar que el ID exista en NCBIxxx
+# [ TODO ]: documentation of methods: .getNCBI2UniProtIP
 
