@@ -1,0 +1,6 @@
+# [ TODO ]: documentation of methods:
+    - getNCBIProtein2UniProt
+    - getNCBIGene2UniProt
+    - getNCBINucleotide2UniProt
+
+# NCBI identical proteins to UniProt method retrieval time when have lots of identical proteins is extremely long.

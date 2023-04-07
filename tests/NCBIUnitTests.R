@@ -67,9 +67,11 @@ checkException(getNCBINucleotide2NCBIGene('KF513177'))
 ### Test .getNCBI2UniProtDT
 
 # Positive case
-checkEquals(.getNCBI2UniProtDT('AEJ08681'), 'F8TCS6')
+checkEquals(.getNCBI2UniProtDT('AEJ08681'), list('F8TCS6'))
+checkEquals(.getNCBI2UniProtDT('AEJ08681 AGQ48857.1 CAA79696'), list('F8TCS6','S5FUH0','Q12860'))
+checkEquals(.getNCBI2UniProtDT('CAA79696'), list('Q12860'))
 # ID not registered case
-checkEquals(.getNCBI2UniProtDT('test'), logical())
+checkEquals(.getNCBI2UniProtDT('test'), list())
 
 ### Test getNCBIIdenticalProteins
 
@@ -97,7 +99,7 @@ checkEquals(.getNCBI2UniProtBatch(dummyDf[which(dummyDf$Source=='RefSeq'),] ,'Re
 checkEquals(.getNCBI2UniProtBatch(dummyDf[which(dummyDf$Source=='INSDC'),] ,'EMBL-GenBank-DDBJ_CDS' ),
             data.frame(From=c('AAC06040.1','AAN61404.1','CAA76794.1'),
             Entry=c('O68642','Q8GP08','Q9R747')))
-# No translations possible case
+# No translations case
 dummyDf <- getNCBIIdenticalProteins('WP_041918279', format = 'dataframe')
 checkEquals(.getNCBI2UniProtBatch(dummyDf[which(dummyDf$Source=='RefSeq'),] ,'RefSeq_Protein' ),
             data.frame(From=logical(),Entry=logical()))
@@ -109,11 +111,36 @@ checkEquals(.getNCBI2UniProtBatch(dummyDf[which(dummyDf$Source=='INSDC'),] ,'EMB
 # Positive case
 checkEquals(.getNCBI2UniProtIP('WP_010896559.1'), list('Q7AJZ0','Q9RC37'))
 # No identical proteins found case
-checkEquals(.getNCBI2UniProtIP('test'), NULL)
+checkEquals(.getNCBI2UniProtIP('test'), list())
 # Identical proteins found, but no possible translation
-checkEquals(.getNCBI2UniProtIP('AMR06225.1'), NULL)
+checkEquals(.getNCBI2UniProtIP('AMR06225.1'), list())
 
 
+### Test getNCBIProtein2UniProt
 
+# Positive cases
+checkEquals(getNCBIProtein2UniProt('WP_010896559.1'), list('Q7AJZ0','Q9RC37'))
+checkEquals(getNCBIProtein2UniProt('WP_039189232.1'), list('A0A2A2MC99','Q9K351', 'A0A141RJY1'))
+# No translation case
+checkException(getNCBIProtein2UniProt('WP_188331862.1'))
+# NCBI Protein ID not registered case
+checkException(getNCBIProtein2UniProt('test'))
 
+### Test getNCBINucleotide2UniProt
+
+# Positive cases
+checkEquals(getNCBINucleotide2UniProt('AY536519'), list('Q6QJ79','A0A7G1KXU2','A0A6I4WTI5','D0UY02'))
+# No translation case
+checkException(getNCBINucleotide2UniProt('Z21488'))
+# NCBI Nucleotide ID not registered case
+checkException(getNCBINucleotide2UniProt('test'))
+
+### Test getNCBIGene2UniProt
+
+# Positive cases
+checkEquals(getNCBIGene2UniProt('76524190'), list('A0A1W6DPG3'))
+# No translation case
+checkException(getNCBIGene2UniProt('69412715'))
+# NCBI Gene ID not registered case
+checkException(getNCBIGene2UniProt('test'))
 
