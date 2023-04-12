@@ -19,6 +19,7 @@ getUniProt2KEGG <- function(upId){
     }
 }
 
+# Method to retrieve similar genes by clusters of a % of identity
 getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0'){
 
     # Auxiliar function
@@ -64,4 +65,34 @@ getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0'){
         return(genesList)
     }
 }
+
+# Method to translate UniProt to KEGG through Similar Genes method, that is,
+# translating genes from UniProt clusters of similar genes
+.getUniProt2KEGGSGT <- function(upId){
+
+    # Iterate over clusters identities
+    for(clusterIdentity in c('1.0','0.9','0.5')){
+        similarGenes <- getUniProtSimilarGenes(upId, clusterIdentity)
+        # Iterate over clusters of the same identity if there were
+        for(cluster in names(similarGenes)){
+            cluster <- similarGenes[[cluster]]
+            # Check whether the cluster has similar genes
+            if(length(cluster)!=0){
+                # For every similar gene, try to translate to KEGG
+                for(i in 1:length(cluster)){
+                    translation <- .getUniProt2KEGGDT(cluster[[i]])
+                    # If there is a translation, return the identity of the cluster,
+                    # the similar gene selected and the translation to KEGG
+                    if(!identical(translation, list())){
+                        return(c(clusterIdentity, cluster[[i]], translation))
+                    }
+                }
+            }
+        }
+    }
+    # If a translation has not been found, return an empty list
+    return(list())
+}
+
+
 
