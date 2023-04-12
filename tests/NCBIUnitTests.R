@@ -66,7 +66,7 @@ checkException(getNCBINucleotide2NCBIGene('KF513177'))
 
 ### Test .getNCBI2UniProtDT
 
-# Positive case
+# Positive cases
 checkEquals(.getNCBI2UniProtDT('AEJ08681'), list('F8TCS6'))
 checkEquals(.getNCBI2UniProtDT('AEJ08681 AGQ48857.1 CAA79696'), list('F8TCS6','S5FUH0','Q12860'))
 checkEquals(.getNCBI2UniProtDT('CAA79696'), list('Q12860'))
@@ -92,14 +92,14 @@ checkException(getNCBIIdenticalProteins('test'))
 
 ### Test .getNCBI2UniProtBatch
 
-# Positive case
+# Positive cases
 dummyDf <- getNCBIIdenticalProteins('CAA76794', format = 'dataframe')
 checkEquals(.getNCBI2UniProtBatch(dummyDf[which(dummyDf$Source=='RefSeq'),] ,'RefSeq_Protein' ),
             data.frame(From=c('WP_063864899.1'), Entry=c('Q8GP08')))
 checkEquals(.getNCBI2UniProtBatch(dummyDf[which(dummyDf$Source=='INSDC'),] ,'EMBL-GenBank-DDBJ_CDS' ),
             data.frame(From=c('AAC06040.1','AAN61404.1','CAA76794.1'),
             Entry=c('O68642','Q8GP08','Q9R747')))
-# No translations case
+# No translations cases
 dummyDf <- getNCBIIdenticalProteins('WP_041918279', format = 'dataframe')
 checkEquals(.getNCBI2UniProtBatch(dummyDf[which(dummyDf$Source=='RefSeq'),] ,'RefSeq_Protein' ),
             data.frame(From=logical(),Entry=logical()))
@@ -128,7 +128,7 @@ checkException(getNCBIProtein2UniProt('test'))
 
 ### Test getNCBINucleotide2UniProt
 
-# Positive cases
+# Positive case
 checkEquals(getNCBINucleotide2UniProt('AY536519'), list('Q6QJ79','A0A7G1KXU2','A0A6I4WTI5','D0UY02'))
 # No translation case
 checkException(getNCBINucleotide2UniProt('Z21488'))
@@ -137,7 +137,7 @@ checkException(getNCBINucleotide2UniProt('test'))
 
 ### Test getNCBIGene2UniProt
 
-# Positive cases
+# Positive case
 checkEquals(getNCBIGene2UniProt('76524190'), list('A0A1W6DPG3'))
 # No translation case
 checkException(getNCBIGene2UniProt('69412715'))

@@ -2,5 +2,8 @@
     - getNCBIProtein2UniProt
     - getNCBIGene2UniProt
     - getNCBINucleotide2UniProt
+    - getUniProtSimilarGenes
 
-# NCBI identical proteins to UniProt method retrieval time when have lots of identical proteins is extremely long.
+# NCBI identical proteins to UniProt method retrieval time is extremely long when have lots of identical proteins.
+
+# UniProt gene cluster retrieval method: group genes by cluster name? or just return a list of genes?

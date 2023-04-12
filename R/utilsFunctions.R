@@ -16,7 +16,7 @@
     # [ACCN] means we look for an Accesion Number OR [UID] Unique number assigned to publication
     invisible(capture.output(query <- entrez_search(db='protein', term=paste(proteinId,'[ACCN] OR ', proteinId, '[UID]',sep=''))))
     if(!length(query[['ids']])>0) {
-        stop(paste('The given ID "', proteinId, '" is not registered in NCBI Protein database', sep = ""))
+        stop(paste('The given ID "', proteinId, '" is not registered in NCBI Protein database', sep = ''))
     }
 }
 
@@ -25,7 +25,7 @@
     # Example id: HM036080.1
     invisible(capture.output(query <- entrez_search(db='nucleotide', term=paste(nucleotideId,'[ACCN] OR ', nucleotideId, '[UID]',sep=''))))
     if(!length(query[['ids']])>0) {
-        stop(paste('The given ID "', nucleotideId, '" is not registered in NCBI Nucleotide database', sep = ""))
+        stop(paste('The given ID "', nucleotideId, '" is not registered in NCBI Nucleotide database', sep = ''))
     }
 }
 
@@ -34,6 +34,29 @@
     # Example id: WP_001082319
     invisible(capture.output(query <- entrez_search(db='gene', term=paste(geneId,'[ACCN] OR ', geneId, '[UID]',sep=''))))
     if(!length(query[['ids']])>0) {
-        stop(paste('The given ID "', geneId, '" is not registered in NCBI Gene database', sep = ""))
+        stop(paste('The given ID "', geneId, '" is not registered in NCBI Gene database', sep = ''))
+    }
+}
+
+.checkUniProtIdExists <- function(upId){
+    .checkNotNull(upId, 'The given UniProt Gene ID is ')
+    # Example id not registered: P0ZTH2
+    # Example id not valid: P0ZTUH2
+    # Example valid id: P0DTH6
+    output <- invisible(capture.output(queryUniProt(
+        query = paste('accession:', upId, sep=''),
+        fields = c('accession'),
+        collapse = ' OR '
+    )))
+    if(grepl('invalid format', output[2], fixed = TRUE)){
+        stop(paste('The given ID "', upId, '" has not a valid UniProt database accesion format', sep = ''))
+    }else if(grepl('0 rows', output[2], fixed = TRUE)){
+        stop(paste('The given ID "', upId, '" is not registered in UniProt database', sep = ''))
+    }
+}
+
+.checkClusterIdentity <- function(clusterIdentity){
+    if(!clusterIdentity %in% c('1.0','0.9','0.5')){
+        stop(paste('The requested cluster identity "', clusterIdentity, '" is not valid', sep = ''))
     }
 }

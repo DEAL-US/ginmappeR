@@ -99,9 +99,9 @@ getNCBINucleotide2NCBIGene <- function(id){
     return(as.list(query[['links']][['nuccore_gene']]))
 }
 
-#####################################
+#############################
 # NCBI databases to UniProt #
-#####################################
+#############################
 
 # Direct translation method
 .getNCBI2UniProtDT <- function(ncbiId){
