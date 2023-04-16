@@ -119,8 +119,9 @@ checkEquals(.getNCBI2UniProtIP('AMR06225.1'), list())
 ### Test getNCBIProtein2UniProt
 
 # Positive cases
-checkEquals(getNCBIProtein2UniProt('WP_010896559.1'), list('Q7AJZ0','Q9RC37'))
+checkEquals(getNCBIProtein2UniProt('WP_010896559.1',), list('Q7AJZ0','Q9RC37'))
 checkEquals(getNCBIProtein2UniProt('WP_039189232.1'), list('A0A2A2MC99','Q9K351', 'A0A141RJY1'))
+checkException(getNCBIProtein2UniProt('WP_039189232.1', FALSE))
 # No translation case
 checkException(getNCBIProtein2UniProt('WP_188331862.1'))
 # NCBI Protein ID not registered case
@@ -130,6 +131,7 @@ checkException(getNCBIProtein2UniProt('test'))
 
 # Positive case
 checkEquals(getNCBINucleotide2UniProt('AY536519'), list('Q6QJ79','A0A7G1KXU2','A0A6I4WTI5','D0UY02'))
+checkException(getNCBINucleotide2UniProt('AY536519', FALSE))
 # No translation case
 checkException(getNCBINucleotide2UniProt('Z21488'))
 # NCBI Nucleotide ID not registered case
@@ -138,6 +140,7 @@ checkException(getNCBINucleotide2UniProt('test'))
 ### Test getNCBIGene2UniProt
 
 # Positive case
+checkEquals(getNCBIGene2UniProt('76524190'), list('A0A1W6DPG3'))
 checkEquals(getNCBIGene2UniProt('76524190'), list('A0A1W6DPG3'))
 # No translation case
 checkException(getNCBIGene2UniProt('69412715'))

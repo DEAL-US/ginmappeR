@@ -209,14 +209,16 @@ getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
 }
 
 # NCBI Protein to UniProt translation
-getNCBIProtein2UniProt <- function(ncbiId){
+getNCBIProtein2UniProt <- function(ncbiId, byIdenticalProteins = TRUE){
     .checkNCBIProteinIdExists(ncbiId)
 
     # First translation strategy
     translatedIDs <- .getNCBI2UniProtDT(ncbiId)
 
     # Second translation strategy
-    translatedIDs <- append(translatedIDs, .getNCBI2UniProtIP(ncbiId))
+    if(byIdenticalProteins){
+        translatedIDs <- append(translatedIDs, .getNCBI2UniProtIP(ncbiId))
+    }
 
     # Handle no possible translations case
     if(length(translatedIDs)==0){
@@ -227,14 +229,16 @@ getNCBIProtein2UniProt <- function(ncbiId){
 }
 
 # NCBI Nucleotide to UniProt translation
-getNCBINucleotide2UniProt <- function(ncbiId){
+getNCBINucleotide2UniProt <- function(ncbiId, byIdenticalProteins = TRUE){
     .checkNCBINucleotideIdExists(ncbiId)
 
     # First translation strategy
     translatedIDs <- .getNCBI2UniProtDT(ncbiId)
 
     # Second translation strategy
-    translatedIDs <- append(translatedIDs, .getNCBI2UniProtIP(ncbiId))
+    if(byIdenticalProteins){
+        translatedIDs <- append(translatedIDs, .getNCBI2UniProtIP(ncbiId))
+    }
 
     # Handle no possible translations case
     if(length(translatedIDs)==0){
@@ -245,14 +249,16 @@ getNCBINucleotide2UniProt <- function(ncbiId){
 }
 
 # NCBI Gene to UniProt translation
-getNCBIGene2UniProt <- function(ncbiId){
+getNCBIGene2UniProt <- function(ncbiId, byIdenticalProteins = TRUE){
     .checkNCBIGeneIdExists(ncbiId)
 
     # First translation strategy
     translatedIDs <- .getNCBI2UniProtDT(ncbiId)
 
     # Second translation strategy
-    translatedIDs <- append(translatedIDs, .getNCBI2UniProtIP(ncbiId))
+    if(byIdenticalProteins){
+        translatedIDs <- append(translatedIDs, .getNCBI2UniProtIP(ncbiId))
+    }
 
     # Handle no possible translations case
     if(length(translatedIDs)==0){
