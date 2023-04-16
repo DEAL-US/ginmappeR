@@ -96,6 +96,7 @@ getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0'){
 # list( 'DT' = list(ag:AEX08599), 'SGT' = list(0.9, C7C422, ag:CAZ39946))
 getUniProt2KEGG <- function(upId, bySimilarGenes = TRUE){
     .checkUniProtIdExists(upId)
+    .checkBoolean(bySimilarGenes, 'bySimilarGenes')
 
     translations <- list('DT'=.getUniProt2KEGGDT(upId))
 
@@ -105,8 +106,4 @@ getUniProt2KEGG <- function(upId, bySimilarGenes = TRUE){
 
     return(translations)
 }
-
-
-
-
 

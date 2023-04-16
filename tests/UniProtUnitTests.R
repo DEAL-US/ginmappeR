@@ -2,6 +2,9 @@ library(RUnit)
 source('../R/UniProtFunctions.R')
 source('../R/utilsFunctions.R')
 library('UniProt.ws')
+library('KEGGREST')
+library('httr')
+
 
 ######################################
 # UniProt database auxiliar function #

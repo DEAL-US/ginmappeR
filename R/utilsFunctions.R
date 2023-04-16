@@ -60,3 +60,9 @@
         stop(paste('The requested cluster identity "', clusterIdentity, '" is not valid', sep = ''))
     }
 }
+
+.checkBoolean <- function(value, name){
+    if(!value %in% c(TRUE, FALSE)){
+        stop(paste(name, ' variable value must be TRUE or FALSE, value given: ', value, sep = ''))
+    }
+}
