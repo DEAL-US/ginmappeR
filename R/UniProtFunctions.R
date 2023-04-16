@@ -2,13 +2,6 @@
 # UniProt database to KEGG #
 ############################
 
-# Main function
-getUniProt2KEGG <- function(upId){
-    .checkUniProtIdExists(upId)
-
-    #TODO
-}
-
 # Direct translation method
 .getUniProt2KEGGDT <- function(upId){
     keggId <- paste(keggConv("genes", sprintf('uniprot:%s', upId)), collapse = ';')
@@ -66,7 +59,7 @@ getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0'){
     }
 }
 
-# Method to translate UniProt to KEGG through Similar Genes method, that is,
+# Method to translate UniProt to KEGG through Similar Genes Translation method, that is,
 # translating genes from UniProt clusters of similar genes
 .getUniProt2KEGGSGT <- function(upId){
 
@@ -93,6 +86,27 @@ getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0'){
     # If a translation has not been found, return an empty list
     return(list())
 }
+
+# Main function --- Explanations below in order to facilitate documentation writing
+# Tries direct translation method and, if requested, by similar genes clusters
+# method too
+# If SGT method is selected, returns a list with two lists, one with de DT method
+# result and another one with the SGT method result. For example:
+# list( 'DT' = list(translation), 'SGT' = list(clusterIdentity, intermediateUPID, translation))
+# list( 'DT' = list(ag:AEX08599), 'SGT' = list(0.9, C7C422, ag:CAZ39946))
+getUniProt2KEGG <- function(upId, bySimilarGenes = TRUE){
+    .checkUniProtIdExists(upId)
+
+    translations <- list('DT'=.getUniProt2KEGGDT(upId))
+
+    if(bySimilarGenes){
+        translations <- append(translations, list('SGT'=.getUniProt2KEGGSGT(upId)))
+    }
+
+    return(translations)
+}
+
+
 
 
 
