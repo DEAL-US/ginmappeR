@@ -236,7 +236,6 @@ getNCBINucleotide2UniProt <- function(ncbiId, byIdenticalProteins = TRUE){
     .checkNCBINucleotideIdExists(ncbiId)
     .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
 
-
     # First translation strategy
     translatedIDs <- .getNCBI2UniProtDT(ncbiId)
 
@@ -273,6 +272,81 @@ getNCBIGene2UniProt <- function(ncbiId, byIdenticalProteins = TRUE){
     return(unique(translatedIDs))
     # }
 }
+
+##########################
+# NCBI databases to KEGG #
+##########################
+
+# Direct translation method
+.getNCBI2KEGGDT <- function(ncbiId){
+    query <- keggConv("genes", paste('ncbi-proteinid:', strsplit(ncbiId,'.', fixed = T)[[1]], sep=''))
+
+    if(!identical(query, character(0))&!identical(query, NULL)&!identical(query, NA)){
+        return(as.list(query[[1]]))
+    }else{
+        return(list())
+    }
+}
+
+# ------ Notes to facilitate documentation writing
+# -- Se ha puesto desactivable lo de byIdenticalProteins y bySimilarGenes,
+# Al desactivarlos, reducimos las probabilidades de traducir el gen, pero también tendrá un coste computacional menor (necesario en algunos
+# casos donde por ejemplo, el método de proteínas similares tarde muchísimo)
+# -- Se ha añadido un allTranslations booleano que activo, devuelve todas las posibles traducciones tanto directas como por clusters de similitud de UniProt;
+# desactivada, devuelve la primera traducción directa que encuentre o, en caso contrario, la de mayor % de identidad.
+# Through UniProt database method
+.getNCBI2KEGGTUP <- function(ncbiId, ncbiDatabase, allTranslations = TRUE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
+    .getSGTFirstElement <- function(x) {
+        as.numeric(x$SGT[[1]])
+    }
+
+    upIDs <- switch (ncbiDatabase,
+        'protein' = getNCBIProtein2UniProt(ncbiId, byIdenticalProteins = byIdenticalProteins),
+        'nucleotide' = getNCBINucleotide2UniProt(ncbiId, byIdenticalProteins = byIdenticalProteins),
+        'gene' = getNCBIGene2UniProt(ncbiId, byIdenticalProteins = byIdenticalProteins),
+    )
+
+    translations <- list()
+    if(length(upIDs)>0){
+
+        # If user wants all possible translations
+        if(allTranslations){
+            for(upId in upIDs){
+                keggId <- getUniProt2KEGG(upId, bySimilarGenes = bySimilarGenes)
+                if(!identical(keggId, list('DT'=list(), 'SGT'=list()))){
+                    translations[upId] <- list(keggId)
+                }
+            }
+            if(!identical(translations, list())){
+                return(translations[order(sapply(translations, .getSGTFirstElement), decreasing = TRUE)])
+            }
+        }else{
+            # If user wants the best/faster translation
+            for(upId in upIDs){
+                keggId <- getUniProt2KEGG(upId, bySimilarGenes = bySimilarGenes)
+                if(!identical(keggId, list('DT'=list(), 'SGT'=list()))){
+                    if(length(keggId$DT)>0){
+                        return(setNames(list(keggId), `upId`))
+                    }
+                    translations[upId] <- list(keggId)
+                }
+            }
+            if(!identical(translations, list())){
+                return(translations[order(sapply(translations, .getSGTFirstElement), decreasing = TRUE)][[1]])
+            }
+        }
+    }
+    return(translations)
+}
+
+# TODO: del método .getNCBI2KEGGTUP, en el método superior, quedarte con la DT si hay y si no, ya coger la
+# de Similar Genes y devolver la explicación de 0.9, blablabla. Poner un allCoincidences o algo así, que sea
+# True o False y de esta forma devolver la primera traducción o todas las posibles, según la prisa que tenga
+# el usuario. Poner tmb el byIdenticalProteins y bySimilarGenes con sus correspondientes validaciones
+
+
+
+
 
 
 

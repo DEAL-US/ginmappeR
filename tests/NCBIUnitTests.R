@@ -60,9 +60,9 @@ checkException(getNCBINucleotide2NCBIGene('test'))
 # No translation case
 checkEquals(getNCBINucleotide2NCBIGene('KF513177'), list())
 
-#####################################
-# NCBI databases auxiliar functions #
-#####################################
+#############################
+# NCBI databases to UniProt #
+#############################
 
 ### Test .getNCBI2UniProtDT
 
@@ -146,4 +146,35 @@ checkEquals(getNCBIGene2UniProt('76524190'), list('A0A1W6DPG3'))
 checkEquals(getNCBIGene2UniProt('69412715'), list())
 # NCBI Gene ID not registered case
 checkException(getNCBIGene2UniProt('test'))
+
+##########################
+# NCBI databases to KEGG #
+##########################
+
+### Test .getNCBI2KEGGDT
+
+# Positive cases
+checkEquals(.getNCBI2KEGGDT('AAC44793.1'),list('ag:AAC44793'))
+checkEquals(.getNCBI2KEGGDT('AAO66446.1'),list('ag:AAO66446'))
+checkEquals(.getNCBI2KEGGDT('NP_059345'),list('hsa:10458'))
+checkEquals(.getNCBI2KEGGDT('AAG58814'),list('ece:Z5100'))
+# No translation case
+checkEquals(.getNCBI2KEGGDT('CAD69003.1'), list())
+
+### Test .getNCBI2KEGGTUP
+
+# Positive cases
+checkTrue(length(.getNCBI2KEGGTUP('WP_039189232.1', 'protein'))== 3)
+checkEquals(.getNCBI2KEGGTUP('WP_039189232.1', 'protein', allTranslations = FALSE) ,list('A0A2A2MC99'=
+         list('DT'=list('hpar:AL518_05720'), 'SGT'=list('1.0','Q9K351','ag:AAF86692'))))
+checkTrue(length(.getNCBI2KEGGTUP('WP_010896559.1', 'protein'))== 2)
+checkEquals(.getNCBI2KEGGTUP('WP_010896559.1', 'protein', allTranslations = FALSE) ,list('Q7AJZ0'=
+         list('DT'=list('bha:BH0380'), 'SGT'=list('0.5','Q03986','ag:AAA22599'))))
+checkEquals(.getNCBI2KEGGTUP('AY536519', 'nucleotide', allTranslations = FALSE) ,list('Q6QJ79'=
+         list('DT'=list('ag:AAS48620'), 'SGT'=list('0.9','A0A0R4J8B5','aby:ABAYE3623'))))
+checkEquals(.getNCBI2KEGGTUP('76524190', 'gene', allTranslations = FALSE) ,list('A0A1W6DPG3'=
+         list('DT'=list('cet:B8281_09025'), 'SGT'=list('0.9','A0A6M5UD64','cprt:FIC82_007935'))))
+# No translation case
+checkEquals(.getNCBI2KEGGTUP('WP_188331862.1', 'protein'), list())
+
 

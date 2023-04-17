@@ -53,10 +53,10 @@ checkEquals(.getUniProt2KEGGSGT('A0A1S7BGS4'), list())
 
 # Positive cases
 checkEquals(getUniProt2KEGG('G9JVE6'), list( 'DT' = list('ag:AEX08599'), 'SGT' = list('0.9', 'C7C422', 'ag:CAZ39946')))
-checkEquals(getUniProt2KEGG('G9JVE6', FALSE), list('DT'=list('ag:AEX08599')))
+checkEquals(getUniProt2KEGG('G9JVE6', FALSE), list('DT'=list('ag:AEX08599'),'SGT'=list()))
 # No translation cases
 checkEquals(getUniProt2KEGG('A0A1S7BGS4'), list('DT'=list(), 'SGT'=list()))
-checkEquals(getUniProt2KEGG('A0A1S7BGS4', FALSE), list('DT'=list()))
+checkEquals(getUniProt2KEGG('A0A1S7BGS4', FALSE), list('DT'=list(), 'SGT'=list()))
 # ID not valid case
 checkException(getUniProt2KEGG('P0ZTUH2'))
 

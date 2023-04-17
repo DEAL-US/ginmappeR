@@ -8,7 +8,7 @@
     if(identical(keggId, character(0))|identical(keggId, "")){
         return(list())
     }else{
-        return(as.list(strsplit(keggId,';')[[1]]))
+        return(as.list(strsplit(keggId,';',fixed = TRUE)[[1]]))
     }
 }
 
@@ -98,10 +98,11 @@ getUniProt2KEGG <- function(upId, bySimilarGenes = TRUE){
     .checkUniProtIdExists(upId)
     .checkBoolean(bySimilarGenes, 'bySimilarGenes')
 
-    translations <- list('DT'=.getUniProt2KEGGDT(upId))
+    translations <- list('DT'=.getUniProt2KEGGDT(upId), 'SGT'=list())
 
     if(bySimilarGenes){
-        translations <- append(translations, list('SGT'=.getUniProt2KEGGSGT(upId)))
+        # translations <- append(translations, list('SGT'=.getUniProt2KEGGSGT(upId)))
+        translations$SGT <- .getUniProt2KEGGSGT(upId)
     }
 
     return(translations)
