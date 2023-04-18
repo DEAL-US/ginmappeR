@@ -34,10 +34,12 @@ checkEquals(.getUniProt2KEGGDT('P0DTH6'), character(0))
 ### Test getUniProtSimilarGenes
 
 # Positive cases
-checkTrue(length(getUniProtSimilarGenes('G0L217', clusterIdentity = '0.5')$UniRef50_A0A5S3PNY9)==4)
-checkTrue(length(getUniProtSimilarGenes('G9JVE6', clusterIdentity = '1.0')$UniRef100_G9JVE6)==10)
+checkTrue(length(getUniProtSimilarGenes('G0L217', clusterIdentity = '0.5', clusterNames = TRUE)$UniRef50_A0A5S3PNY9)==4)
+checkTrue(length(getUniProtSimilarGenes('G9JVE6', clusterIdentity = '1.0', clusterNames = TRUE)$UniRef100_G9JVE6)==10)
+checkTrue(length(getUniProtSimilarGenes('G9JVE6', clusterIdentity = '1.0'))==10)
 # No similar genes case
-checkEquals(getUniProtSimilarGenes('G0L217', clusterIdentity = '1.0'), list('UniRef100_G0L217'=character(0)))
+checkEquals(getUniProtSimilarGenes('G0L217', clusterIdentity = '1.0', clusterNames = TRUE), list('UniRef100_G0L217'=character(0)))
+checkEquals(getUniProtSimilarGenes('G0L217', clusterIdentity = '1.0'), character(0))
 # Invalid cluster identity provided
 checkException(getUniProtSimilarGenes('G9JVE6','test'))
 
@@ -52,19 +54,21 @@ checkEquals(.getUniProt2KEGGSGT('A0A1S7BGS4'), list())
 
 ### Test getUniProt2KEGG
 
-checkEquals(getUniProt2KEGG('G9JVE6'), list('DT'=c('ag:AEX08599'))) # Sí DT
-checkEquals(getUniProt2KEGG('A0A2R4PHC7'), list('0.5'=c('ffl:HYN86_12595'))) # No DT, sí por similar genes
-checkEquals(getUniProt2KEGG('A0A2R4PHC7', exhaustiveMapping = TRUE), list('0.5'=c('ffl:HYN86_12595', 'fcr:HYN56_14615', 'fls:GLV81_10715'))) # exhaustive mapping case without DT
-checkTrue(length(getUniProt2KEGG('Q6XL56', exhaustiveMapping = TRUE)[['0.5']])==20) # exhaustive mapping case with DT
-checkEquals(getUniProt2KEGG('G9JVE6', exhaustiveMapping = TRUE, bySimilarGenes = FALSE), list('DT'=c('ag:AEX08599'))) # With exhaustive mapping, but without similar genes
-checkEquals(getUniProt2KEGG('Q6XL56', exhaustiveMapping = TRUE, bySimilarGenes = FALSE), list('DT'=c('ag:AAP69916'))) # With exhaustive mapping, but without similar genes
+checkEquals(getUniProt2KEGG('G9JVE6', detailedMapping = TRUE), list('DT'=c('ag:AEX08599')))
+checkEquals(getUniProt2KEGG('G9JVE6'), c('ag:AEX08599'))
+checkEquals(getUniProt2KEGG('A0A2R4PHC7', detailedMapping = TRUE), list('0.5'=c('ffl:HYN86_12595')))
+checkEquals(getUniProt2KEGG('A0A2R4PHC7'), c('ffl:HYN86_12595'))
+checkEquals(getUniProt2KEGG('A0A2R4PHC7', exhaustiveMapping = TRUE, detailedMapping = TRUE), list('0.5'=c('ffl:HYN86_12595', 'fcr:HYN56_14615', 'fls:GLV81_10715')))
+checkTrue(length(getUniProt2KEGG('Q6XL56', exhaustiveMapping = TRUE, detailedMapping = TRUE)[['0.5']])==20)
+checkEquals(getUniProt2KEGG('G9JVE6', exhaustiveMapping = TRUE, bySimilarGenes = FALSE, detailedMapping = TRUE), list('DT'=c('ag:AEX08599')))
+checkEquals(getUniProt2KEGG('Q6XL56', exhaustiveMapping = TRUE, bySimilarGenes = FALSE, detailedMapping = TRUE), list('DT'=c('ag:AAP69916')))
+checkEquals(getUniProt2KEGG('Q6XL56', exhaustiveMapping = TRUE, bySimilarGenes = FALSE), c('ag:AAP69916'))
 # No translation cases
-checkEquals(getUniProt2KEGG('A0A1S7BGS4'), list())
-checkEquals(getUniProt2KEGG('A0A1S7BGS4', FALSE, FALSE), list())
+checkEquals(getUniProt2KEGG('A0A1S7BGS4'), character(0))
+checkEquals(getUniProt2KEGG('A0A1S7BGS4', detailedMapping = TRUE), list())
+checkEquals(getUniProt2KEGG('A0A1S7BGS4', FALSE, FALSE), character(0))
 # ID not valid case
 checkException(getUniProt2KEGG('P0ZTUH2'))
-
-
 
 
 

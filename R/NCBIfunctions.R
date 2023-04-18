@@ -346,7 +346,14 @@ getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, byIdenticalPr
         }
     }
     return(translations)
+
+    #
+    # TODO: incluir últimas modificaciones respecto a detailedMapping y exhaustiveMapping
+    #
 }
+
+
+
 
 # TODO: del método .getNCBI2KEGGTUP, en el método superior, quedarte con la DT si hay y si no, ya coger la
 # de Similar Genes y devolver la explicación de 0.9, blablabla. Poner un allCoincidences o algo así, que sea

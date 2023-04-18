@@ -4,8 +4,3 @@
     - getNCBINucleotide2UniProt
     - getUniProtSimilarGenes
     - getUniProt2KEGG
-
-
-# For complex mappings like UniProt identical genes clusters, introduce a param like
-# detailedMapping, default FALSE, that if TRUE, returns a named list with direct
-# translation IDs and 100%, 90% and 50% identical genes. Not the intermediate ID
