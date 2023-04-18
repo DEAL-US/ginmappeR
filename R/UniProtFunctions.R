@@ -6,9 +6,9 @@
 .getUniProt2KEGGDT <- function(upId){
     keggId <- paste(keggConv("genes", sprintf('uniprot:%s', upId)), collapse = ';')
     if(identical(keggId, character(0))|identical(keggId, "")){
-        return(list())
+        return(character(0))
     }else{
-        return(as.list(strsplit(keggId,';',fixed = TRUE)[[1]]))
+        return(c(strsplit(keggId,';',fixed = TRUE)[[1]]))
     }
 }
 
@@ -44,16 +44,17 @@ getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0'){
                                                getClusterTypeBySimilarity(clusterIdentity) , clusterName, upId)
 
         # Handle UniProt's API 500 genes per request issue
-        auxList <- list()
+        auxList <- character(0)
         request <- GET(similarGenesSearchUrl)
-        auxList <- append(auxList, as.list(read.csv(text=content(request, as='text', encoding='UTF-8'), sep='\t')$Entry))
+        auxList <- c(auxList, c(read.csv(text=content(request, as='text', encoding='UTF-8'), sep='\t')$Entry))
 
         while(!is.null(request$headers$link)){
             link <- strsplit(strsplit(request$headers$link, '<')[[1]],'>')[[2]][[1]]
             request <- GET(link)
-            auxList <- append(auxList, as.list(read.csv(text=content(request, as='text', encoding='UTF-8'), sep='\t')$Entry))
+            auxList <- c(auxList, c(read.csv(text=content(request, as='text', encoding='UTF-8'), sep='\t')$Entry))
         }
 
+        if(identical(logical(0), auxList)){auxList<-character(0)}
         genesList[[clusterName]] <- auxList
         return(genesList)
     }
@@ -73,19 +74,20 @@ getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0'){
             if(length(cluster)!=0){
                 # For every similar gene, try to translate to KEGG
                 for(i in 1:length(cluster)){
-                    translation <- .getUniProt2KEGGDT(cluster[[i]])
+                    translation <- .getUniProt2KEGGDT(cluster[i])
                     # If there is a translation, return the identity of the cluster,
                     # the similar gene selected and the translation to KEGG
-                    if(!identical(translation, list())){
-                        return(c(clusterIdentity, cluster[[i]], translation))
+                    if(!identical(translation, character(0))){
+                        return(c(clusterIdentity, cluster[i], translation))
                     }
                 }
             }
         }
     }
     # If a translation has not been found, return an empty list
-    return(list())
+    return(character(0))
 }
+
 
 # Main function --- Explanations below in order to facilitate documentation writing
 # Tries direct translation method and, if requested, by similar genes clusters
@@ -98,10 +100,9 @@ getUniProt2KEGG <- function(upId, bySimilarGenes = TRUE){
     .checkUniProtIdExists(upId)
     .checkBoolean(bySimilarGenes, 'bySimilarGenes')
 
-    translations <- list('DT'=.getUniProt2KEGGDT(upId), 'SGT'=list())
+    translations <- list('DT'=.getUniProt2KEGGDT(upId), 'SGT'=character(0))
 
     if(bySimilarGenes){
-        # translations <- append(translations, list('SGT'=.getUniProt2KEGGSGT(upId)))
         translations$SGT <- .getUniProt2KEGGSGT(upId)
     }
 

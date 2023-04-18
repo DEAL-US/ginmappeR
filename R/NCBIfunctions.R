@@ -9,93 +9,79 @@
 getNCBIGene2NCBIProtein <- function(id){
     .checkNCBIGeneIdExists(id)
     query <- .getNCBIDatabasesLinks(dbFrom='gene', id=id, dbTo='protein')
-    result <- list()
+    result <- character(0)
     # Handle multiple protein IDs case
     if(!identical(query[['links']][['gene_protein']], NULL)){
         for(queryId in query[['links']][['gene_protein']]){
             proteinXml <- entrez_fetch(db = "protein", id = queryId, rettype = "xml")
-            result <- append(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
+            result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
+
         }
     }
-    # Handle no possible translations case
-    # if(length(result)==0){
-    #     stop("The given NCBI Gene ID has no translation to NCBI Protein database")
-    # }
     return(result)
 }
 
 getNCBIProtein2NCBIGene <- function(id){
     .checkNCBIProteinIdExists(id)
     query <- .getNCBIDatabasesLinks(dbFrom='protein', id=id, dbTo='gene')
-    # Handle no possible translations case
-    # if(length(query[['links']][['protein_gene']])==0){
-    #     stop("The given NCBI Protein ID has no translation to NCBI Gene database")
-    # }
-    return(as.list(query[['links']][['protein_gene']]))
+    if(!identical(query[['links']][['protein_gene']], NULL)){
+        return(c(query[['links']][['protein_gene']]))
+    }else{
+        return(character(0))
+    }
 }
 
 getNCBIProtein2NCBINucleotide <- function(id){
     .checkNCBIProteinIdExists(id)
     query <- .getNCBIDatabasesLinks(dbFrom='protein', id=id, dbTo='nucleotide')
-    result <- list()
+    result <- character(0)
     # Handle multiple protein IDs case
     if(!identical(query[['links']][['protein_nuccore']], NULL)){
         for(queryId in query[['links']][['protein_nuccore']]){
             proteinXml <- entrez_fetch(db = "nucleotide", id = queryId, rettype = "xml")
-            result <- append(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
+            result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
         }
     }
-    # Handle no possible translations case
-    # if(length(result)==0){
-    #     stop("The given NCBI Protein ID has no translation to NCBI Nucleotide database")
-    # }
     return(result)
 }
 
 getNCBINucleotide2NCBIProtein <- function(id){
     .checkNCBINucleotideIdExists(id)
     query <- .getNCBIDatabasesLinks(dbFrom='nucleotide', id=id, dbTo='protein')
-    result <- list()
+    result <- character(0)
     # Handle multiple protein IDs case
     if(!identical(query[['links']][['nuccore_protein']], NULL)){
         for(queryId in query[['links']][['nuccore_protein']]){
             proteinXml <- entrez_fetch(db = "protein", id = queryId, rettype = "xml")
-            result <- append(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
+            result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
         }
     }
-    # Handle no possible translations case
-    # if(length(result)==0){
-    #     stop("The given NCBI Nucleotide ID has no translation to NCBI Protein database")
-    # }
     return(result)
 }
 
 getNCBIGene2NCBINucleotide <- function(id){
     .checkNCBIGeneIdExists(id)
     query <- .getNCBIDatabasesLinks(dbFrom='gene', id=id, dbTo='nucleotide')
-    result <- list()
+    result <- character(0)
     # Handle multiple protein IDs case
     if(!identical(query[['links']][['gene_nuccore']], NULL)){
         for(queryId in query[['links']][['gene_nuccore']]){
             proteinXml <- entrez_fetch(db = "nucleotide", id = queryId, rettype = "xml")
-            result <- append(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
+            result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
         }
     }
-    # Handle no possible translations case
-    # if(length(result)==0){
-    #     stop("The given NCBI Gene ID has no translation to NCBI Nucleotide database")
-    # }
     return(result)
 }
 
 getNCBINucleotide2NCBIGene <- function(id){
     .checkNCBINucleotideIdExists(id)
     query <- .getNCBIDatabasesLinks(dbFrom='nucleotide', id=id, dbTo='gene')
-    # Handle no possible translations case
-    # if(length(query[['links']][['nuccore_gene']])==0){
-    #     stop("The given NCBI Nucleotide ID has no translation to NCBI Gene database")
-    # }
-    return(as.list(query[['links']][['nuccore_gene']]))
+
+    if(!identical(query[['links']][['nuccore_gene']], NULL)){
+        return(c(query[['links']][['nuccore_gene']]))
+    }else{
+        return(character(0))
+    }
 }
 
 #############################
@@ -104,26 +90,29 @@ getNCBINucleotide2NCBIGene <- function(id){
 
 # Direct translation method
 .getNCBI2UniProtDT <- function(ncbiId){
-    query <- list()
-    query <- append(query, suppressWarnings(mapUniProt(
+    query <- character(0)
+    query <- c(query, suppressWarnings(mapUniProt(
         from='EMBL-GenBank-DDBJ_CDS',
         to='UniProtKB',
         query=c(ncbiId),
         columns=c('accession')
-    )))
-    query <- append(query, suppressWarnings(mapUniProt(
+    ))$Entry)
+    query <- c(query, suppressWarnings(mapUniProt(
         from='RefSeq_Protein',
         to='UniProtKB',
         query=c(ncbiId),
         columns=c('accession')
-    )))
-    query <- append(query, suppressWarnings(mapUniProt(
+    ))$Entry)
+    query <- c(query, suppressWarnings(mapUniProt(
         from='RefSeq_Nucleotide',
         to='UniProtKB',
         query=c(ncbiId),
         columns=c('accession')
-    )))
-    return(as.list(query$Entry))
+    ))$Entry)
+    if(identical(logical(0),query)|identical(NULL,query)){
+        return(character(0))
+    }
+    return(query)
 }
 
 # Get identical NCBI proteins
@@ -141,7 +130,7 @@ getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
     # Check if intermediate ID has been retrieved (shows us if there are or not identical proteins registered)
     if(length(auxId$ids)==0){
         switch(format,
-               'ids'= return(list()),
+               'ids'= return(character(0)),
                'dataframe' = return(data.frame()))
         # stop('The given NCBI ID has no similar proteins registered')
     }else{
@@ -153,7 +142,7 @@ getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
         identicalProteins <- read.csv(text=identicalProteins, sep = '\t')
         identicalProteins <- identicalProteins[which(identicalProteins$Source=='RefSeq' | identicalProteins$Source=='INSDC'),]
         switch(format,
-               'ids'= return(as.list(identicalProteins$Protein)),
+               'ids'= return(c(identicalProteins$Protein)),
                'dataframe' = return(identicalProteins))
     }
 }
@@ -201,12 +190,12 @@ getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
         translationsCds <- .getNCBI2UniProtBatch(identicalProteins[which(identicalProteins$Source=='INSDC'),],"EMBL-GenBank-DDBJ_CDS" )
         if(nrow(translationsRefSeq)>0 & nrow(translationsCds)>0){
             translations <- unique(rbind(translationsRefSeq, translationsCds)$Entry)
-            return(as.list(translations))
+            return(c(translations))
         }else{
-            return(list())
+            return(character(0))
         }
     }else{
-        return(list())
+        return(character(0))
     }
 }
 
@@ -220,15 +209,10 @@ getNCBIProtein2UniProt <- function(ncbiId, byIdenticalProteins = TRUE){
 
     # Second translation strategy
     if(byIdenticalProteins){
-        translatedIDs <- append(translatedIDs, .getNCBI2UniProtIP(ncbiId))
+        translatedIDs <- c(translatedIDs, .getNCBI2UniProtIP(ncbiId))
     }
 
-    # Handle no possible translations case
-    # if(length(translatedIDs)==0){
-    #     stop("The given NCBI Protein ID has no translation to UniProt database")
-    # }else{
-        return(unique(translatedIDs))
-    # }
+    return(unique(translatedIDs))
 }
 
 # NCBI Nucleotide to UniProt translation
@@ -241,15 +225,10 @@ getNCBINucleotide2UniProt <- function(ncbiId, byIdenticalProteins = TRUE){
 
     # Second translation strategy
     if(byIdenticalProteins){
-        translatedIDs <- append(translatedIDs, .getNCBI2UniProtIP(ncbiId))
+        translatedIDs <- c(translatedIDs, .getNCBI2UniProtIP(ncbiId))
     }
 
-    # Handle no possible translations case
-    # if(length(translatedIDs)==0){
-        # stop("The given NCBI Nucleotide ID has no translation to UniProt database")
-    # }else{
-        return(unique(translatedIDs))
-    # }
+    return(unique(translatedIDs))
 }
 
 # NCBI Gene to UniProt translation
@@ -262,15 +241,10 @@ getNCBIGene2UniProt <- function(ncbiId, byIdenticalProteins = TRUE){
 
     # Second translation strategy
     if(byIdenticalProteins){
-        translatedIDs <- append(translatedIDs, .getNCBI2UniProtIP(ncbiId))
+        translatedIDs <- c(translatedIDs, .getNCBI2UniProtIP(ncbiId))
     }
 
-    # Handle no possible translations case
-    # if(length(translatedIDs)==0){
-    #     # stop("The given NCBI Gene ID has no translation to UniProt database")
-    # }else{
     return(unique(translatedIDs))
-    # }
 }
 
 ##########################
@@ -282,9 +256,9 @@ getNCBIGene2UniProt <- function(ncbiId, byIdenticalProteins = TRUE){
     query <- keggConv("genes", paste('ncbi-proteinid:', strsplit(ncbiId,'.', fixed = T)[[1]], sep=''))
 
     if(!identical(query, character(0))&!identical(query, NULL)&!identical(query, NA)){
-        return(as.list(query[[1]]))
+        return(c(query[[1]]))
     }else{
-        return(list())
+        return(character(0))
     }
 }
 
