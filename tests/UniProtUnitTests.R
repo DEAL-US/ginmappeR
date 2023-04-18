@@ -43,22 +43,27 @@ checkException(getUniProtSimilarGenes('G9JVE6','test'))
 
 ### Test .getUniProt2KEGGSGT
 # Positive cases
-checkEquals(.getUniProt2KEGGSGT('B2ZPD3'), c('1.0','B9V4W1','kpb:FH42_26825'))
-checkEquals(.getUniProt2KEGGSGT('A0A0B5ECY2'), c('0.9','C7C422','ag:CAZ39946'))
-checkEquals(.getUniProt2KEGGSGT('A0A2R4PHC7'), c('0.5','A0A344LTZ2','ffl:HYN86_12595'))
+checkEquals(.getUniProt2KEGGSGT('B2ZPD3'), list('1.0' = c('kpb:FH42_26825')))
+checkEquals(.getUniProt2KEGGSGT('A0A0B5ECY2'), list('0.9' = c('ag:CAZ39946')))
+checkEquals(.getUniProt2KEGGSGT('A0A2R4PHC7'), list('0.5' = c('ffl:HYN86_12595')))
+checkEquals(.getUniProt2KEGGSGT('A0A2R4PHC7', TRUE), list('0.5' = c('ffl:HYN86_12595', 'fcr:HYN56_14615', 'fls:GLV81_10715')))
 # No translation case
-checkEquals(.getUniProt2KEGGSGT('A0A1S7BGS4'), character(0))
+checkEquals(.getUniProt2KEGGSGT('A0A1S7BGS4'), list())
 
 ### Test getUniProt2KEGG
 
-# Positive cases
-checkEquals(getUniProt2KEGG('G9JVE6'), list( 'DT' = c('ag:AEX08599'), 'SGT' = c('0.9', 'C7C422', 'ag:CAZ39946')))
-checkEquals(getUniProt2KEGG('G9JVE6', FALSE), list('DT'=c('ag:AEX08599'),'SGT'=character(0)))
+checkEquals(getUniProt2KEGG('G9JVE6'), list('DT'=c('ag:AEX08599'))) # Sí DT
+checkEquals(getUniProt2KEGG('A0A2R4PHC7'), list('0.5'=c('ffl:HYN86_12595'))) # No DT, sí por similar genes
+checkEquals(getUniProt2KEGG('A0A2R4PHC7', exhaustiveMapping = TRUE), list('0.5'=c('ffl:HYN86_12595', 'fcr:HYN56_14615', 'fls:GLV81_10715'))) # exhaustive mapping case without DT
+checkTrue(length(getUniProt2KEGG('Q6XL56', exhaustiveMapping = TRUE)[['0.5']])==20) # exhaustive mapping case with DT
+checkEquals(getUniProt2KEGG('G9JVE6', exhaustiveMapping = TRUE, bySimilarGenes = FALSE), list('DT'=c('ag:AEX08599'))) # With exhaustive mapping, but without similar genes
+checkEquals(getUniProt2KEGG('Q6XL56', exhaustiveMapping = TRUE, bySimilarGenes = FALSE), list('DT'=c('ag:AAP69916'))) # With exhaustive mapping, but without similar genes
 # No translation cases
-checkEquals(getUniProt2KEGG('A0A1S7BGS4'), list('DT'=character(0), 'SGT'=character(0)))
-checkEquals(getUniProt2KEGG('A0A1S7BGS4', FALSE), list('DT'=character(0), 'SGT'=character(0)))
+checkEquals(getUniProt2KEGG('A0A1S7BGS4'), list())
+checkEquals(getUniProt2KEGG('A0A1S7BGS4', FALSE, FALSE), list())
 # ID not valid case
 checkException(getUniProt2KEGG('P0ZTUH2'))
+
 
 
 

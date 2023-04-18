@@ -6,8 +6,10 @@
     return(entrez_link(dbfrom=dbFrom, id=id, db=dbTo))
 }
 
-getNCBIGene2NCBIProtein <- function(id){
+getNCBIGene2NCBIProtein <- function(id, exhaustiveMapping = FALSE){
     .checkNCBIGeneIdExists(id)
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+
     query <- .getNCBIDatabasesLinks(dbFrom='gene', id=id, dbTo='protein')
     result <- character(0)
     # Handle multiple protein IDs case
@@ -15,24 +17,33 @@ getNCBIGene2NCBIProtein <- function(id){
         for(queryId in query[['links']][['gene_protein']]){
             proteinXml <- entrez_fetch(db = "protein", id = queryId, rettype = "xml")
             result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
-
+            if(!exhaustiveMapping){
+                return(result)
+            }
         }
     }
     return(result)
 }
 
-getNCBIProtein2NCBIGene <- function(id){
+getNCBIProtein2NCBIGene <- function(id, exhaustiveMapping = FALSE){
     .checkNCBIProteinIdExists(id)
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+
     query <- .getNCBIDatabasesLinks(dbFrom='protein', id=id, dbTo='gene')
     if(!identical(query[['links']][['protein_gene']], NULL)){
+        if(!exhaustiveMapping){
+            return(c(query[['links']][['protein_gene']])[1])
+        }
         return(c(query[['links']][['protein_gene']]))
     }else{
         return(character(0))
     }
 }
 
-getNCBIProtein2NCBINucleotide <- function(id){
+getNCBIProtein2NCBINucleotide <- function(id, exhaustiveMapping = FALSE){
     .checkNCBIProteinIdExists(id)
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+
     query <- .getNCBIDatabasesLinks(dbFrom='protein', id=id, dbTo='nucleotide')
     result <- character(0)
     # Handle multiple protein IDs case
@@ -40,13 +51,18 @@ getNCBIProtein2NCBINucleotide <- function(id){
         for(queryId in query[['links']][['protein_nuccore']]){
             proteinXml <- entrez_fetch(db = "nucleotide", id = queryId, rettype = "xml")
             result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
+            if(!exhaustiveMapping){
+                return(result)
+            }
         }
     }
     return(result)
 }
 
-getNCBINucleotide2NCBIProtein <- function(id){
+getNCBINucleotide2NCBIProtein <- function(id, exhaustiveMapping = FALSE){
     .checkNCBINucleotideIdExists(id)
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+
     query <- .getNCBIDatabasesLinks(dbFrom='nucleotide', id=id, dbTo='protein')
     result <- character(0)
     # Handle multiple protein IDs case
@@ -54,13 +70,18 @@ getNCBINucleotide2NCBIProtein <- function(id){
         for(queryId in query[['links']][['nuccore_protein']]){
             proteinXml <- entrez_fetch(db = "protein", id = queryId, rettype = "xml")
             result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
+            if(!exhaustiveMapping){
+                return(result)
+            }
         }
     }
     return(result)
 }
 
-getNCBIGene2NCBINucleotide <- function(id){
+getNCBIGene2NCBINucleotide <- function(id, exhaustiveMapping = FALSE){
     .checkNCBIGeneIdExists(id)
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+
     query <- .getNCBIDatabasesLinks(dbFrom='gene', id=id, dbTo='nucleotide')
     result <- character(0)
     # Handle multiple protein IDs case
@@ -68,16 +89,24 @@ getNCBIGene2NCBINucleotide <- function(id){
         for(queryId in query[['links']][['gene_nuccore']]){
             proteinXml <- entrez_fetch(db = "nucleotide", id = queryId, rettype = "xml")
             result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
+            if(!exhaustiveMapping){
+                return(result)
+            }
         }
     }
     return(result)
 }
 
-getNCBINucleotide2NCBIGene <- function(id){
+getNCBINucleotide2NCBIGene <- function(id, exhaustiveMapping = FALSE){
     .checkNCBINucleotideIdExists(id)
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+
     query <- .getNCBIDatabasesLinks(dbFrom='nucleotide', id=id, dbTo='gene')
 
     if(!identical(query[['links']][['nuccore_gene']], NULL)){
+        if(!exhaustiveMapping){
+            return(c(query[['links']][['nuccore_gene']])[1])
+        }
         return(c(query[['links']][['nuccore_gene']]))
     }else{
         return(character(0))
@@ -200,9 +229,10 @@ getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
 }
 
 # NCBI Protein to UniProt translation
-getNCBIProtein2UniProt <- function(ncbiId, byIdenticalProteins = TRUE){
+getNCBIProtein2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, byIdenticalProteins = TRUE){
     .checkNCBIProteinIdExists(ncbiId)
     .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
 
     # First translation strategy
     translatedIDs <- .getNCBI2UniProtDT(ncbiId)
@@ -212,13 +242,15 @@ getNCBIProtein2UniProt <- function(ncbiId, byIdenticalProteins = TRUE){
         translatedIDs <- c(translatedIDs, .getNCBI2UniProtIP(ncbiId))
     }
 
-    return(unique(translatedIDs))
+    if(!exhaustiveMapping&!is.na(unique(translatedIDs)[1])){return(unique(translatedIDs)[1])}
+    else{return(unique(translatedIDs))}
 }
 
 # NCBI Nucleotide to UniProt translation
-getNCBINucleotide2UniProt <- function(ncbiId, byIdenticalProteins = TRUE){
+getNCBINucleotide2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, byIdenticalProteins = TRUE){
     .checkNCBINucleotideIdExists(ncbiId)
     .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
 
     # First translation strategy
     translatedIDs <- .getNCBI2UniProtDT(ncbiId)
@@ -228,13 +260,15 @@ getNCBINucleotide2UniProt <- function(ncbiId, byIdenticalProteins = TRUE){
         translatedIDs <- c(translatedIDs, .getNCBI2UniProtIP(ncbiId))
     }
 
-    return(unique(translatedIDs))
+    if(!exhaustiveMapping&!is.na(unique(translatedIDs)[1])){return(unique(translatedIDs)[1])}
+    else{return(unique(translatedIDs))}
 }
 
 # NCBI Gene to UniProt translation
-getNCBIGene2UniProt <- function(ncbiId, byIdenticalProteins = TRUE){
+getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, byIdenticalProteins = TRUE){
     .checkNCBIGeneIdExists(ncbiId)
     .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
 
     # First translation strategy
     translatedIDs <- .getNCBI2UniProtDT(ncbiId)
@@ -244,7 +278,8 @@ getNCBIGene2UniProt <- function(ncbiId, byIdenticalProteins = TRUE){
         translatedIDs <- c(translatedIDs, .getNCBI2UniProtIP(ncbiId))
     }
 
-    return(unique(translatedIDs))
+    if(!exhaustiveMapping&!is.na(unique(translatedIDs)[1])){return(unique(translatedIDs)[1])}
+    else{return(unique(translatedIDs))}
 }
 
 ##########################

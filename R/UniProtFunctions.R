@@ -62,7 +62,8 @@ getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0'){
 
 # Method to translate UniProt to KEGG through Similar Genes Translation method, that is,
 # translating genes from UniProt clusters of similar genes
-.getUniProt2KEGGSGT <- function(upId){
+.getUniProt2KEGGSGT <- function(upId, exhaustiveMapping = FALSE){
+    result <- list()
 
     # Iterate over clusters identities
     for(clusterIdentity in c('1.0','0.9','0.5')){
@@ -78,34 +79,58 @@ getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0'){
                     # If there is a translation, return the identity of the cluster,
                     # the similar gene selected and the translation to KEGG
                     if(!identical(translation, character(0))){
-                        return(c(clusterIdentity, cluster[i], translation))
+                        if(!exhaustiveMapping){
+                            result[[clusterIdentity]] <- c(translation)
+                            return(result)
+                        }else{
+                            result[[clusterIdentity]] <- append(result[[clusterIdentity]], translation)
+                        }
                     }
                 }
             }
         }
     }
-    # If a translation has not been found, return an empty list
-    return(character(0))
+    # Return result list, if none found, would be empty
+    return(lapply(result, unique))
 }
 
 
 # Main function --- Explanations below in order to facilitate documentation writing
 # Tries direct translation method and, if requested, by similar genes clusters
 # method too
-# If SGT method is selected, returns a list with two lists, one with de DT method
-# result and another one with the SGT method result. For example:
-# list( 'DT' = list(translation), 'SGT' = list(clusterIdentity, intermediateUPID, translation))
-# list( 'DT' = list(ag:AEX08599), 'SGT' = list(0.9, C7C422, ag:CAZ39946))
-getUniProt2KEGG <- function(upId, bySimilarGenes = TRUE){
+getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TRUE){
     .checkUniProtIdExists(upId)
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkBoolean(bySimilarGenes, 'bySimilarGenes')
 
-    translations <- list('DT'=.getUniProt2KEGGDT(upId), 'SGT'=character(0))
+    result <- list()
+    translationsDT <- .getUniProt2KEGGDT(upId)
 
-    if(bySimilarGenes){
-        translations$SGT <- .getUniProt2KEGGSGT(upId)
+    if(!identical(translationsDT, character(0))){
+        if(!exhaustiveMapping){
+            result[['DT']] <- translationsDT[1]
+            return(result)
+        }else{
+            result[['DT']] <- translationsDT
+        }
     }
 
-    return(translations)
+    if(bySimilarGenes){
+        if(!exhaustiveMapping){
+            translationsSGT <- .getUniProt2KEGGSGT(upId, FALSE)
+            if(length(translationsSGT)>0){
+                result[[names(translationsSGT[1])]] <- translationsSGT[[names(translationsSGT[1])]]
+            }
+        }else{
+            result <- append(result, .getUniProt2KEGGSGT(upId, TRUE))
+        }
+    }
+    # To return a char vector of IDs if detailedMapping is active, simply try to extract
+    # all IDs from result in a char vector and return it
+    return(result)
 }
+
+
+
+
 

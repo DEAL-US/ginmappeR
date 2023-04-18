@@ -5,11 +5,7 @@
     - getUniProtSimilarGenes
     - getUniProt2KEGG
 
-# UniProt gene cluster retrieval method: group genes by cluster name? or just return a list of genes?
-
-# Introduce a boolean param in all functions, like exhaustiveMapping, to return just
-# the first possible and best translation, or all possible ones.
 
 # For complex mappings like UniProt identical genes clusters, introduce a param like
 # detailedMapping, default FALSE, that if TRUE, returns a named list with direct
-# translation IDs and 100%, 90% and 50% identical genes.
+# translation IDs and 100%, 90% and 50% identical genes. Not the intermediate ID
