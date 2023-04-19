@@ -111,6 +111,7 @@ getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TR
     result <- list()
     translationsDT <- .getUniProt2KEGGDT(upId)
 
+    # First, try to retrieve a direct translation
     if(!identical(translationsDT, character(0))){
         if(!exhaustiveMapping){
             if(!detailedMapping){
@@ -124,6 +125,7 @@ getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TR
         }
     }
 
+    # If required, try to translate using similar genes method
     if(bySimilarGenes){
         if(!exhaustiveMapping){
             translationsSGT <- .getUniProt2KEGGSGT(upId, FALSE)
@@ -137,10 +139,13 @@ getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TR
     # To return a char vector of IDs if detailedMapping is false, simply extract
     # all IDs from result in a char vector and return it
     if(!detailedMapping){
-        result <- unlist(result, recursive = FALSE, use.names = FALSE)
+        result <- unique(unlist(result, recursive = FALSE, use.names = FALSE))
         if(is.null(result)){result <- character(0)}
     }
     return(result)
 }
+
+
+
 
 

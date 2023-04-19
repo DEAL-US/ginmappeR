@@ -66,3 +66,14 @@
         stop(paste(name, ' variable value must be TRUE or FALSE, value given: ', value, sep = ''))
     }
 }
+
+.mergeNamedLists <- function(list1,list2){
+    for (key in names(list2)) {
+        if (key %in% names(list1)) {
+            list1[[key]] <- c(list1[[key]], list2[[key]])
+        } else {
+            list1[[key]] <- list2[[key]]
+        }
+    }
+    return(list1)
+}

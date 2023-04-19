@@ -301,64 +301,101 @@ getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, byIdenticalPr
 # -- Se ha puesto desactivable lo de byIdenticalProteins y bySimilarGenes,
 # Al desactivarlos, reducimos las probabilidades de traducir el gen, pero también tendrá un coste computacional menor (necesario en algunos
 # casos donde por ejemplo, el método de proteínas similares tarde muchísimo)
-# -- Se ha añadido un allTranslations booleano que activo, devuelve todas las posibles traducciones tanto directas como por clusters de similitud de UniProt;
+# -- Se ha añadido un exhaustiveMapping booleano que activo, devuelve todas las posibles traducciones tanto directas como por clusters de similitud de UniProt;
 # desactivada, devuelve la primera traducción directa que encuentre o, en caso contrario, la de mayor % de identidad.
 # Through UniProt database method
-.getNCBI2KEGGTUP <- function(ncbiId, ncbiDatabase, allTranslations = TRUE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
-    .getSGTFirstElement <- function(x) {
-        as.numeric(x$SGT[[1]])
-    }
+.getNCBI2KEGGTUP <- function(ncbiId, ncbiDatabase, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
 
     upIDs <- switch (ncbiDatabase,
-        'protein' = getNCBIProtein2UniProt(ncbiId, byIdenticalProteins = byIdenticalProteins),
-        'nucleotide' = getNCBINucleotide2UniProt(ncbiId, byIdenticalProteins = byIdenticalProteins),
-        'gene' = getNCBIGene2UniProt(ncbiId, byIdenticalProteins = byIdenticalProteins),
+                     'protein' = getNCBIProtein2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, byIdenticalProteins = byIdenticalProteins),
+                     'nucleotide' = getNCBINucleotide2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, byIdenticalProteins = byIdenticalProteins),
+                     'gene' = getNCBIGene2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, byIdenticalProteins = byIdenticalProteins),
     )
 
     translations <- list()
     if(length(upIDs)>0){
 
-        # If user wants all possible translations
-        if(allTranslations){
-            for(upId in upIDs){
-                keggId <- getUniProt2KEGG(upId, bySimilarGenes = bySimilarGenes)
-                if(!identical(keggId, list('DT'=list(), 'SGT'=list()))){
-                    translations[upId] <- list(keggId)
-                }
-            }
-            if(!identical(translations, list())){
-                return(translations[order(sapply(translations, .getSGTFirstElement), decreasing = TRUE)])
-            }
-        }else{
-            # If user wants the best/faster translation
-            for(upId in upIDs){
-                keggId <- getUniProt2KEGG(upId, bySimilarGenes = bySimilarGenes)
-                if(!identical(keggId, list('DT'=list(), 'SGT'=list()))){
-                    if(length(keggId$DT)>0){
-                        return(setNames(list(keggId), `upId`))
-                    }
-                    translations[upId] <- list(keggId)
-                }
-            }
-            if(!identical(translations, list())){
-                return(translations[order(sapply(translations, .getSGTFirstElement), decreasing = TRUE)][[1]])
+        for(upId in upIDs){
+            keggId <- getUniProt2KEGG(upId, exhaustiveMapping = exhaustiveMapping, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
+            if(length(keggId)>0){
+                translations <- .mergeNamedLists(translations, keggId)
             }
         }
+
+    }
+
+    if(!detailedMapping){
+        translations <- unique(unlist(translations, recursive = FALSE, use.names = FALSE))
+        if(is.null(translations)){translations <- character(0)}
+    }else{
+        translations <- lapply(translations, unique)
     }
     return(translations)
+}
 
-    #
-    # TODO: incluir últimas modificaciones respecto a detailedMapping y exhaustiveMapping
-    #
+.getNCBI2KEGG <- function(ncbiId, ncbiDB, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
+    upIDs <- switch (ncbiDB,
+                     'protein' = .checkNCBIProteinIdExists(ncbiId),
+                     'nucleotide' = .checkNCBINucleotideIdExists(ncbiId),
+                     'gene' = .checkNCBIGeneIdExists(ncbiId),
+    )
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkBoolean(detailedMapping, 'detailedMapping')
+    .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
+    .checkBoolean(bySimilarGenes, 'bySimilarGenes')
+
+    result <- list()
+    translationsDT <- .getNCBI2KEGGDT(ncbiId)
+
+    # First, try to retrieve a direct translation
+    if(!identical(translationsDT, character(0))){
+        if(!exhaustiveMapping){
+            if(!detailedMapping){
+                return(translationsDT[1])
+            }else{
+                result[['DT']] <- translationsDT[1]
+            }
+            return(result)
+        }else{
+            result[['DT']] <- translationsDT
+        }
+    }
+
+    # Then, try to translate through UniProt database
+    result <- .mergeNamedLists(result, .getNCBI2KEGGTUP(ncbiId, ncbiDB, exhaustiveMapping = exhaustiveMapping, detailedMapping = TRUE,
+                                                        byIdenticalProteins = byIdenticalProteins, bySimilarGenes = bySimilarGenes))
+
+    # To return a char vector of IDs if detailedMapping is false, simply extract
+    # all IDs from result in a char vector and return it. Also, perform a 'unique' operation
+    if(!detailedMapping){
+        result <- unique(unlist(result, recursive = FALSE, use.names = FALSE))
+        if(is.null(result)){result <- character(0)}
+    }else{
+        result <- lapply(result, unique)
+    }
+    return(result)
+}
+
+getNCBIProtein2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
+    return(.getNCBI2KEGG(ncbiId, 'protein', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                         byIdenticalProteins = byIdenticalProteins, bySimilarGenes = bySimilarGenes))
+}
+
+getNCBINucleotide2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
+    return(.getNCBI2KEGG(ncbiId, 'nucleotide', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                         byIdenticalProteins = byIdenticalProteins, bySimilarGenes = bySimilarGenes))
+}
+
+getNCBIGene2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
+    return(.getNCBI2KEGG(ncbiId, 'gene', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                         byIdenticalProteins = byIdenticalProteins, bySimilarGenes = bySimilarGenes))
 }
 
 
 
 
-# TODO: del método .getNCBI2KEGGTUP, en el método superior, quedarte con la DT si hay y si no, ya coger la
-# de Similar Genes y devolver la explicación de 0.9, blablabla. Poner un allCoincidences o algo así, que sea
-# True o False y de esta forma devolver la primera traducción o todas las posibles, según la prisa que tenga
-# el usuario. Poner tmb el byIdenticalProteins y bySimilarGenes con sus correspondientes validaciones
+
+
 
 
 

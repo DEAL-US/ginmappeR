@@ -173,17 +173,57 @@ checkEquals(.getNCBI2KEGGDT('CAD69003.1'), character(0))
 ### Test .getNCBI2KEGGTUP
 
 # Positive cases
-checkTrue(length(.getNCBI2KEGGTUP('WP_039189232.1', 'protein'))== 3)
-checkEquals(.getNCBI2KEGGTUP('WP_039189232.1', 'protein', allTranslations = FALSE) ,list('A0A2A2MC99'=
-         list('DT'=list('hpar:AL518_05720'), 'SGT'=list('1.0','Q9K351','ag:AAF86692'))))
-checkTrue(length(.getNCBI2KEGGTUP('WP_010896559.1', 'protein'))== 2)
-checkEquals(.getNCBI2KEGGTUP('WP_010896559.1', 'protein', allTranslations = FALSE) ,list('Q7AJZ0'=
-         list('DT'=list('bha:BH0380'), 'SGT'=list('0.5','Q03986','ag:AAA22599'))))
-checkEquals(.getNCBI2KEGGTUP('AY536519', 'nucleotide', allTranslations = FALSE) ,list('Q6QJ79'=
-         list('DT'=list('ag:AAS48620'), 'SGT'=list('0.9','A0A0R4J8B5','aby:ABAYE3623'))))
-checkEquals(.getNCBI2KEGGTUP('76524190', 'gene', allTranslations = FALSE) ,list('A0A1W6DPG3'=
-         list('DT'=list('cet:B8281_09025'), 'SGT'=list('0.9','A0A6M5UD64','cprt:FIC82_007935'))))
+checkEquals(.getNCBI2KEGGTUP('WP_010896559.1', 'protein', exhaustiveMapping = TRUE, detailedMapping = TRUE, byIdenticalProteins = FALSE),
+            list('DT'=c('bha:BH0380'), '0.5'=c("ag:AAA22599","vpn:A21D_00889","ag:AAP74657","ddh:Desde_1644","bcl:ABC3508","scib:HUG20_05815","bha:BH0380"),
+                 '1.0'=c('bha:BH0380'), '0.9'=c('bha:BH0380')))
+checkEquals(.getNCBI2KEGGTUP('WP_010896559.1', 'protein', exhaustiveMapping = TRUE, detailedMapping = FALSE, byIdenticalProteins = FALSE),
+            c("bha:BH0380","ag:AAA22599","vpn:A21D_00889","ag:AAP74657","ddh:Desde_1644","bcl:ABC3508","scib:HUG20_05815"))
+checkEquals(.getNCBI2KEGGTUP('WP_010896559.1', 'protein', exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = FALSE),
+            c("bha:BH0380"))
+checkEquals(.getNCBI2KEGGTUP('WP_010896559.1', 'protein', exhaustiveMapping = FALSE, detailedMapping = TRUE, byIdenticalProteins = FALSE),
+            list('DT'=c("bha:BH0380")))
 # No translation case
-checkEquals(.getNCBI2KEGGTUP('WP_188331862.1', 'protein'), list())
+checkEquals(.getNCBI2KEGGTUP('WP_188331862.1', 'protein'), character(0))
+checkEquals(.getNCBI2KEGGTUP('WP_188331862.1', 'protein', detailedMapping = TRUE), list())
+
+
+### Test getNCBIProtein2KEGG
+
+# Positive cases
+checkEquals(getNCBIProtein2KEGG('WP_010896559.1', exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = FALSE),
+            c("bha:BH0380"))
+checkEquals(getNCBIProtein2KEGG('WP_010896559.1', exhaustiveMapping = FALSE, detailedMapping = TRUE, byIdenticalProteins = FALSE),
+            list('DT'=c("bha:BH0380")))
+checkEquals(getNCBIProtein2KEGG('WP_010896559.1',exhaustiveMapping = TRUE, detailedMapping = TRUE, byIdenticalProteins = FALSE),
+            list('DT'=c('bha:BH0380'), '0.5'=c("ag:AAA22599","vpn:A21D_00889","ag:AAP74657","ddh:Desde_1644","bcl:ABC3508","scib:HUG20_05815","bha:BH0380"),
+                 '1.0'=c('bha:BH0380'), '0.9'=c('bha:BH0380')))
+checkEquals(getNCBIProtein2KEGG('WP_010896559.1',exhaustiveMapping = TRUE, detailedMapping = FALSE, byIdenticalProteins = FALSE),
+            c("bha:BH0380","ag:AAA22599","vpn:A21D_00889","ag:AAP74657","ddh:Desde_1644","bcl:ABC3508","scib:HUG20_05815"))
+# No translation case
+checkEquals(getNCBIProtein2KEGG('WP_188331862.1'), character(0))
+checkEquals(getNCBIProtein2KEGG('WP_188331862.1', detailedMapping = TRUE), list())
+
+### Test getNCBINucleotide2KEGG
+
+# Positive cases
+
+checkEquals(getNCBINucleotide2KEGG('AY536519', exhaustiveMapping = FALSE, detailedMapping = FALSE),
+            c("ag:AAS48620"))
+checkEquals(getNCBINucleotide2KEGG('NZ_CP059690', exhaustiveMapping = FALSE, detailedMapping = TRUE, byIdenticalProteins = FALSE),
+            list('1.0'=c("apa:APP7_0365","apa:APP7_1820")))
+# No translation case
+checkEquals(getNCBINucleotide2KEGG('AY536519', byIdenticalProteins = FALSE), character(0))
+checkEquals(getNCBINucleotide2KEGG('AY536519', detailedMapping = TRUE, byIdenticalProteins = FALSE), list())
+
+### Test getNCBIGene2KEGG
+
+# Positive cases
+checkEquals(getNCBIGene2KEGG('76524190', exhaustiveMapping = FALSE, detailedMapping = FALSE),
+            c("cet:B8281_09025"))
+checkEquals(getNCBIGene2KEGG('76524190', exhaustiveMapping = FALSE, detailedMapping = TRUE),
+            list('DT'=c("cet:B8281_09025")))
+# No translation case
+checkEquals(getNCBIGene2KEGG('76524190', byIdenticalProteins = FALSE, bySimilarGenes = FALSE), character(0))
+checkEquals(getNCBIGene2KEGG('76524190', detailedMapping = TRUE, byIdenticalProteins = FALSE, bySimilarGenes = FALSE), list())
 
 
