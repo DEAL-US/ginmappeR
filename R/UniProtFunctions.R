@@ -71,7 +71,7 @@ getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0', clusterNames =
 
     # Iterate over clusters identities
     for(clusterIdentity in c('1.0','0.9','0.5')){
-        similarGenes <- getUniProtSimilarGenes(upId, clusterIdentity)
+        similarGenes <- getUniProtSimilarGenes(upId, clusterIdentity, TRUE)
         # Iterate over clusters of the same identity if there were
         for(cluster in names(similarGenes)){
             cluster <- similarGenes[[cluster]]
@@ -145,7 +145,77 @@ getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TR
     return(result)
 }
 
+############################
+# UniProt database to NCBI #
+############################
 
+# Direct translation through UniProt.ws mapper
+.getUniProt2NCBIDT <- function(upId){
+    query <- character(0)
+    query <- c(query, suppressWarnings(mapUniProt(
+        from='UniProtKB_AC-ID',
+        to='EMBL-GenBank-DDBJ_CDS',
+        query=c(upId),
+        columns=c('accession')
+    ))$To)
+    query <- c(query, suppressWarnings(mapUniProt(
+        from='UniProtKB_AC-ID',
+        to='RefSeq_Protein',
+        query=c(upId),
+        columns=c('accession')
+    ))$To)
+    query <- c(query, suppressWarnings(mapUniProt(
+        from='UniProtKB_AC-ID',
+        to='RefSeq_Nucleotide',
+        query=c(upId),
+        columns=c('accession')
+    ))$To)
+    if(identical(logical(0),query)|identical(NULL,query)){
+        return(character(0))
+    }
+    return(query)
+}
+
+# 2nd: using UP mapper, look in UP clusters of identity and try to convert to NCBI.
+.getUniProt2NCBISGT <- function(upId, exhaustiveMapping = FALSE){
+    result <- list()
+
+    # Iterate over clusters identities
+    for(clusterIdentity in c('1.0','0.9','0.5')){
+        similarGenes <- getUniProtSimilarGenes(upId, clusterIdentity)
+        # Check whether there are similar genes
+        if(length(similarGenes)!=0){
+            # For every similar gene, try to translate to NCBI
+            for(i in 1:length(similarGenes)){
+                translation <- .getUniProt2NCBIDT(similarGenes[i])
+                # If there is a translation, return the identity of the cluster,
+                # the similar gene selected and the translation to NCBI
+                if(!identical(translation, character(0))){
+                    if(!exhaustiveMapping){
+                        result[[clusterIdentity]] <- c(translation)
+                        return(result)
+                    }else{
+                        result[[clusterIdentity]] <- append(result[[clusterIdentity]], translation)
+                    }
+                }
+            }
+        }
+    }
+    # Return result list, if none found, would be empty
+    return(lapply(result, unique))
+}
+
+# For main function:
+# TODO: when retrieved all IDs, must check if its NCBIProteins/Gene/Nucleotide
+# TODO: When retrieving IDs in exhaustive mode must be checking too if its from the
+# NCBI DB required before returning it (may change .getUniProt2NCBISGT to pass
+# the ncbiDB to it)
+
+# Warning: the combination of exhaustiveMapping=TRUE and bySimilarGenes=TRUE here takes a really
+# long time to finish because of lots of translations through UniProt API that is slower than NCBI's
+.getUniProt2NCBI <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TRUE, detailedMapping = FALSE){
+
+}
 
 
 

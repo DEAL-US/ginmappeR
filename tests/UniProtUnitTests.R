@@ -70,5 +70,25 @@ checkEquals(getUniProt2KEGG('A0A1S7BGS4', FALSE, FALSE), character(0))
 # ID not valid case
 checkException(getUniProt2KEGG('P0ZTUH2'))
 
+############################
+# UniProt database to NCBI #
+############################
+
+### Test .getNCBI2UniProtDT
+
+# Positive cases
+checkEquals(.getUniProt2NCBIDT('A0SNL9'), c("ABH10964.1","WP_002449123.1","NZ_VDQI01000026.1"))
+checkEquals(.getUniProt2NCBIDT('A0SNL9 B0BKZ8'), c("ABH10964.1","CAP69659.1","WP_002449123.1","NZ_VDQI01000026.1"))
+# ID not registered case
+checkEquals(.getUniProt2NCBIDT('test'), character(0))
+
+### Test .getUniProt2NCBISGT
+
+# Positive cases
+checkEquals(.getUniProt2NCBISGT('A0SNL9'), list('1.0' = c('MBF2710085.1')))
+checkEquals(.getUniProt2NCBISGT('B0BKZ8'), list('1.0' = c("ACC77494.1","WP_004187529.1","NZ_UWXB01000002.1")))
+checkTrue(length(.getUniProt2NCBISGT('A0A6H2TXZ6', exhaustiveMapping = TRUE)$`0.5`)==19)
+# # No translation case
+checkEquals(.getUniProt2NCBISGT('Q6R7P5'), list())
 
 

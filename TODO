@@ -4,3 +4,9 @@
     - getNCBINucleotide2UniProt
     - getUniProtSimilarGenes
     - getUniProt2KEGG
+    - getNCBIProtein2KEGG
+    - getNCBINucleotide2KEGG
+    - getNCBIGene2KEGG
+
+# TODO: suppress UniProt.ws '(\) waiting for query completion.......... 00:00:02' messages
+
