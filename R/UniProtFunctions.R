@@ -130,7 +130,7 @@ getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TR
         if(!exhaustiveMapping){
             translationsSGT <- .getUniProt2KEGGSGT(upId, FALSE)
             if(length(translationsSGT)>0){
-                result[[names(translationsSGT[1])]] <- translationsSGT[[names(translationsSGT[1])]]
+                result[[names(translationsSGT[1])]] <- translationsSGT[[names(translationsSGT[1])]][[1]]
             }
         }else{
             result <- append(result, .getUniProt2KEGGSGT(upId, TRUE))
@@ -177,7 +177,7 @@ getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TR
 }
 
 # 2nd: using UP mapper, look in UP clusters of identity and try to convert to NCBI.
-.getUniProt2NCBISGT <- function(upId, exhaustiveMapping = FALSE){
+.getUniProt2NCBISGT <- function(upId, exhaustiveMapping = FALSE, ncbiDB){
     result <- list()
 
     # Iterate over clusters identities
@@ -188,6 +188,8 @@ getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TR
             # For every similar gene, try to translate to NCBI
             for(i in 1:length(similarGenes)){
                 translation <- .getUniProt2NCBIDT(similarGenes[i])
+                # Filter translations to get only those of the desired ncbiDB
+                translation <- translation[which(sapply(translation, .checkIdInNCBIDataBase, ncbiDB=ncbiDB))]
                 # If there is a translation, return the identity of the cluster,
                 # the similar gene selected and the translation to NCBI
                 if(!identical(translation, character(0))){
@@ -205,17 +207,66 @@ getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TR
     return(lapply(result, unique))
 }
 
-# For main function:
-# TODO: when retrieved all IDs, must check if its NCBIProteins/Gene/Nucleotide
-# TODO: When retrieving IDs in exhaustive mode must be checking too if its from the
-# NCBI DB required before returning it (may change .getUniProt2NCBISGT to pass
-# the ncbiDB to it)
-
 # Warning: the combination of exhaustiveMapping=TRUE and bySimilarGenes=TRUE here takes a really
 # long time to finish because of lots of translations through UniProt API that is slower than NCBI's
-.getUniProt2NCBI <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TRUE, detailedMapping = FALSE){
+### Main function
+.getUniProt2NCBI <- function(upId, ncbiDB = 'protein', exhaustiveMapping = FALSE, bySimilarGenes = TRUE, detailedMapping = FALSE){
+    .checkUniProtIdExists(upId)
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkBoolean(bySimilarGenes, 'bySimilarGenes')
+    .checkBoolean(detailedMapping, 'detailedMapping')
 
+    result <- list()
+    translationsDT <- .getUniProt2NCBIDT(upId)
+    translationsDT <- translationsDT[which(sapply(translationsDT, .checkIdInNCBIDataBase, ncbiDB=ncbiDB))]
+
+    # First, try to retrieve a direct translation
+    if(!identical(translationsDT, character(0))){
+        if(!exhaustiveMapping){
+            if(!detailedMapping){
+                return(translationsDT[1])
+            }else{
+                result[['DT']] <- translationsDT[1]
+            }
+            return(result)
+        }else{
+            result[['DT']] <- translationsDT
+        }
+    }
+
+    # If required, try to translate using similar genes method
+    if(bySimilarGenes){
+        if(!exhaustiveMapping){
+            translationsSGT <- .getUniProt2NCBISGT(upId, FALSE, ncbiDB = ncbiDB)
+            if(length(translationsSGT)>0){
+                result[[names(translationsSGT[1])]] <- translationsSGT[[names(translationsSGT[1])]][[1]]
+            }
+        }else{
+            result <- append(result, .getUniProt2NCBISGT(upId, TRUE, ncbiDB = ncbiDB))
+        }
+    }
+
+    if(!detailedMapping){
+        result <- unique(unlist(result, recursive = FALSE, use.names = FALSE))
+        if(is.null(result)){result <- character(0)}
+    }
+
+    return(result)
 }
 
+getUniProt2NCBIProtein <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
+    return(.getUniProt2NCBI(upId, 'protein', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                         bySimilarGenes = bySimilarGenes))
+}
+
+getUniProt2NCBINucleotide <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
+    return(.getUniProt2NCBI(upId, 'nucleotide', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                            bySimilarGenes = bySimilarGenes))
+}
+
+getUniProt2NCBIGene <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
+    return(.getUniProt2NCBI(upId, 'gene', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                            bySimilarGenes = bySimilarGenes))
+}
 
 

@@ -77,3 +77,17 @@
     }
     return(list1)
 }
+
+.checkIdInNCBIDataBase <- function(ncbiId, ncbiDB) {
+    result<- tryCatch(
+        switch (ncbiDB,
+                'protein' = .checkNCBIProteinIdExists(ncbiId),
+                'nucleotide' = .checkNCBINucleotideIdExists(ncbiId),
+                'gene' = .checkNCBIGeneIdExists(ncbiId),
+        ),
+        error = function(e){return(FALSE)}
+    )
+    if(is.null(result)){result <- TRUE}
+    return(result)
+}
+

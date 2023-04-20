@@ -85,10 +85,27 @@ checkEquals(.getUniProt2NCBIDT('test'), character(0))
 ### Test .getUniProt2NCBISGT
 
 # Positive cases
-checkEquals(.getUniProt2NCBISGT('A0SNL9'), list('1.0' = c('MBF2710085.1')))
-checkEquals(.getUniProt2NCBISGT('B0BKZ8'), list('1.0' = c("ACC77494.1","WP_004187529.1","NZ_UWXB01000002.1")))
-checkTrue(length(.getUniProt2NCBISGT('A0A6H2TXZ6', exhaustiveMapping = TRUE)$`0.5`)==19)
+test <- .getUniProt2NCBISGT('B0BKZ8', ncbiDB = 'nucleotide')
+checkEquals(.getUniProt2NCBISGT('A0SNL9', ncbiDB = 'protein'), list('0.9' = c("ACX34100.1","WP_032492560.1")))
+checkEquals(.getUniProt2NCBISGT('B0BKZ8', ncbiDB = 'nucleotide'), list('1.0' = c("NZ_UWXB01000002.1")))
+checkTrue(length(.getUniProt2NCBISGT('A0A6H2TXZ6', ncbiDB = 'protein', exhaustiveMapping = TRUE)$`0.5`)==15)
 # # No translation case
-checkEquals(.getUniProt2NCBISGT('Q6R7P5'), list())
+checkEquals(.getUniProt2NCBISGT('Q6R7P5', ncbiDB = 'protein'), list())
+
+# Test getUniProt2NCBIProtein, getUniProt2NCBINucleotide, getUniProt2NCBIGene
+
+# Positive cases
+checkTrue(length(getUniProt2NCBIProtein('A0A6H2TXZ6', exhaustiveMapping = TRUE, detailedMapping = TRUE)$`0.5`)==15)
+checkTrue(length(getUniProt2NCBINucleotide('A0A6H2TXZ6', exhaustiveMapping = TRUE, detailedMapping = TRUE)$`0.5`)==2)
+checkEquals(getUniProt2NCBINucleotide('A0A6H2TXZ6', exhaustiveMapping = FALSE, detailedMapping = TRUE), list('0.5' = c("NZ_LMFS01000003.1")))
+checkEquals(getUniProt2NCBIProtein('A0SNL9', exhaustiveMapping = FALSE, detailedMapping = FALSE), c('ABH10964.1'))
+checkEquals(getUniProt2NCBINucleotide('A0SNL9', exhaustiveMapping = FALSE, detailedMapping = FALSE), c('NZ_VDQI01000026.1'))
+checkEquals(getUniProt2NCBIGene('A0SNL9', exhaustiveMapping = FALSE, detailedMapping = FALSE), c('AFH57403.1'))
+# No translation cases
+checkEquals(getUniProt2NCBIGene('A0A1S7BGS4', bySimilarGenes = FALSE), character(0))
+checkEquals(getUniProt2NCBIGene('A0A1S7BGS4', bySimilarGenes = FALSE, detailedMapping = TRUE), list())
+# ID not valid case
+checkException(getUniProt2NCBIProtein('P0ZTUH2'))
+
 
 

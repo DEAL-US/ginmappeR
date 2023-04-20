@@ -305,7 +305,6 @@ getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, byIdenticalPr
 # desactivada, devuelve la primera traducción directa que encuentre o, en caso contrario, la de mayor % de identidad.
 # Through UniProt database method
 .getNCBI2KEGGTUP <- function(ncbiId, ncbiDatabase, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
-
     upIDs <- switch (ncbiDatabase,
                      'protein' = getNCBIProtein2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, byIdenticalProteins = byIdenticalProteins),
                      'nucleotide' = getNCBINucleotide2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, byIdenticalProteins = byIdenticalProteins),
@@ -334,10 +333,10 @@ getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, byIdenticalPr
 }
 
 .getNCBI2KEGG <- function(ncbiId, ncbiDB, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
-    upIDs <- switch (ncbiDB,
-                     'protein' = .checkNCBIProteinIdExists(ncbiId),
-                     'nucleotide' = .checkNCBINucleotideIdExists(ncbiId),
-                     'gene' = .checkNCBIGeneIdExists(ncbiId),
+    switch(ncbiDB,
+         'protein' = .checkNCBIProteinIdExists(ncbiId),
+         'nucleotide' = .checkNCBINucleotideIdExists(ncbiId),
+         'gene' = .checkNCBIGeneIdExists(ncbiId),
     )
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkBoolean(detailedMapping, 'detailedMapping')
