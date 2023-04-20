@@ -4,7 +4,8 @@ source('../R/utilsFunctions.R')
 library('UniProt.ws')
 library('KEGGREST')
 library('httr')
-
+library('rentrez')
+library('XML')
 
 ######################################
 # UniProt database auxiliar function #

@@ -39,7 +39,7 @@
 }
 
 .checkUniProtIdExists <- function(upId){
-    .checkNotNull(upId, 'The given UniProt Gene ID is ')
+    .checkNotNull(upId, 'The given UniProt ID is ')
     # Example id not registered: P0ZTH2
     # Example id not valid: P0ZTUH2
     # Example valid id: P0DTH6
@@ -52,6 +52,18 @@
         stop(paste('The given ID "', upId, '" has not a valid UniProt database accesion format', sep = ''))
     }else if(grepl('0 rows', output[2], fixed = TRUE)){
         stop(paste('The given ID "', upId, '" is not registered in UniProt database', sep = ''))
+    }
+}
+
+.checkKEGGIdExists <- function(keggId){
+    .checkNotNull(keggId, 'The given KEGG ID is ')
+
+    # Search ID in KEGG genes database
+    query <- keggFind('genes',keggId)
+
+    # Check if there is a coincidence and if it corresponds to an unique gene
+    if(!length(query)==1){
+        stop(paste('The given ID "', keggId, '" is not registered in KEGG genes database', sep = ''))
     }
 }
 
@@ -90,4 +102,6 @@
     if(is.null(result)){result <- TRUE}
     return(result)
 }
+
+
 

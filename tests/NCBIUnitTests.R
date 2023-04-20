@@ -1,5 +1,6 @@
 library(RUnit)
 source('../R/NCBIFunctions.R')
+source('../R/UniProtFunctions.R')
 source('../R/utilsFunctions.R')
 library('UniProt.ws')
 library('rentrez')

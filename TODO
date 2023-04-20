@@ -10,6 +10,7 @@
     - getUniProt2NCBIProtein
     - getUniProt2NCBINucleotide
     - getUniProt2NCBIGene
+    - getKEGG2UniProt
 
 # TODO: suppress UniProt.ws '(\) waiting for query completion.......... 00:00:02' messages
 
