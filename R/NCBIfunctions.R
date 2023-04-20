@@ -304,8 +304,8 @@ getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, byIdenticalPr
 # -- Se ha añadido un exhaustiveMapping booleano que activo, devuelve todas las posibles traducciones tanto directas como por clusters de similitud de UniProt;
 # desactivada, devuelve la primera traducción directa que encuentre o, en caso contrario, la de mayor % de identidad.
 # Through UniProt database method
-.getNCBI2KEGGTUP <- function(ncbiId, ncbiDatabase, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
-    upIDs <- switch (ncbiDatabase,
+.getNCBI2KEGGTUP <- function(ncbiId, ncbiDB, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
+    upIDs <- switch (ncbiDB,
                      'protein' = getNCBIProtein2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, byIdenticalProteins = byIdenticalProteins),
                      'nucleotide' = getNCBINucleotide2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, byIdenticalProteins = byIdenticalProteins),
                      'gene' = getNCBIGene2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, byIdenticalProteins = byIdenticalProteins),
@@ -320,7 +320,6 @@ getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, byIdenticalPr
                 translations <- .mergeNamedLists(translations, keggId)
             }
         }
-
     }
 
     if(!detailedMapping){

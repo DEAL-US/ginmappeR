@@ -59,7 +59,7 @@ getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0', clusterNames =
         genesList[[clusterName]] <- auxList
     }
     if(!clusterNames){
-        genesList <- unlist(genesList, recursive = FALSE)
+        genesList <- unname(unlist(genesList, recursive = FALSE))
     }
     return(genesList)
 }
@@ -182,22 +182,24 @@ getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TR
 
     # Iterate over clusters identities
     for(clusterIdentity in c('1.0','0.9','0.5')){
-        similarGenes <- getUniProtSimilarGenes(upId, clusterIdentity)
+        similarGenes <- getUniProtSimilarGenes(upId, clusterIdentity, clusterNames = FALSE)
         # Check whether there are similar genes
         if(length(similarGenes)!=0){
             # For every similar gene, try to translate to NCBI
             for(i in 1:length(similarGenes)){
                 translation <- .getUniProt2NCBIDT(similarGenes[i])
-                # Filter translations to get only those of the desired ncbiDB
-                translation <- translation[which(sapply(translation, .checkIdInNCBIDataBase, ncbiDB=ncbiDB))]
-                # If there is a translation, return the identity of the cluster,
-                # the similar gene selected and the translation to NCBI
                 if(!identical(translation, character(0))){
-                    if(!exhaustiveMapping){
-                        result[[clusterIdentity]] <- c(translation)
-                        return(result)
-                    }else{
-                        result[[clusterIdentity]] <- append(result[[clusterIdentity]], translation)
+                    # Filter translations to get only those of the desired ncbiDB
+                    translation <- translation[which(sapply(translation, .checkIdInNCBIDataBase, ncbiDB=ncbiDB))]
+                    # If there is a translation, return the identity of the cluster,
+                    # the similar gene selected and the translation to NCBI
+                    if(!identical(translation, character(0))){
+                        if(!exhaustiveMapping){
+                            result[[clusterIdentity]] <- c(translation)
+                            return(result)
+                        }else{
+                            result[[clusterIdentity]] <- append(result[[clusterIdentity]], translation)
+                        }
                     }
                 }
             }

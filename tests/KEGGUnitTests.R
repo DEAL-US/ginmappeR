@@ -31,5 +31,32 @@ checkException(.checkKEGGIdExists('lacy:A4V08_'))
 checkEquals(getKEGG2UniProt('lacy:A4V08_06425'), c('A0A1C7G297'))
 checkEquals(getKEGG2UniProt('mct:MCR_1292'), c('D5VCZ9'))
 checkEquals(getKEGG2UniProt('abc:ACICU_00223'), c('A0A7U3XVN2'))
+checkEquals(getKEGG2UniProt('aag:5579347'), c('A0A1S4G4Z1','Q1DGP2'))
 # No translation case
 checkEquals(getKEGG2UniProt('eco:b0204'), character(0))
+
+###################################
+# KEGG database to NCBI databases #
+###################################
+
+### Test .getKEGG2NCBIDT
+
+# Positive cases
+checkEquals(.getKEGG2NCBIDT('lacy:A4V08_06425'), c('ANU45512'))
+checkEquals(.getKEGG2NCBIDT('mct:MCR_1292'), c('ADG61552'))
+checkEquals(.getKEGG2NCBIDT('abc:ACICU_00223'), c('ACC55535'))
+checkEquals(.getKEGG2NCBIDT('aag:5579347'), c('5579347','XP_001647653'))
+
+### Test .getKEGG2NCBITUP
+
+# Positive cases
+checkEquals(.getKEGG2NCBITUP('aag:5579347', 'protein', bySimilarGenes = FALSE), list('DT'=c("EAT32321.1","XP_001647653.1")))
+checkEquals(.getKEGG2NCBITUP('aag:5579347', 'nucleotide', bySimilarGenes = FALSE), list())
+checkEquals(.getKEGG2NCBITUP('aag:5579347', 'gene', bySimilarGenes = FALSE), list('DT'=c("EAT32321.1","XP_001647653.1")))
+checkEquals(.getKEGG2NCBITUP('aag:5579347', 'nucleotide', bySimilarGenes = TRUE), list('0.5'='XM_001230804.1'))
+checkEquals(.getKEGG2NCBITUP('llo:LLO_2673', 'nucleotide', exhaustiveMapping = TRUE, bySimilarGenes = TRUE),
+            list('DT'=c('NC_013861.1'), '0.5'=c("NZ_CCVW01000004.1","NZ_LNYO01000024.1","NZ_UGNZ01000001.1","NZ_UASS01000015.1",
+                                                "NZ_UGOX01000001.1","NZ_UGGV01000001.1")))
+checkEquals(.getKEGG2NCBITUP('llo:LLO_2673', 'gene', bySimilarGenes = TRUE), list('DT'=c('CBJ13102.1')))
+
+

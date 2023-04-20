@@ -90,7 +90,7 @@ test <- .getUniProt2NCBISGT('B0BKZ8', ncbiDB = 'nucleotide')
 checkEquals(.getUniProt2NCBISGT('A0SNL9', ncbiDB = 'protein'), list('0.9' = c("ACX34100.1","WP_032492560.1")))
 checkEquals(.getUniProt2NCBISGT('B0BKZ8', ncbiDB = 'nucleotide'), list('1.0' = c("NZ_UWXB01000002.1")))
 checkTrue(length(.getUniProt2NCBISGT('A0A6H2TXZ6', ncbiDB = 'protein', exhaustiveMapping = TRUE)$`0.5`)==15)
-# # No translation case
+# No translation case
 checkEquals(.getUniProt2NCBISGT('Q6R7P5', ncbiDB = 'protein'), list())
 
 # Test getUniProt2NCBIProtein, getUniProt2NCBINucleotide, getUniProt2NCBIGene
