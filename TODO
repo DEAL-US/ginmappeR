@@ -11,6 +11,18 @@
     - getUniProt2NCBINucleotide
     - getUniProt2NCBIGene
     - getKEGG2UniProt
+    - getKEGG2NCBIProtein
+    - getKEGG2NCBINucleotide
+    - getKEGG2NCBIGene
 
 # TODO: suppress UniProt.ws '(\) waiting for query completion.......... 00:00:02' messages
+
+# TODO: CARD last version checker and downloader. Posibility of caching CARD between R sessions,
+check https://blog.r-hub.io/2021/07/30/cache/.
+To not run tests that may need temporal files:
+\dontrun
+codigo
+\dontrun
+
+
 

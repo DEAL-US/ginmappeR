@@ -59,4 +59,16 @@ checkEquals(.getKEGG2NCBITUP('llo:LLO_2673', 'nucleotide', exhaustiveMapping = T
                                                 "NZ_UGOX01000001.1","NZ_UGGV01000001.1")))
 checkEquals(.getKEGG2NCBITUP('llo:LLO_2673', 'gene', bySimilarGenes = TRUE), list('DT'=c('CBJ13102.1')))
 
+### Test getKEGG2NCBIProtein, getKEGG2NCBINucleotide, getKEGG2NCBIGene
+
+# Positive cases
+checkTrue(length(getKEGG2NCBIProtein('llo:LLO_2673', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = TRUE)$`0.5`)==51)
+checkEquals(getKEGG2NCBINucleotide('llo:LLO_2673', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = TRUE),
+            list('DT'=c('NC_013861.1'), '0.5'=c("NZ_CCVW01000004.1","NZ_LNYO01000024.1","NZ_UGNZ01000001.1","NZ_UASS01000015.1",
+                                                "NZ_UGOX01000001.1","NZ_UGGV01000001.1")))
+checkEquals(getKEGG2NCBINucleotide('llo:LLO_2673', bySimilarGenes = TRUE), c('NC_013861.1'))
+checkEquals(getKEGG2NCBINucleotide('aag:5579347', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = TRUE), list('0.5'='XM_001230804.1'))
+checkEquals(getKEGG2NCBIGene('aag:5579347', detailedMapping = TRUE, bySimilarGenes = TRUE), list('DT'='5579347'))
+checkEquals(getKEGG2NCBIGene('aag:5579347', bySimilarGenes = TRUE), c('5579347'))
+
 
