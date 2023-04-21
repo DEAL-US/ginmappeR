@@ -67,6 +67,18 @@
     }
 }
 
+.checkCARDIdExists <- function(cardId){
+    .checkNotNull(cardId, 'The given CARD ARO accession is ')
+
+    checkedCardId <- if (grepl("^ARO:", cardId)) cardId else paste0("ARO:", cardId)
+
+    aroIndex <- read.csv(paste(get_cache_dir(get_pkg_info("ginmappeR")),'/card-data/aro_index.tsv', sep=''), sep='\t')
+
+    if(!checkedCardId %in% aroIndex$ARO.Accession) {
+        stop(paste('The given ARO accession "', cardId, '" is not registered in CARD database', sep = ''))
+    }
+}
+
 .checkClusterIdentity <- function(clusterIdentity){
     if(!clusterIdentity %in% c('1.0','0.9','0.5')){
         stop(paste('The requested cluster identity "', clusterIdentity, '" is not valid', sep = ''))
@@ -103,5 +115,46 @@
     return(result)
 }
 
+#####################################
+# CARD database retrieval functions #
+#####################################
 
+.downloadAndExtractCARD <- function(){
 
+    pkgInfo <- get_pkg_info("ginmappeR")
+    localRelativeFilenames <- c('card-data.tar.bz2')
+    url <- c('https://card.mcmaster.ca/latest/data')
+    # Download CARD zip if not present
+    ensure_files_available(pkgInfo, localRelativeFilenames, url)
+
+    # If it has not been extracted, extract it
+    if(!are_files_available(pkgInfo, c('card-data'))){
+        zipF<- paste(get_cache_dir(pkgInfo),'/',localRelativeFilenames[1], sep='')
+        outDir<- paste(get_cache_dir(pkgInfo),'/card-data', sep='')
+
+        # Unizip the compressed file
+        untar(zipF, exdir = './card-data')
+        # Move it to cached files directory
+        file.rename('./card-data', outDir)
+
+        # Write download date to a file
+        fileConn<-file(paste(outDir,'/','downloadDate.txt', sep=''))
+        writeLines(c(format(Sys.time(), "%a %m/%d/%Y %H:%M:%S")), fileConn)
+        close(fileConn)
+    }
+}
+
+updateCARDDataBase <- function(){
+    message('Updating CARD database data...')
+    erase_file_cache(get_pkg_info("ginmappeR"))
+    .downloadAndExtractCARD()
+}
+
+.checkIfCARDIsDownloaded <- function(){
+    if(!are_files_available(get_pkg_info("ginmappeR"), c('card-data'))){
+        updateCARDDataBase()
+    }else{
+        message(sprintf('Using a CARD database version downloaded on %s, please consider updating it with updateCARDDataBase() function.',
+                        read.delim(paste(get_cache_dir(pkgInfo),'/card-data/downloadDate.txt', sep=''), header = FALSE)))
+    }
+}

@@ -21,8 +21,7 @@
 check https://blog.r-hub.io/2021/07/30/cache/.
 To not run tests that may need temporal files:
 \dontrun
-codigo
+code
 \dontrun
 
-
-
+# TODO: only extract aro_index.tsv from CARD zip if, finally, it's the unique file employed
