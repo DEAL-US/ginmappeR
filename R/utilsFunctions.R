@@ -138,9 +138,9 @@
         file.rename('./card-data', outDir)
 
         # Write download date to a file
-        fileConn<-file(paste(outDir,'/','downloadDate.txt', sep=''))
+        fileConn <- file(paste(outDir,'/','downloadDate.txt', sep=''))
         writeLines(c(format(Sys.time(), "%a %m/%d/%Y %H:%M:%S")), fileConn)
-        close(fileConn)
+        on.exit(close(fileConn))
     }
 }
 

@@ -14,6 +14,9 @@
     - getKEGG2NCBIProtein
     - getKEGG2NCBINucleotide
     - getKEGG2NCBIGene
+    - getCARD2NCBIProtein
+    - getCARD2NCBINucleotide
+    - getCARD2NCBIGene
 
 # TODO: suppress UniProt.ws '(\) waiting for query completion.......... 00:00:02' messages
 
@@ -25,3 +28,7 @@ code
 \dontrun
 
 # TODO: only extract aro_index.tsv from CARD zip if, finally, it's the unique file employed
+
+# TODO: Fix tests environment and integrate with GitHub Actions.
+
+# TODO: Save CARD datbase (aro_index dataframe) in a variable in order to avoid loading it many times
