@@ -227,4 +227,44 @@ checkEquals(getNCBIGene2KEGG('76524190', exhaustiveMapping = FALSE, detailedMapp
 checkEquals(getNCBIGene2KEGG('76524190', byIdenticalProteins = FALSE, bySimilarGenes = FALSE), character(0))
 checkEquals(getNCBIGene2KEGG('76524190', detailedMapping = TRUE, byIdenticalProteins = FALSE, bySimilarGenes = FALSE), list())
 
+##########################
+# NCBI databases to CARD #
+##########################
+
+### Test getNCBIProtein2CARD
+
+# Positive cases
+checkEquals(getNCBIProtein2CARD('AAK64581'), c('ARO:3004568'))
+checkEquals(getNCBIProtein2CARD('AAK64581.1'), c('ARO:3004568'))
+checkEquals(getNCBIProtein2CARD('CAC81324'), c('ARO:3003015'))
+checkEquals(getNCBIProtein2CARD('CAC81324.1'), c('ARO:3003015'))
+# No translation case
+checkEquals(getNCBIProtein2CARD('EAT32321.1'), character(0))
+
+### Test getNCBINucleotide2CARD
+
+# Positive cases
+checkEquals(getNCBINucleotide2CARD('AY034138'), c('ARO:3004568'))
+checkEquals(getNCBINucleotide2CARD('AY034138.1'), c('ARO:3004568'))
+checkEquals(getNCBINucleotide2CARD('AJ310778'), c('ARO:3003015'))
+checkEquals(getNCBINucleotide2CARD('AJ310778.1'), c('ARO:3003015'))
+# No translation case
+checkEquals(getNCBINucleotide2CARD('XM_001230804.1'), character(0))
+
+### Test getNCBIGene2CARD
+
+# Positive case
+checkEquals(getNCBIGene2CARD('3510143'), c('ARO:3003942'))
+checkEquals(getNCBIGene2CARD('WP_001082319'), character(0))
+
+
+
+
+
+
+
+
+
+
+
 

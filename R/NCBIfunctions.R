@@ -390,19 +390,55 @@ getNCBIGene2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping 
 }
 
 
+##########################
+# NCBI databases to CARD #
+##########################
 
+getNCBIProtein2CARD <- function(ncbiId){
 
+    .checkIfCARDIsDownloaded()
+    .checkNCBIProteinIdExists(ncbiId)
 
+    ncbiId <- strsplit(ncbiId,'.', fixed = T)[[1]][[1]]
 
+    aroIndex <- read.csv(paste(get_cache_dir(get_pkg_info("ginmappeR")),'/card-data/aro_index.tsv', sep=''), sep='\t')
+    aroAccession <- aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == ncbiId, "ARO.Accession"]
 
+    return(aroAccession)
+}
 
+getNCBINucleotide2CARD <- function(ncbiId){
 
+    .checkIfCARDIsDownloaded()
+    .checkNCBINucleotideIdExists(ncbiId)
 
+    ncbiId <- strsplit(ncbiId,'.', fixed = T)[[1]][[1]]
 
+    aroIndex <- read.csv(paste(get_cache_dir(get_pkg_info("ginmappeR")),'/card-data/aro_index.tsv', sep=''), sep='\t')
+    aroAccession <- aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == ncbiId, "ARO.Accession"]
 
+    return(aroAccession)
+}
 
+getNCBIGene2CARD <- function(ncbiId){
 
+    .checkIfCARDIsDownloaded()
+    .checkNCBIGeneIdExists(ncbiId)
 
+    ncbiId <- strsplit(ncbiId,'.', fixed = T)[[1]][[1]]
 
+    proteinId <- getNCBIGene2NCBIProtein(ncbiId, exhaustiveMapping = TRUE)
 
-
+    result <- character(0)
+    aroIndex <- read.csv(paste(get_cache_dir(get_pkg_info("ginmappeR")),'/card-data/aro_index.tsv', sep=''), sep='\t')
+    for(auxId in proteinId){
+        result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == auxId, "ARO.Accession"])
+    }
+    if(length(result)==0){
+        nucleotideId <- getNCBIGene2NCBINucleotide(ncbiId, exhaustiveMapping = TRUE)
+        for(auxId in nucleotideId){
+            result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == auxId, "ARO.Accession"])
+        }
+    }
+    return(unique(result))
+}

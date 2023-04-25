@@ -49,6 +49,7 @@ getCARD2UniProt <- function(cardId, exhaustiveMapping = FALSE){
 
     .checkIfCARDIsDownloaded()
     .checkCARDIdExists(cardId)
+    .checkBoolean(exhaustiveMapping)
 
     aroIndex <- read.csv(paste(get_cache_dir(get_pkg_info("ginmappeR")),'/card-data/aro_index.tsv', sep=''), sep='\t')
     nucleotideId <- aroIndex[aroIndex$ARO.Accession == (if (grepl("^ARO:", cardId)) cardId else paste0("ARO:", cardId)),]$DNA.Accession
@@ -71,6 +72,10 @@ getCARD2KEGG <- function(cardId, exhaustiveMapping = FALSE, detailedMapping = FA
 
     .checkIfCARDIsDownloaded()
     .checkCARDIdExists(cardId)
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkBoolean(detailedMapping, 'detailedMapping')
+    .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
+    .checkBoolean(bySimilarGenes, 'bySimilarGenes')
 
     aroIndex <- read.csv(paste(get_cache_dir(get_pkg_info("ginmappeR")),'/card-data/aro_index.tsv', sep=''), sep='\t')
     nucleotideId <- aroIndex[aroIndex$ARO.Accession == (if (grepl("^ARO:", cardId)) cardId else paste0("ARO:", cardId)),]$DNA.Accession
