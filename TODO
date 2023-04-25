@@ -19,6 +19,10 @@
     - getCARD2NCBIGene
     - getCARD2UniProt
     - getCARD2KEGG
+    - getNCBIProtein2CARD
+    - getNCBINucleotide2CARD
+    - getNCBIGene2CARD
+    - getUniProt2CARD
 
 # TODO: suppress UniProt.ws '(\) waiting for query completion.......... 00:00:02' messages
 

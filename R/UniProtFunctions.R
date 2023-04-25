@@ -272,3 +272,49 @@ getUniProt2NCBIGene <- function(upId, exhaustiveMapping = FALSE, detailedMapping
 }
 
 
+###################
+# UniProt to CARD #
+###################
+
+getUniProt2CARD <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE){
+    .checkIfCARDIsDownloaded()
+    .checkUniProtIdExists(upId)
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkBoolean(detailedMapping, 'detailedMapping')
+    aroIndex <- read.csv(paste(get_cache_dir(get_pkg_info("ginmappeR")),'/card-data/aro_index.tsv', sep=''), sep='\t')
+
+    result <- list()
+    proteinId <- getUniProt2NCBIProtein(upId, exhaustiveMapping = exhaustiveMapping, detailedMapping = TRUE, bySimilarGenes = TRUE)
+
+    if(length(proteinId)>0){
+        result <- lapply(proteinId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
+            auxId <- strsplit(auxId,'.', fixed = T)[[1]][[1]]
+            return(aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == auxId, "ARO.Accession"])
+        })))
+        result <- result[lengths(result) > 0]
+    }
+
+    if(length(result)==0 | exhaustiveMapping){
+        nucleotideId <- getUniProt2NCBINucleotide(upId, exhaustiveMapping = exhaustiveMapping, detailedMapping = TRUE, bySimilarGenes = TRUE)
+        if(length(nucleotideId)>0){
+            nucleotideId <- lapply(nucleotideId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
+                auxId <- strsplit(auxId,'.', fixed = T)[[1]][[1]]
+                return(aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == auxId, "ARO.Accession"])
+            })))
+        }
+        nucleotideId <- nucleotideId[lengths(nucleotideId) > 0]
+        result <- .mergeNamedLists(result, nucleotideId)
+    }
+
+    if(!detailedMapping){
+        result <- unique(unlist(result, recursive = FALSE, use.names = FALSE))
+        if(is.null(result)){result <- character(0)}
+    }else{
+        result <- lapply(result, unique)
+        result <- result[lengths(result) > 0]
+        if(length(result)==0){result <- list()}
+    }
+    return(result)
+
+}
+

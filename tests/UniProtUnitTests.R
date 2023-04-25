@@ -108,5 +108,18 @@ checkEquals(getUniProt2NCBIGene('A0A1S7BGS4', bySimilarGenes = FALSE, detailedMa
 # ID not valid case
 checkException(getUniProt2NCBIProtein('P0ZTUH2'))
 
+############################
+# UniProt database to CARD #
+############################
 
+### Test getUniProt2CARD
+
+# Positive cases
+checkEquals(getUniProt2CARD('Q8GNY5', detailedMapping = TRUE), list('DT'=c("ARO:3003552")))
+checkEquals(getUniProt2CARD('Q8GNY5'), c('ARO:3003552'))
+checkEquals(getUniProt2CARD('A0A6H2TXZ6', exhaustiveMapping = TRUE, detailedMapping = TRUE), list('DT' = c('ARO:3005012'), '0.9'= c('ARO:3005013'), '0.5'=c('ARO:3005013')))
+checkEquals(getUniProt2CARD('A0A6H2TXZ6', exhaustiveMapping = FALSE, detailedMapping = TRUE), list('DT' = c('ARO:3005012')))
+# No translation cases
+checkEquals(getUniProt2CARD('A0A1S7BGS4'), character(0))
+checkEquals(getUniProt2CARD('A0A1S7BGS4', detailedMapping = TRUE), list())
 
