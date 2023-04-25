@@ -17,6 +17,8 @@
     - getCARD2NCBIProtein
     - getCARD2NCBINucleotide
     - getCARD2NCBIGene
+    - getCARD2UniProt
+    - getCARD2KEGG
 
 # TODO: suppress UniProt.ws '(\) waiting for query completion.......... 00:00:02' messages
 
@@ -32,3 +34,7 @@ code
 # TODO: Fix tests environment and integrate with GitHub Actions.
 
 # TODO: Save CARD datbase (aro_index dataframe) in a variable in order to avoid loading it many times
+# Possibility of make a function out of this code:
+    aroIndex <- read.csv(paste(get_cache_dir(get_pkg_info("ginmappeR")),'/card-data/aro_index.tsv', sep=''), sep='\t')
+    nucleotideId <- aroIndex[aroIndex$ARO.Accession == (if (grepl("^ARO:", cardId)) cardId else paste0("ARO:", cardId)),]$DNA.Accession
+    proteinId <- aroIndex[aroIndex$ARO.Accession == (if (grepl("^ARO:", cardId)) cardId else paste0("ARO:", cardId)),]$Protein.Accession
