@@ -71,4 +71,22 @@ checkEquals(getKEGG2NCBINucleotide('aag:5579347', exhaustiveMapping = TRUE, deta
 checkEquals(getKEGG2NCBIGene('aag:5579347', detailedMapping = TRUE, bySimilarGenes = TRUE), list('DT'='5579347'))
 checkEquals(getKEGG2NCBIGene('aag:5579347', bySimilarGenes = TRUE), c('5579347'))
 
+#########################
+# KEGG database to CARD #
+#########################
+
+### Test getKEGG2CARD
+
+# Positive cases
+checkEquals(getKEGG2CARD('llo:LLO_2673', detailedMapping = TRUE), list('0.5' = c('ARO:3004591')))
+checkEquals(getKEGG2CARD('ag:ACC85616'), c("ARO:3002804"))
+checkEquals(getKEGG2CARD('ag:ACC85616', detailedMapping = TRUE), list('DT' = c('ARO:3002804')))
+checkEquals(getKEGG2CARD('ag:CAJ47134'), c("ARO:3001133"))
+checkEquals(getKEGG2CARD('ag:CAJ47134', detailedMapping = TRUE), list('DT' = c('ARO:3001133')))
+checkEquals(getKEGG2CARD('ag:ACC85616', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = FALSE), list('DT' = c('ARO:3002804')))
+checkEquals(getKEGG2CARD('ag:ACC85616', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = TRUE), list('DT' = c('ARO:3002804')))
+checkEquals(getKEGG2CARD('llo:LLO_2673', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = TRUE), list('0.5' = c("ARO:3004591", "ARO:3004584", "ARO:3004587", "ARO:3004586", "ARO:3004613", "ARO:3004590", "ARO:3004589", "ARO:3004582", "ARO:3004581")))
+# No translation case
+checkEquals(getKEGG2CARD('llo:LLO_2673', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = FALSE), list())
+
 

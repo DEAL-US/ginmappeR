@@ -24,13 +24,23 @@ getKEGG2UniProt <- function(keggId){
     query <- keggConv('ncbi-geneid', keggId)
     query <- c(query, keggConv('ncbi-proteinid', keggId))
 
-    if(identical(query, character(0))|identical(query, "")){
+    splittedQuery <- strsplit(query,':')
+    splittedQuery <- unname(unlist(splittedQuery)[2*(1:length(query))])
+
+    aux <- keggGet(keggId)
+    if('DBLINKS' %in% names(aux[[1]])){
+        aux <- unlist(lapply(strsplit(aux[[1]]$DBLINKS[grep("^NCBI", aux[[1]]$DBLINKS)], ":"), function(x) trimws(x[2])))
+        if(is.null(aux)){aux <- character(0)}
+        splittedQuery <- unique(c(splittedQuery, aux))
+    }
+
+    if(identical(splittedQuery, character(0))|is.null(splittedQuery)|identical(splittedQuery, "")){
         return(character(0))
     }else{
-        splittedQuery <- strsplit(query,':')
-        return(unname(unlist(splittedQuery)[2*(1:length(query))]))
+        return(splittedQuery)
     }
 }
+
 
 # Through UniProt method: translate first to UniProt and use
 # getUniProt2NCBIxxx methods to get to NCBIxxx
@@ -65,10 +75,10 @@ getKEGG2UniProt <- function(keggId){
 
     result <- list()
     translationsDT <- .getKEGG2NCBIDT(keggId)
-    translationsDT <- translationsDT[which(sapply(translationsDT, .checkIdInNCBIDataBase, ncbiDB=ncbiDB))]
 
     # First, try to retrieve a direct translation
     if(!identical(translationsDT, character(0))){
+        translationsDT <- translationsDT[which(sapply(translationsDT, .checkIdInNCBIDataBase, ncbiDB=ncbiDB))]
         if(!exhaustiveMapping){
             if(!detailedMapping){
                 return(translationsDT[1])
@@ -107,5 +117,112 @@ getKEGG2NCBINucleotide <- function(keggId, exhaustiveMapping = FALSE, detailedMa
 getKEGG2NCBIGene <- function(keggId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
     return(.getKEGG2NCBI(keggId, 'gene', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
                             bySimilarGenes = bySimilarGenes))
+}
+
+#########################
+# KEGG database to CARD #
+#########################
+
+# Auxiliar function to retrieve intermediate NCBI ids and check their translations
+# to CARD on the go
+.getKEGG2CARDexhaustiveMappingAux <- function(keggId, ncbiDB, bySimilarGenes){
+    aroIndex <- read.csv(paste(get_cache_dir(get_pkg_info("ginmappeR")),'/card-data/aro_index.tsv', sep=''), sep='\t')
+
+    # This function translates a bunch of NCBI ids to CARD
+    .auxNCBI2CARD <- function(translations, ncbiDB){
+        if(identical(ncbiDB, 'protein')){
+            translations <- lapply(translations, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
+                auxId <- strsplit(auxId,'.', fixed = T)[[1]][[1]]
+                return(aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == auxId, "ARO.Accession"])
+            })))
+        }else{
+            translations <- lapply(translations, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
+                auxId <- strsplit(auxId,'.', fixed = T)[[1]][[1]]
+                return(aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == auxId, "ARO.Accession"])
+            })))
+        }
+        return(translations)
+    }
+
+    # Direct translation
+    translationsDT <- .getKEGG2NCBIDT(keggId)
+    if(!identical(translationsDT, character(0))){
+        translationsDT <- lapply(.auxNCBI2CARD(list('DT' = translationsDT),ncbiDB), unique)
+        translationsDT <- translationsDT[lengths(translationsDT) > 0]
+        if(length(translationsDT[['DT']]) > 0){
+            return(translationsDT)
+        }
+    }
+
+    # Through UniProt
+    translationsTUP <- .getKEGG2NCBITUP(keggId, ncbiDB, exhaustiveMapping = TRUE, bySimilarGenes = bySimilarGenes)
+    if(length(translationsTUP)>0){
+        translationsTUP <- lapply(.auxNCBI2CARD(translationsTUP, ncbiDB), unique)
+        translationsTUP <- translationsTUP[lengths(translationsTUP) > 0]
+        if(length(translationsTUP)>0){
+            return(translationsTUP)
+        }else{
+            return(list())
+        }
+    }
+}
+
+
+# Added bySimilarGenes param to deactivate it in case it takes long time to finish, or activate it if no
+# translation is found
+getKEGG2CARD <- function(keggId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
+    .checkIfCARDIsDownloaded()
+    .checkKEGGIdExists(keggId)
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkBoolean(detailedMapping, 'detailedMapping')
+    aroIndex <- read.csv(paste(get_cache_dir(get_pkg_info("ginmappeR")),'/card-data/aro_index.tsv', sep=''), sep='\t')
+    result <- list()
+
+    # Handle not exhaustiveMapping case, trying to get the fastest result present in CARD
+    if(!exhaustiveMapping){
+        proteinId <-.getKEGG2CARDexhaustiveMappingAux(keggId, 'protein', bySimilarGenes)
+        if(length(proteinId)>0){
+            proteinId <- Filter(Negate(is.null), proteinId[c("DT", "1.0", "0.9", "0.5")])
+            result[names(proteinId)[1]] <- proteinId[[1]][[1]]
+        }else{
+            nucleotideId <-.getKEGG2CARDexhaustiveMappingAux(keggId, 'nucleotide', bySimilarGenes)
+            if(length(nucleotideId)>0){
+                nucleotideId <- Filter(Negate(is.null), nucleotideId[c("DT", "1.0", "0.9", "0.5")])
+                result[names(nucleotideId)[1]] <- nucleotideId[[1]][[1]]
+            }
+        }
+    }else{
+        # Handle exhaustiveMapping case, trying to retrieve all possible cases
+        proteinId <- getKEGG2NCBIProtein(keggId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
+        if(length(proteinId)>0){
+            result <- lapply(proteinId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
+                auxId <- strsplit(auxId,'.', fixed = T)[[1]][[1]]
+                return(aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == auxId, "ARO.Accession"])
+            })))
+            result <- result[lengths(result) > 0]
+        }
+
+        nucleotideId <- getKEGG2NCBINucleotide(keggId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
+        if(length(nucleotideId)>0){
+            nucleotideId <- lapply(nucleotideId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
+                auxId <- strsplit(auxId,'.', fixed = T)[[1]][[1]]
+                return(aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == auxId, "ARO.Accession"])
+            })))
+        }
+        nucleotideId <- nucleotideId[lengths(nucleotideId) > 0]
+        result <- .mergeNamedLists(result, nucleotideId)
+    }
+
+    # Finally, parse the output according to detailedMapping parameter
+    if(!detailedMapping){
+        result <- unique(unlist(result, recursive = FALSE, use.names = FALSE))
+        if(is.null(result)){result <- character(0)}
+    }else{
+        result <- lapply(result, unique)
+        result <- result[lengths(result) > 0]
+        if(length(result)==0){result <- list()}
+    }
+    return(result)
+
 }
 
