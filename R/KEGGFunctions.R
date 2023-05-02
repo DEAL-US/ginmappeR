@@ -223,6 +223,5 @@ getKEGG2CARD <- function(keggId, exhaustiveMapping = FALSE, detailedMapping = FA
         if(length(result)==0){result <- list()}
     }
     return(result)
-
 }
 

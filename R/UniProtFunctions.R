@@ -276,26 +276,88 @@ getUniProt2NCBIGene <- function(upId, exhaustiveMapping = FALSE, detailedMapping
 # UniProt to CARD #
 ###################
 
-getUniProt2CARD <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE){
+# Auxiliar function to retrieve intermediate NCBI ids and check their translations
+# to CARD on the go
+.getUniProt2CARDexhaustiveMappingAux <- function(upId, ncbiDB, bySimilarGenes){
+    aroIndex <- read.csv(paste(get_cache_dir(get_pkg_info("ginmappeR")),'/card-data/aro_index.tsv', sep=''), sep='\t')
+
+    # This function translates a bunch of NCBI ids to CARD
+    .auxNCBI2CARD <- function(translations, ncbiDB){
+        if(identical(ncbiDB, 'protein')){
+            translations <- lapply(translations, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
+                auxId <- strsplit(auxId,'.', fixed = T)[[1]][[1]]
+                return(aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == auxId, "ARO.Accession"])
+            })))
+        }else{
+            translations <- lapply(translations, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
+                auxId <- strsplit(auxId,'.', fixed = T)[[1]][[1]]
+                return(aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == auxId, "ARO.Accession"])
+            })))
+        }
+        return(translations)
+    }
+
+    # Direct translation
+    translationsDT <- .getUniProt2NCBIDT(upId)
+    if(!identical(translationsDT, character(0))){
+        translationsDT <- lapply(.auxNCBI2CARD(list('DT' = translationsDT),ncbiDB), unique)
+        translationsDT <- translationsDT[lengths(translationsDT) > 0]
+        if(length(translationsDT[['DT']]) > 0){
+            return(translationsDT)
+        }
+    }
+
+    # Through UniProt
+    if(bySimilarGenes){
+        translationsTUP <- .getUniProt2NCBISGT(upId, exhaustiveMapping = TRUE,  ncbiDB)
+        if(length(translationsTUP)>0){
+            translationsTUP <- lapply(.auxNCBI2CARD(translationsTUP, ncbiDB), unique)
+            translationsTUP <- translationsTUP[lengths(translationsTUP) > 0]
+            if(length(translationsTUP)>0){
+                return(translationsTUP)
+            }else{
+                return(list())
+            }
+        }
+    }else{
+        return(list())
+    }
+
+}
+
+getUniProt2CARD <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
     .checkIfCARDIsDownloaded()
     .checkUniProtIdExists(upId)
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkBoolean(detailedMapping, 'detailedMapping')
     aroIndex <- read.csv(paste(get_cache_dir(get_pkg_info("ginmappeR")),'/card-data/aro_index.tsv', sep=''), sep='\t')
-
     result <- list()
-    proteinId <- getUniProt2NCBIProtein(upId, exhaustiveMapping = exhaustiveMapping, detailedMapping = TRUE, bySimilarGenes = TRUE)
 
-    if(length(proteinId)>0){
-        result <- lapply(proteinId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
-            auxId <- strsplit(auxId,'.', fixed = T)[[1]][[1]]
-            return(aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == auxId, "ARO.Accession"])
-        })))
-        result <- result[lengths(result) > 0]
-    }
+    # Handle not exhaustiveMapping case, trying to get the fastest result present in CARD
+    if(!exhaustiveMapping){
+        proteinId <-.getUniProt2CARDexhaustiveMappingAux(upId, 'protein', bySimilarGenes)
+        if(length(proteinId)>0){
+            proteinId <- Filter(Negate(is.null), proteinId[c("DT", "1.0", "0.9", "0.5")])
+            result[names(proteinId)[1]] <- proteinId[[1]][[1]]
+        }else{
+            nucleotideId <-.getUniProt2CARDexhaustiveMappingAux(upId, 'nucleotide', bySimilarGenes)
+            if(length(nucleotideId)>0){
+                nucleotideId <- Filter(Negate(is.null), nucleotideId[c("DT", "1.0", "0.9", "0.5")])
+                result[names(nucleotideId)[1]] <- nucleotideId[[1]][[1]]
+            }
+        }
+    }else{
+        # Handle exhaustiveMapping case, trying to retrieve all possible cases
+        proteinId <- getUniProt2NCBIProtein(upId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
+        if(length(proteinId)>0){
+            result <- lapply(proteinId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
+                auxId <- strsplit(auxId,'.', fixed = T)[[1]][[1]]
+                return(aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == auxId, "ARO.Accession"])
+            })))
+            result <- result[lengths(result) > 0]
+        }
 
-    if(length(result)==0 | exhaustiveMapping){
-        nucleotideId <- getUniProt2NCBINucleotide(upId, exhaustiveMapping = exhaustiveMapping, detailedMapping = TRUE, bySimilarGenes = TRUE)
+        nucleotideId <- getUniProt2NCBINucleotide(upId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
         if(length(nucleotideId)>0){
             nucleotideId <- lapply(nucleotideId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
                 auxId <- strsplit(auxId,'.', fixed = T)[[1]][[1]]
@@ -306,6 +368,7 @@ getUniProt2CARD <- function(upId, exhaustiveMapping = FALSE, detailedMapping = F
         result <- .mergeNamedLists(result, nucleotideId)
     }
 
+    # Finally, parse the output according to detailedMapping parameter
     if(!detailedMapping){
         result <- unique(unlist(result, recursive = FALSE, use.names = FALSE))
         if(is.null(result)){result <- character(0)}
@@ -315,6 +378,5 @@ getUniProt2CARD <- function(upId, exhaustiveMapping = FALSE, detailedMapping = F
         if(length(result)==0){result <- list()}
     }
     return(result)
-
 }
 

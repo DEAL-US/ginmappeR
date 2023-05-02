@@ -115,11 +115,13 @@ checkException(getUniProt2NCBIProtein('P0ZTUH2'))
 ### Test getUniProt2CARD
 
 # Positive cases
+checkEquals(getUniProt2CARD('A0A1S7BGS4'), c("ARO:3004185"))
+checkEquals(getUniProt2CARD('A0A4R5XW64', bySimilarGenes = TRUE), c("ARO:3004185"))
 checkEquals(getUniProt2CARD('Q8GNY5', detailedMapping = TRUE), list('DT'=c("ARO:3003552")))
 checkEquals(getUniProt2CARD('Q8GNY5'), c('ARO:3003552'))
 checkEquals(getUniProt2CARD('A0A6H2TXZ6', exhaustiveMapping = TRUE, detailedMapping = TRUE), list('DT' = c('ARO:3005012'), '0.9'= c('ARO:3005013'), '0.5'=c('ARO:3005013')))
 checkEquals(getUniProt2CARD('A0A6H2TXZ6', exhaustiveMapping = FALSE, detailedMapping = TRUE), list('DT' = c('ARO:3005012')))
 # No translation cases
-checkEquals(getUniProt2CARD('A0A1S7BGS4'), character(0))
-checkEquals(getUniProt2CARD('A0A1S7BGS4', detailedMapping = TRUE), list())
+checkEquals(getUniProt2CARD('A0A4R5XW64', bySimilarGenes = FALSE), character(0))
+checkEquals(getUniProt2CARD('A0A4R5XW64', detailedMapping = TRUE, bySimilarGenes = FALSE), list())
 
