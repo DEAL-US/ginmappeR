@@ -1,3 +1,4 @@
+setwd(".")
 library(RUnit)
 library(ginmappeR)
 library('UniProt.ws')
@@ -6,8 +7,8 @@ library('httr')
 library('rentrez')
 library('XML')
 library('pkgfilecache')
-source('R/KEGGFunctions.R')
-source('R/utilsFunctions.R')
+source('../R/KEGGFunctions.R')
+source('../R/utilsFunctions.R')
 
 ###################################
 # KEGG database auxiliar function #
