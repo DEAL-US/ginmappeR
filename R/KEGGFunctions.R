@@ -105,8 +105,6 @@ getKEGG2UniProt <- function(keggId){
     return(result)
 }
 
-test <- getKEGG2NCBINucleotide("llo:LLO_2673", bySimilarGenes = TRUE)
-
 getKEGG2NCBIProtein <- function(keggId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
     return(.getKEGG2NCBI(keggId, 'protein', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
                             bySimilarGenes = bySimilarGenes))
