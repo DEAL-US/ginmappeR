@@ -6,10 +6,10 @@ library('httr')
 library('rentrez')
 library('XML')
 library('pkgfilecache')
-# source('../R/CARDFunctions.R')
-# source('../R/utilsFunctions.R')
+source('../R/CARDFunctions.R')
+source('../R/utilsFunctions.R')
 
-
+print(getwd())
 #########################
 # CARD database to NCBI #
 #########################
