@@ -1,11 +1,13 @@
 library(RUnit)
-source('../R/KEGGFunctions.R')
-source('../R/utilsFunctions.R')
+library(ginmappeR)
 library('UniProt.ws')
 library('KEGGREST')
 library('httr')
 library('rentrez')
 library('XML')
+library('pkgfilecache')
+source('../R/KEGGFunctions.R')
+source('../R/utilsFunctions.R')
 
 ###################################
 # KEGG database auxiliar function #

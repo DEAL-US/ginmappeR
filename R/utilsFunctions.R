@@ -151,7 +151,8 @@ updateCARDDataBase <- function(){
 }
 
 .checkIfCARDIsDownloaded <- function(){
-    if(!are_files_available(get_pkg_info("ginmappeR"), c('card-data'))){
+    pkgInfo <- get_pkg_info("ginmappeR")
+    if(!are_files_available(pkgInfo, c('card-data'))){
         updateCARDDataBase()
     }else{
         message(sprintf('Using a CARD database version downloaded on %s, please consider updating it with updateCARDDataBase() function.',

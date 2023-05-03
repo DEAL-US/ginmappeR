@@ -75,12 +75,13 @@ getKEGG2UniProt <- function(keggId){
 
     result <- list()
     translationsDT <- .getKEGG2NCBIDT(keggId)
+    translationsDT <- translationsDT[which(sapply(translationsDT, .checkIdInNCBIDataBase, ncbiDB=ncbiDB))]
 
     # First, try to retrieve a direct translation
     if(!identical(translationsDT, character(0))){
-        translationsDT <- translationsDT[which(sapply(translationsDT, .checkIdInNCBIDataBase, ncbiDB=ncbiDB))]
         if(!exhaustiveMapping){
             if(!detailedMapping){
+                print(translationsDT)
                 return(translationsDT[1])
             }else{
                 result[['DT']] <- translationsDT[1]
@@ -103,6 +104,8 @@ getKEGG2UniProt <- function(keggId){
     }
     return(result)
 }
+
+test <- getKEGG2NCBINucleotide("llo:LLO_2673", bySimilarGenes = TRUE)
 
 getKEGG2NCBIProtein <- function(keggId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
     return(.getKEGG2NCBI(keggId, 'protein', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,

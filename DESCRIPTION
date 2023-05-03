@@ -1,12 +1,21 @@
 Package: ginmappeR
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Gene Identifier Mapper
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: 
+    person("Fernando", "Sola", email = "fsola@us.es", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-1685-3270")),
+    person("Rafael", "Ayala", email = "rafael.ayala@oist.jp", role = "aut", comment = c(ORCID = "0000-0002-9332-4623")),
+    person("Daniel", "Ayala", email = "dayala1@us.es", role = "aut", comment = c(ORCID = "0000-0003-2095-1009")),
+    person("Inma", "Hernandez", email = "inmahernandez@us.es", role = "aut", comment = c(ORCID = "0000-0001-8920-6635")),
+    person("David", "Ruiz", email = "druiz@us.es", role = "aut", comment = c(ORCID = "0000-0003-4460-5493")),
+Maintainer: Fernando Sola <fsola@us.es>
+Description: Provides functionalities to translate gene or protein identifiers between
+    state-of-art biological databases: CARD (<https://card.mcmaster.ca/>), NCBI Protein,
+    Nucleotide and Gene (<https://www.ncbi.nlm.nih.gov/>), UniProt (<https://www.uniprot.org/>)
+    and KEGG (<https://www.kegg.jp>). Also offers complementary functionality like
+    NCBI identical proteins or UniProt similar genes clusters retrieval.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Imports: KEGGREST, UniProt.ws, XML, rentrez, RUnit, httr, pkgfilecache
+Imports: KEGGREST, UniProt.ws, XML, rentrez, httr, pkgfilecache
+Suggests: RUnit, BiocGenerics

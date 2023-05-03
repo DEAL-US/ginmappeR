@@ -1,11 +1,14 @@
 library(RUnit)
+library(ginmappeR)
+library('UniProt.ws')
+library('KEGGREST')
+library('httr')
+library('rentrez')
+library('XML')
+library('pkgfilecache')
 source('../R/NCBIFunctions.R')
 source('../R/UniProtFunctions.R')
 source('../R/utilsFunctions.R')
-library('UniProt.ws')
-library('rentrez')
-library('KEGGREST')
-library('XML')
 
 #####################################
 # NCBI databases inter-translations #

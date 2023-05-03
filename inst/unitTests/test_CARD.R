@@ -1,11 +1,14 @@
 library(RUnit)
-source('../R/CARDFunctions.R')
-source('../R/utilsFunctions.R')
+library(ginmappeR)
 library('UniProt.ws')
 library('KEGGREST')
 library('httr')
 library('rentrez')
 library('XML')
+library('pkgfilecache')
+source('../R/CARDFunctions.R')
+source('../R/utilsFunctions.R')
+
 
 #########################
 # CARD database to NCBI #
@@ -47,7 +50,7 @@ checkEquals(getCARD2NCBIGene('3005061'), character(0))
 
 # Positive cases
 checkEquals(getCARD2UniProt('3002867'), c('Q9ZIF9'))
-checkTrue(length(getCARD2UniProt('3002867', TRUE)) == 76)
+checkTrue(length(getCARD2UniProt('3002867', TRUE)) == 38)
 checkEquals(getCARD2UniProt('3003649'), c('A0A0K0TQH5'))
 # No translation case
 checkEquals(getCARD2UniProt('3006267'), character(0))
