@@ -25,6 +25,8 @@
     - getUniProt2CARD
     - getKEGG2CARD
 
+# TODO: fix Windows CARD database download paths and permissions issue.
+
 # TODO: suppress UniProt.ws '(\) waiting for query completion.......... 00:00:02' messages
 
 # TODO: CARD last version checker and downloader. Posibility of caching CARD between R sessions,

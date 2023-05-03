@@ -7,13 +7,13 @@ library('rentrez')
 library('XML')
 library('pkgfilecache')
 
-print('-------------')
-print(getwd())
-print('-------------')
+# GitHub Actions imports
+source('../../../R/CARDFunctions.R')
+source('../../../R/utilsFunctions.R')
 
-source('../../../R/CARDFunctions.R', chdir = TRUE)
-source('../../../R/utilsFunctions.R', chdir = TRUE)
-
+# # Local execution imports
+# source('../R/CARDFunctions.R')
+# source('../R/utilsFunctions.R')
 
 #########################
 # CARD database to NCBI #

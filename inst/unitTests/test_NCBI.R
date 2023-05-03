@@ -6,6 +6,13 @@ library('httr')
 library('rentrez')
 library('XML')
 library('pkgfilecache')
+
+# GitHub Actions imports
+source('../../../R/NCBIFunctions.R')
+source('../../../R/UniProtFunctions.R')
+source('../../../R/utilsFunctions.R')
+
+# # Local execution imports
 # source('../R/NCBIFunctions.R')
 # source('../R/UniProtFunctions.R')
 # source('../R/utilsFunctions.R')

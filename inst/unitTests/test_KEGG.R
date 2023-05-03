@@ -6,8 +6,14 @@ library('httr')
 library('rentrez')
 library('XML')
 library('pkgfilecache')
-source('../../R/KEGGFunctions.R', chdir = TRUE)
-source('../../R/utilsFunctions.R', chdir = TRUE)
+
+# GitHub Actions imports
+source('../../../R/KEGGFunctions.R')
+source('../../../R/utilsFunctions.R')
+
+# # Local execution imports
+# source('../R/KEGGFunctions.R')
+# source('../R/utilsFunctions.R')
 
 ###################################
 # KEGG database auxiliar function #
