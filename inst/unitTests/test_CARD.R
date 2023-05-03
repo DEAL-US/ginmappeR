@@ -11,8 +11,8 @@ print('-------------')
 print(getwd())
 print('-------------')
 
-source('../R/CARDFunctions.R', chdir = TRUE)
-source('../R/utilsFunctions.R', chdir = TRUE)
+source('../../../R/CARDFunctions.R', chdir = TRUE)
+source('../../../R/utilsFunctions.R', chdir = TRUE)
 
 
 #########################
