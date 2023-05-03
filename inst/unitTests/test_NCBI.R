@@ -1,4 +1,3 @@
-setwd(".")
 library(RUnit)
 library(ginmappeR)
 library('UniProt.ws')
@@ -7,9 +6,9 @@ library('httr')
 library('rentrez')
 library('XML')
 library('pkgfilecache')
-source('../R/NCBIFunctions.R')
-source('../R/UniProtFunctions.R')
-source('../R/utilsFunctions.R')
+# source('../R/NCBIFunctions.R')
+# source('../R/UniProtFunctions.R')
+# source('../R/utilsFunctions.R')
 
 #####################################
 # NCBI databases inter-translations #
