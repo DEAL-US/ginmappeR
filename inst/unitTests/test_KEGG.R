@@ -6,8 +6,8 @@ library('httr')
 library('rentrez')
 library('XML')
 library('pkgfilecache')
-source('../R/KEGGFunctions.R')
-source('../R/utilsFunctions.R')
+source('../R/KEGGFunctions.R', chdir = TRUE)
+source('../R/utilsFunctions.R', chdir = TRUE)
 
 ###################################
 # KEGG database auxiliar function #

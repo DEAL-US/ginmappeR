@@ -7,12 +7,13 @@ library('rentrez')
 library('XML')
 library('pkgfilecache')
 
-source('../R/CARDFunctions.R')
-source('../R/utilsFunctions.R')
-
 print('-------------')
 print(getwd())
 print('-------------')
+
+source('../R/CARDFunctions.R', chdir = TRUE)
+source('../R/utilsFunctions.R', chdir = TRUE)
+
 
 #########################
 # CARD database to NCBI #
