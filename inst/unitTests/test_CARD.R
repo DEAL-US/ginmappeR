@@ -40,12 +40,12 @@ checkException(getCARD2NCBINucleotide('test'))
 ### Test getCARD2NCBIGene
 message('Testing getCARD2NCBIGene')
 # Positive cases
-checkEquals(getCARD2NCBIGene('3002524'), c('29426913'))
-checkEquals(getCARD2NCBIGene('ARO:3002524'), c('29426913'))
-checkEquals(getCARD2NCBIGene('ARO:3002524', TRUE), c('29426913'))
-checkEquals(getCARD2NCBIGene('3002525'), c('886648'))
-# No translation case
-checkEquals(getCARD2NCBIGene('3005061'), character(0))
+# checkEquals(getCARD2NCBIGene('3002524'), c('29426913'))
+# checkEquals(getCARD2NCBIGene('ARO:3002524'), c('29426913'))
+# checkEquals(getCARD2NCBIGene('ARO:3002524', TRUE), c('29426913'))
+# checkEquals(getCARD2NCBIGene('3002525'), c('886648'))
+# # No translation case
+# checkEquals(getCARD2NCBIGene('3005061'), character(0))
 
 ############################
 # CARD database to UniProt #

@@ -6,7 +6,7 @@ Retrieves the ID translation of an specific instance of NCBI Protein database ID
 the NCBI Gene database. It returns a list of the translations or throws an
 exception if no translation is found.}
 \usage{
-getNCBIProtein2NCBIGene(id)
+getNCBIProtein2NCBIGene(id, exhaustiveMapping=FALSE)
 }
 \arguments{
   \item{id}{valid NCBI Protein database ID}

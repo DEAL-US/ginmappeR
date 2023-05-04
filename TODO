@@ -24,6 +24,8 @@
     - getNCBIGene2CARD
     - getUniProt2CARD
     - getKEGG2CARD
+    - updateCARDDataBase
+
 
 # TODO: fix Windows CARD database download paths and permissions issue.
 

@@ -122,40 +122,33 @@
 .downloadAndExtractCARD <- function(){
 
     pkgInfo <- get_pkg_info("ginmappeR")
-    localRelativeFilenames <- c('card-data.tar.bz2')
+    localRelativeFilenames <- c(paste('card-data.tar.bz2-', format(Sys.time(), "%a %m-%d-%Y %H:%M:%S"),sep=''))
     url <- c('https://card.mcmaster.ca/latest/data')
     # Download CARD zip if not present
     ensure_files_available(pkgInfo, localRelativeFilenames, url)
 
     # If it has not been extracted, extract it
-    if(!are_files_available(pkgInfo, c('card-data'))){
+    if(!file.exists(paste(getwd(),'/card-data/aro_index.tsv',sep=''))){
         zipF<- paste(get_cache_dir(pkgInfo),'/',localRelativeFilenames[1], sep='')
-        outDir<- paste(get_cache_dir(pkgInfo),'/card-data', sep='')
 
         # Unzip the compressed file
-        untar(zipF, exdir = './card-data')
-        # Move it to cached files directory
-        file.rename('./card-data', outDir)
-
-        # Write download date to a file
-        fileConn <- file(paste(outDir,'/','downloadDate.txt', sep=''))
-        writeLines(c(format(Sys.time(), "%a %m/%d/%Y %H:%M:%S")), fileConn)
-        on.exit(close(fileConn))
+        untar(zipF, exdir = paste(getwd(),'/card-data',sep=''))
     }
 }
 
 updateCARDDataBase <- function(){
     message('Updating CARD database data...')
     erase_file_cache(get_pkg_info("ginmappeR"))
+    unlink(paste(getwd(),'/card-data',sep=''), recursive = TRUE)
     .downloadAndExtractCARD()
 }
 
 .checkIfCARDIsDownloaded <- function(){
     pkgInfo <- get_pkg_info("ginmappeR")
-    if(!are_files_available(pkgInfo, c('card-data'))){
+    if(!file.exists(paste(getwd(),'/card-data/aro_index.tsv',sep=''))){
         updateCARDDataBase()
     }else{
         message(sprintf('Using a CARD database version downloaded on %s, please consider updating it with updateCARDDataBase() function.',
-                        read.delim(paste(get_cache_dir(pkgInfo),'/card-data/downloadDate.txt', sep=''), header = FALSE)))
+                        strsplit(list.files(get_cache_dir(get_pkg_info('ginmappeR')))[[1]],'bz2-')[[1]][[2]]))
     }
 }
