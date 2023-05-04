@@ -3,7 +3,7 @@
 #####################################
 
 .getNCBIDatabasesLinks <- function(dbFrom="protein", id, dbTo="gene"){
-    return(entrez_link(dbfrom=dbFrom, id=id, db=dbTo))
+    return(entrez_link(dbfrom=dbFrom, id=id, db=dbTo, config = httr::config(timeout = 5)))
 }
 
 getNCBIGene2NCBIProtein <- function(id, exhaustiveMapping = FALSE){
@@ -13,7 +13,7 @@ getNCBIGene2NCBIProtein <- function(id, exhaustiveMapping = FALSE){
     query <- .getNCBIDatabasesLinks(dbFrom='gene', id=id, dbTo='protein')
     result <- character(0)
     # Handle multiple protein IDs case
-    if(!identical(query[['links']][['gene_protein']], NULL)){
+    if(!is.null(query[['links']][['gene_protein']])){
         for(queryId in query[['links']][['gene_protein']]){
             proteinXml <- entrez_fetch(db = "protein", id = queryId, rettype = "xml")
             result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
@@ -30,7 +30,7 @@ getNCBIProtein2NCBIGene <- function(id, exhaustiveMapping = FALSE){
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
 
     query <- .getNCBIDatabasesLinks(dbFrom='protein', id=id, dbTo='gene')
-    if(!identical(query[['links']][['protein_gene']], NULL)){
+    if(!is.null(query[['links']][['protein_gene']])){
         if(!exhaustiveMapping){
             return(c(query[['links']][['protein_gene']])[1])
         }
@@ -47,7 +47,7 @@ getNCBIProtein2NCBINucleotide <- function(id, exhaustiveMapping = FALSE){
     query <- .getNCBIDatabasesLinks(dbFrom='protein', id=id, dbTo='nucleotide')
     result <- character(0)
     # Handle multiple protein IDs case
-    if(!identical(query[['links']][['protein_nuccore']], NULL)){
+    if(!is.null(query[['links']][['protein_nuccore']])){
         for(queryId in query[['links']][['protein_nuccore']]){
             proteinXml <- entrez_fetch(db = "nucleotide", id = queryId, rettype = "xml")
             result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
@@ -66,7 +66,7 @@ getNCBINucleotide2NCBIProtein <- function(id, exhaustiveMapping = FALSE){
     query <- .getNCBIDatabasesLinks(dbFrom='nucleotide', id=id, dbTo='protein')
     result <- character(0)
     # Handle multiple protein IDs case
-    if(!identical(query[['links']][['nuccore_protein']], NULL)){
+    if(!is.null(query[['links']][['nuccore_protein']])){
         for(queryId in query[['links']][['nuccore_protein']]){
             proteinXml <- entrez_fetch(db = "protein", id = queryId, rettype = "xml")
             result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
@@ -85,7 +85,7 @@ getNCBIGene2NCBINucleotide <- function(id, exhaustiveMapping = FALSE){
     query <- .getNCBIDatabasesLinks(dbFrom='gene', id=id, dbTo='nucleotide')
     result <- character(0)
     # Handle multiple protein IDs case
-    if(!identical(query[['links']][['gene_nuccore']], NULL)){
+    if(!is.null(query[['links']][['gene_nuccore']])){
         for(queryId in query[['links']][['gene_nuccore']]){
             proteinXml <- entrez_fetch(db = "nucleotide", id = queryId, rettype = "xml")
             result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
@@ -103,7 +103,7 @@ getNCBINucleotide2NCBIGene <- function(id, exhaustiveMapping = FALSE){
 
     query <- .getNCBIDatabasesLinks(dbFrom='nucleotide', id=id, dbTo='gene')
 
-    if(!identical(query[['links']][['nuccore_gene']], NULL)){
+    if(!is.null(query[['links']][['nuccore_gene']])){
         if(!exhaustiveMapping){
             return(c(query[['links']][['nuccore_gene']])[1])
         }

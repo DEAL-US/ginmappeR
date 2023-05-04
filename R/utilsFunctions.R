@@ -132,7 +132,7 @@
         zipF<- paste(get_cache_dir(pkgInfo),'/',localRelativeFilenames[1], sep='')
         outDir<- paste(get_cache_dir(pkgInfo),'/card-data', sep='')
 
-        # Unizip the compressed file
+        # Unzip the compressed file
         untar(zipF, exdir = './card-data')
         # Move it to cached files directory
         file.rename('./card-data', outDir)

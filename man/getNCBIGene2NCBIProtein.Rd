@@ -9,8 +9,9 @@ exception if no translation is found.}
 getNCBIGene2NCBIProtein(id)
 }
 \arguments{
-  \item{id}{valid NCBI Gene database ID
-  }
+  \item{id}{valid NCBI Gene database ID}
+  \item{exhaustiveMapping}{logical value (TRUE or FALSE) indicating to retrieve all possible translations
+  or only the first and fastest one}
 }
 \value{
 A list of translated NCBI Protein IDs.

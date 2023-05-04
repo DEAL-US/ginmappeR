@@ -41,6 +41,3 @@ jobs:
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
-        with:
-          upload-snapshots: true
-          upload-results: true
