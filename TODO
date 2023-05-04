@@ -39,6 +39,9 @@ code
 # TODO: only extract aro_index.tsv from CARD zip if, finally, it's the unique file employed
 
 # TODO: Fix tests environment and integrate with GitHub Actions.
+    - Add messsage(...)
+    - Try only CARD tests in GHA.
+    - Timeout for UniProt.ws queries.
 
 # TODO: Save CARD datbase (aro_index dataframe) in a variable in order to avoid loading it many times
 # Possibility of making a function out of this code:
