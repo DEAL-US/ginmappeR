@@ -1,6 +1,6 @@
 \name{getNCBIGene2NCBINucleotide}
 \alias{getNCBIGene2NCBINucleotide}
-\title{Translates an NCBI Gene database ID to NCBI Nucleotide database}
+\title{Translates a NCBI Gene database ID to NCBI Nucleotide database}
 \description{
 Retrieves the ID translation of an specific instance of NCBI Gene database ID to
 the NCBI Nucleotide database. It returns a vector of the translations or an

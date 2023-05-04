@@ -1,49 +1,9 @@
-# [ TODO ]: documentation of methods:
-    - getNCBIProtein2UniProt
-    - getNCBIGene2UniProt
-    - getNCBINucleotide2UniProt
-    - getUniProtSimilarGenes
-    - getUniProt2KEGG
-    - getNCBIProtein2KEGG
-    - getNCBINucleotide2KEGG
-    - getNCBIGene2KEGG
-    - getUniProt2NCBIProtein
-    - getUniProt2NCBINucleotide
-    - getUniProt2NCBIGene
-    - getKEGG2UniProt
-    - getKEGG2NCBIProtein
-    - getKEGG2NCBINucleotide
-    - getKEGG2NCBIGene
-    - getCARD2NCBIProtein
-    - getCARD2NCBINucleotide
-    - getCARD2NCBIGene
-    - getCARD2UniProt
-    - getCARD2KEGG
-    - getNCBIProtein2CARD
-    - getNCBINucleotide2CARD
-    - getNCBIGene2CARD
-    - getUniProt2CARD
-    - getKEGG2CARD
-    - updateCARDDataBase
-
-
-# TODO: fix Windows CARD database download paths and permissions issue.
-
 # TODO: suppress UniProt.ws '(\) waiting for query completion.......... 00:00:02' messages
-
-# TODO: CARD last version checker and downloader. Posibility of caching CARD between R sessions,
-check https://blog.r-hub.io/2021/07/30/cache/.
-To not run tests that may need temporal files:
-\dontrun
-code
-\dontrun
 
 # TODO: only extract aro_index.tsv from CARD zip if, finally, it's the unique file employed
 
 # TODO: Fix tests environment and integrate with GitHub Actions.
-    - Add messsage(...)
-    - Try only CARD tests in GHA.
-    - Timeout for UniProt.ws queries.
+    - Fix Ubuntu not finding source() files in tests.
 
 # TODO: Save CARD datbase (aro_index dataframe) in a variable in order to avoid loading it many times
 # Possibility of making a function out of this code:

@@ -1,15 +1,15 @@
-\name{getNCBIProtein2UniProt}
-\alias{getNCBIProtein2UniProt}
-\title{Translates a NCBI Protein database ID to UniProt database}
+\name{getNCBIGene2UniProt}
+\alias{getNCBIGene2UniProt}
+\title{Translates a NCBI Gene database ID to UniProt database}
 \description{
-Retrieves the ID translation of an specific instance of NCBI Protein database ID to
+Retrieves the ID translation of an specific instance of NCBI Gene database ID to
 the UniProt database. It returns a vector of the translations or an
 empty vector if no translation is found.}
 \usage{
-getNCBIProtein2UniProt(ncbiId, exhaustiveMapping = FALSE, byIdenticalProteins = TRUE)
+getNCBIGene2UniProt(ncbiId, exhaustiveMapping = FALSE, byIdenticalProteins = TRUE)
 }
 \arguments{
-  \item{ncbiId}{valid NCBI Protein database ID}
+  \item{ncbiId}{valid NCBI Gene database ID}
   \item{exhaustiveMapping}{logical value (TRUE or FALSE) indicating to retrieve all possible translations
   or only the first and fastest one}
   \item{byIdenticalProteins}{logical value (TRUE or FALSE) indicating to retrieve translations of
@@ -19,8 +19,8 @@ getNCBIProtein2UniProt(ncbiId, exhaustiveMapping = FALSE, byIdenticalProteins = 
 A vector of UniProt IDs, empty if no translations were found.
 }
 \examples{
-# Translate NCBI Protein ID 'WP_010896559.1' to UniProt
+# Translate NCBI Gene ID '76524190' to UniProt
 if(interactive()){
-    getNCBIProtein2UniProt('WP_010896559.1')
+    getNCBIGene2UniProt('76524190')
 }
 }
