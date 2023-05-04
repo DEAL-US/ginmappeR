@@ -122,7 +122,7 @@
 .downloadAndExtractCARD <- function(){
 
     pkgInfo <- get_pkg_info("ginmappeR")
-    localRelativeFilenames <- c(paste('card-data.tar.bz2-', format(Sys.time(), "%a %m-%d-%Y %H:%M:%S"),sep=''))
+    localRelativeFilenames <- c(paste('card-data.tar.bz2-', format(Sys.time(), "%a %m-%d-%Y %H-%M-%S"),sep=''))
     url <- c('https://card.mcmaster.ca/latest/data')
     # Download CARD zip if not present
     ensure_files_available(pkgInfo, localRelativeFilenames, url)

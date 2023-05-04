@@ -3,8 +3,8 @@
 \title{Translates an NCBI Protein database ID to NCBI Nucleotide database}
 \description{
 Retrieves the ID translation of an specific instance of NCBI Protein database ID to
-the NCBI Nucleotide database. It returns a list of the translations or throws an
-exception if no translation is found.}
+the NCBI Nucleotide database. It returns a vector of the translations or an
+empty vector if no translation is found.}
 \usage{
 getNCBIProtein2NCBINucleotide(id, exhaustiveMapping=FALSE)
 }
@@ -14,7 +14,7 @@ getNCBIProtein2NCBINucleotide(id, exhaustiveMapping=FALSE)
   or only the first and fastest one}
 }
 \value{
-A list of translated NCBI Nucleotide IDs.
+A list of NCBI Nucleotide IDs, empty if no translations were found.
 }
 \examples{
 # Translate NCBI Protein ID 'CAA79696' to NCBI Nucleotide

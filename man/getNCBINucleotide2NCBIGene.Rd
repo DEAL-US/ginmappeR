@@ -3,8 +3,8 @@
 \title{Translates an NCBI Nucleotide database ID to NCBI Gene database}
 \description{
 Retrieves the ID translation of an specific instance of NCBI Nucleotide database ID to
-the NCBI Gene database. It returns a list of the translations or throws an
-exception if no translation is found.}
+the NCBI Gene database. It returns a vector of the translations or an
+empty vector if no translation is found.}
 \usage{
 getNCBINucleotide2NCBIGene(id, exhaustiveMapping=FALSE)
 }
@@ -14,7 +14,7 @@ getNCBINucleotide2NCBIGene(id, exhaustiveMapping=FALSE)
   or only the first and fastest one}
 }
 \value{
-A list of translated NCBI Gene IDs.
+A list of NCBI Gene IDs, empty if no translations were found.
 }
 \examples{
 # Translate NCBI Nucleotide ID 'Z21488' to NCBI Gene
