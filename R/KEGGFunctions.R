@@ -81,7 +81,6 @@ getKEGG2UniProt <- function(keggId){
     if(!identical(translationsDT, character(0))){
         if(!exhaustiveMapping){
             if(!detailedMapping){
-                print(translationsDT)
                 return(translationsDT[1])
             }else{
                 result[['DT']] <- translationsDT[1]

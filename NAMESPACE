@@ -4,6 +4,7 @@ import('KEGGREST')
 import('XML')
 import('httr')
 import('pkgfilecache')
+import("utils")
 
 export('getNCBIGene2NCBIProtein')
 export('getNCBIProtein2NCBIGene')

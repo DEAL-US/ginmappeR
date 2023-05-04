@@ -17,5 +17,5 @@ Description: Provides functionalities to translate gene or protein identifiers b
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Imports: KEGGREST, UniProt.ws, XML, rentrez, httr, pkgfilecache
+Imports: KEGGREST, UniProt.ws, XML, rentrez, httr, pkgfilecache, utils
 Suggests: RUnit, BiocGenerics
