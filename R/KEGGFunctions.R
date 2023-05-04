@@ -126,7 +126,7 @@ getKEGG2NCBIGene <- function(keggId, exhaustiveMapping = FALSE, detailedMapping 
 # Auxiliar function to retrieve intermediate NCBI ids and check their translations
 # to CARD on the go
 .getKEGG2CARDexhaustiveMappingAux <- function(keggId, ncbiDB, bySimilarGenes){
-    aroIndex <- read.csv(paste(get_cache_dir(get_pkg_info("ginmappeR")),'/card-data/aro_index.tsv', sep=''), sep='\t')
+    aroIndex <- read.csv(paste(getwd(),'/card-data/aro_index.tsv',sep=''), sep='\t')
 
     # This function translates a bunch of NCBI ids to CARD
     .auxNCBI2CARD <- function(translations, ncbiDB){
@@ -175,7 +175,7 @@ getKEGG2CARD <- function(keggId, exhaustiveMapping = FALSE, detailedMapping = FA
     .checkKEGGIdExists(keggId)
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkBoolean(detailedMapping, 'detailedMapping')
-    aroIndex <- read.csv(paste(get_cache_dir(get_pkg_info("ginmappeR")),'/card-data/aro_index.tsv', sep=''), sep='\t')
+    aroIndex <- read.csv(paste(getwd(),'/card-data/aro_index.tsv',sep=''), sep='\t')
     result <- list()
 
     # Handle not exhaustiveMapping case, trying to get the fastest result present in CARD

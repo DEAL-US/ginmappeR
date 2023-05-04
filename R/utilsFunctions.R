@@ -72,7 +72,7 @@
 
     checkedCardId <- if (grepl("^ARO:", cardId)) cardId else paste0("ARO:", cardId)
 
-    aroIndex <- read.csv(paste(get_cache_dir(get_pkg_info("ginmappeR")),'/card-data/aro_index.tsv', sep=''), sep='\t')
+    aroIndex <- read.csv(paste(getwd(),'/card-data/aro_index.tsv',sep=''), sep='\t')
 
     if(!checkedCardId %in% aroIndex$ARO.Accession) {
         stop(paste('The given ARO accession "', cardId, '" is not registered in CARD database', sep = ''))
