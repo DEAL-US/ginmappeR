@@ -98,6 +98,7 @@ checkEquals(.getNCBI2UniProtDT('test'), character(0))
 message('Testing getNCBIIdenticalProteins')
 # Positive cases
 checkEquals(getNCBIIdenticalProteins('AHA80958', format = 'ids'), c('WP_063864654.1','AHA80958.1'))
+Sys.sleep(3)
 dummyDf <- data.frame(Id=c(45721358, 45721358), Source=c('RefSeq','INSDC'),
                       Nucleotide.Accession=c('NG_050043.1','KF513177.1'),
                       Start=c(1,1),Stop=c(861,861),Strand=c('+','+'),
@@ -107,6 +108,7 @@ dummyDf <- data.frame(Id=c(45721358, 45721358), Source=c('RefSeq','INSDC'),
                       Strain=c(845332,845332),Assembly=c(NA,NA))
 checkEquals(getNCBIIdenticalProteins('AHA80958', format = 'dataframe'), dummyDf)
 # Incorrect format request case
+Sys.sleep(3)
 checkException(getNCBIIdenticalProteins('AHA80958', format='test'))
 # No identical proteins found case
 checkEquals(getNCBIIdenticalProteins('test'), character(0))

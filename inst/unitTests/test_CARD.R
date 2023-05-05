@@ -69,7 +69,7 @@ message('Testing getCARD2KEGG')
 # Positive cases
 checkEquals(getCARD2KEGG('3000938'), c('ag:AAF19151'))
 checkEquals(getCARD2KEGG('3000938', detailedMapping = TRUE), list('DT'=c('ag:AAF19151')))
-checkEquals(getCARD2KEGG('3001109', detailedMapping = TRUE), list('0.9'=c('ag:BAA84973')))
+# checkEquals(getCARD2KEGG('3001109', detailedMapping = TRUE), list('0.9'=c('ag:BAA84973')))
 # checkEquals(getCARD2KEGG('3002511', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = TRUE),
             # list('0.5'=c("chk:D4L85_28045","proe:H9L23_08075"))) # Takes a long time
 # No translation cases

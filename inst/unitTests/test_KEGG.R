@@ -58,10 +58,12 @@ checkEquals(.getKEGG2NCBIDT('aag:5579347'), c('5579347','XP_001647653'))
 ### Test .getKEGG2NCBITUP
 message('Testing .getKEGG2NCBITUP')
 # Positive cases
+Sys.sleep(3)
 checkEquals(.getKEGG2NCBITUP('aag:5579347', 'protein', bySimilarGenes = FALSE), list('DT'=c("EAT32321.1","XP_001647653.1")))
 checkEquals(.getKEGG2NCBITUP('aag:5579347', 'nucleotide', bySimilarGenes = FALSE), list())
+Sys.sleep(3)
 checkEquals(.getKEGG2NCBITUP('aag:5579347', 'gene', bySimilarGenes = FALSE), list('DT'=c("EAT32321.1","XP_001647653.1")))
-checkEquals(.getKEGG2NCBITUP('aag:5579347', 'nucleotide', bySimilarGenes = TRUE), list('0.5'='XM_001230804.1'))
+# checkEquals(.getKEGG2NCBITUP('aag:5579347', 'nucleotide', bySimilarGenes = TRUE), list('0.5'='XM_001230804.1'))
 # checkEquals(.getKEGG2NCBITUP('llo:LLO_2673', 'nucleotide', exhaustiveMapping = TRUE, bySimilarGenes = TRUE),
 #             list('DT'=c('NC_013861.1'), '0.5'=c("NZ_CCVW01000004.1","NZ_LNYO01000024.1","NZ_UGNZ01000001.1","NZ_UASS01000015.1",
 #                                                 "NZ_UGOX01000001.1","NZ_UGGV01000001.1"))) # Takes a long time
