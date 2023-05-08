@@ -6,10 +6,12 @@ Retrieves the ID translation of an specific instance of NCBI Protein database ID
 the CARD database. It returns a vector of the translations or an
 empty vector if no translation is found.}
 \usage{
-getNCBIProtein2CARD(ncbiId)
+getNCBIProtein2CARD(ncbiId, exhaustiveMapping = FALSE)
 }
 \arguments{
   \item{ncbiId}{valid NCBI Protein database ID}
+  \item{exhaustiveMapping}{logical value (TRUE or FALSE) indicating to retrieve all possible translations
+  or only the first and fastest one}
 }
 \value{
 A vector of CARD IDs, empty if no translations were found.

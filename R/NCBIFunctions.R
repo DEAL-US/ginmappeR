@@ -387,7 +387,7 @@ getNCBIGene2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping 
 # NCBI databases to CARD #
 ##########################
 
-getNCBIProtein2CARD <- function(ncbiId){
+getNCBIProtein2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
 
     .checkIfCARDIsDownloaded()
     .checkNCBIProteinIdExists(ncbiId)
@@ -396,11 +396,14 @@ getNCBIProtein2CARD <- function(ncbiId){
 
     aroIndex <- read.csv(paste(getwd(),'/card-data/aro_index.tsv',sep=''), sep='\t')
     aroAccession <- aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == ncbiId, "ARO.Accession"]
-
-    return(aroAccession)
+    if(exhaustiveMapping){
+        return(aroAccession)
+    }else{
+        return(if(length(aroAccession>0)) aroAccession[[1]] else aroAccession)
+    }
 }
 
-getNCBINucleotide2CARD <- function(ncbiId){
+getNCBINucleotide2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
 
     .checkIfCARDIsDownloaded()
     .checkNCBINucleotideIdExists(ncbiId)
@@ -409,11 +412,14 @@ getNCBINucleotide2CARD <- function(ncbiId){
 
     aroIndex <- read.csv(paste(getwd(),'/card-data/aro_index.tsv',sep=''), sep='\t')
     aroAccession <- aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == ncbiId, "ARO.Accession"]
-
-    return(aroAccession)
+    if(exhaustiveMapping){
+        return(aroAccession)
+    }else{
+        return(if(length(aroAccession>0)) aroAccession[[1]] else aroAccession)
+    }
 }
 
-getNCBIGene2CARD <- function(ncbiId){
+getNCBIGene2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
 
     .checkIfCARDIsDownloaded()
     .checkNCBIGeneIdExists(ncbiId)
@@ -433,5 +439,9 @@ getNCBIGene2CARD <- function(ncbiId){
             result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == auxId, "ARO.Accession"])
         }
     }
-    return(unique(result))
+    if(exhaustiveMapping){
+        return(unique(result))
+    }else{
+        return(if(length(result>0)) unique(result)[[1]] else unique(result))
+    }
 }
