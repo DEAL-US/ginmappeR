@@ -21,65 +21,60 @@ source('../../../R/utilsFunctions.R')
 # NCBI databases inter-translations #
 #####################################
 
-##
-## Deactivated tests for CI because of rentrez library 'rentrez_link' failure
-## with successive calls
-##
+### Test getNCBIGene2NCBIProtein
+message('Testing getNCBIGene2NCBIProtein')
+# Positive case
+checkEquals(getNCBIGene2NCBIProtein('76524190'), c('WP_001082319'))
+checkEquals(getNCBIGene2NCBIProtein('76524190', exhaustiveMapping = TRUE), c('WP_001082319'))
+# ID not registered case
+checkException(getNCBIGene2NCBIProtein('test'))
+# No translation case
+checkEquals(getNCBIGene2NCBIProtein('WP_001082319'), character(0))
 
-# ### Test getNCBIGene2NCBIProtein
-# message('Testing getNCBIGene2NCBIProtein')
-# # Positive case
-# checkEquals(getNCBIGene2NCBIProtein('76524190'), c('WP_001082319'))
-# checkEquals(getNCBIGene2NCBIProtein('76524190', exhaustiveMapping = TRUE), c('WP_001082319'))
-# # ID not registered case
-# checkException(getNCBIGene2NCBIProtein('test'))
-# # No translation case
-# checkEquals(getNCBIGene2NCBIProtein('WP_001082319'), character(0))
-#
-# ### Test getNCBIProtein2NCBIGene
-# message('Testing getNCBIProtein2NCBIGene')
-# # Positive case
-# checkEquals(getNCBIProtein2NCBIGene('CAA79696'), c('1272'))
-# checkEquals(getNCBIProtein2NCBIGene('CAA79696', exhaustiveMapping = TRUE), c('1272'))
-# # ID not registered case
-# checkException(getNCBIProtein2NCBIGene('test'))
-# # No translation case
-# checkEquals(getNCBIProtein2NCBIGene('WP_011997479'), character(0))
-#
-# ### Test getNCBIProtein2NCBINucleotide
-# message('Testing getNCBIProtein2NCBINucleotide')
-# # Positive case
-# checkEquals(getNCBIProtein2NCBINucleotide('AFH35853'), c('JQ394987'))
-# checkEquals(getNCBIProtein2NCBINucleotide('AFH35853', exhaustiveMapping = TRUE), c('JQ394987'))
-# # ID not registered case
-# checkException(getNCBIProtein2NCBINucleotide('test'))
-#
-# ### Test getNCBINucleotide2NCBIProtein
-# message('Testing getNCBINucleotide2NCBIProtein')
-# # Positive case
-# checkEquals(getNCBINucleotide2NCBIProtein('JQ394987'), c('AFH35853'))
-# # ID not registered case
-# checkException(getNCBINucleotide2NCBIProtein('test'))
-#
-# ### Test getNCBIGene2NCBINucleotide
-# message('Testing getNCBIGene2NCBINucleotide')
-# # Positive case
-# checkEquals(getNCBIGene2NCBINucleotide('76524190'), c('NZ_CP059690'))
-# checkEquals(getNCBIGene2NCBINucleotide('76524190', exhaustiveMapping = TRUE), c('NZ_CP059690'))
-# # ID not registered case
-# checkException(getNCBIGene2NCBINucleotide('test'))
-# # No translation case
-# checkEquals(getNCBIGene2NCBINucleotide('WP_001082319'), character(0))
-#
-# ### Test getNCBINucleotide2NCBIGene
-# message('Testing getNCBINucleotide2NCBIGene')
-# # Positive case
-# checkEquals(getNCBINucleotide2NCBIGene('Z21488'), c('1272'))
-# checkEquals(getNCBINucleotide2NCBIGene('Z21488', exhaustiveMapping = TRUE), c('1272'))
-# # ID not registered case
-# checkException(getNCBINucleotide2NCBIGene('test'))
-# # No translation case
-# checkEquals(getNCBINucleotide2NCBIGene('KF513177'), character(0))
+### Test getNCBIProtein2NCBIGene
+message('Testing getNCBIProtein2NCBIGene')
+# Positive case
+checkEquals(getNCBIProtein2NCBIGene('CAA79696'), c('1272'))
+checkEquals(getNCBIProtein2NCBIGene('CAA79696', exhaustiveMapping = TRUE), c('1272'))
+# ID not registered case
+checkException(getNCBIProtein2NCBIGene('test'))
+# No translation case
+checkEquals(getNCBIProtein2NCBIGene('WP_011997479'), character(0))
+
+### Test getNCBIProtein2NCBINucleotide
+message('Testing getNCBIProtein2NCBINucleotide')
+# Positive case
+checkEquals(getNCBIProtein2NCBINucleotide('AFH35853'), c('JQ394987'))
+checkEquals(getNCBIProtein2NCBINucleotide('AFH35853', exhaustiveMapping = TRUE), c('JQ394987'))
+# ID not registered case
+checkException(getNCBIProtein2NCBINucleotide('test'))
+
+### Test getNCBINucleotide2NCBIProtein
+message('Testing getNCBINucleotide2NCBIProtein')
+# Positive case
+checkEquals(getNCBINucleotide2NCBIProtein('JQ394987'), c('AFH35853'))
+# ID not registered case
+checkException(getNCBINucleotide2NCBIProtein('test'))
+
+### Test getNCBIGene2NCBINucleotide
+message('Testing getNCBIGene2NCBINucleotide')
+# Positive case
+checkEquals(getNCBIGene2NCBINucleotide('76524190'), c('NZ_CP059690'))
+checkEquals(getNCBIGene2NCBINucleotide('76524190', exhaustiveMapping = TRUE), c('NZ_CP059690'))
+# ID not registered case
+checkException(getNCBIGene2NCBINucleotide('test'))
+# No translation case
+checkEquals(getNCBIGene2NCBINucleotide('WP_001082319'), character(0))
+
+### Test getNCBINucleotide2NCBIGene
+message('Testing getNCBINucleotide2NCBIGene')
+# Positive case
+checkEquals(getNCBINucleotide2NCBIGene('Z21488'), c('1272'))
+checkEquals(getNCBINucleotide2NCBIGene('Z21488', exhaustiveMapping = TRUE), c('1272'))
+# ID not registered case
+checkException(getNCBINucleotide2NCBIGene('test'))
+# No translation case
+checkEquals(getNCBINucleotide2NCBIGene('KF513177'), character(0))
 
 #############################
 # NCBI databases to UniProt #

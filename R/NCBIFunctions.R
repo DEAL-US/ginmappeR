@@ -3,7 +3,16 @@
 #####################################
 
 .getNCBIDatabasesLinks <- function(dbFrom="protein", id, dbTo="gene"){
-    return(entrez_link(dbfrom=dbFrom, id=id, db=dbTo, config = httr::config(timeout = 5)))
+    query <- entrez_link(dbfrom=dbFrom, id=id, db=dbTo, config = httr::config(timeout = 10))
+    attempts <- 0
+    while(!length(query[['links']])>0 & attempts < 10){
+        Sys.sleep(1)
+        try(
+            query <- entrez_link(dbfrom=dbFrom, id=id, db=dbTo, config = httr::config(timeout = 10))
+        )
+        attempts <- attempts + 1
+    }
+    return(return(query))
 }
 
 getNCBIGene2NCBIProtein <- function(id, exhaustiveMapping = FALSE){
