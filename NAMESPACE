@@ -5,6 +5,8 @@ import('XML')
 import('httr')
 import('pkgfilecache')
 import("utils")
+importFrom(memoise, memoise)
+import('cachem')
 
 export('getNCBIGene2NCBIProtein')
 export('getNCBIProtein2NCBIGene')

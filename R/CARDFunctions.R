@@ -66,8 +66,6 @@ getCARD2UniProt <- function(cardId, exhaustiveMapping = FALSE){
 # CARD database to KEGG #
 #########################
 
-### TODO: documentation:
-# Warn that byIdenticalProteins and bySimilarGenes combined with exhaustiveMapping takes a long time to finish
 getCARD2KEGG <- function(cardId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
 
     .checkIfCARDIsDownloaded()

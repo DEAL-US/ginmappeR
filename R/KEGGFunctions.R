@@ -66,7 +66,6 @@ getKEGG2UniProt <- function(keggId){
     return(lapply(result, unique))
 }
 
-# TODO: Warning to be included in documentation: using bySimilarGenes=TRUE with exhaustiveMapping=TRUE takes a long time
 .getKEGG2NCBI <- function(keggId, ncbiDB, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
     .checkKEGGIdExists(keggId)
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
