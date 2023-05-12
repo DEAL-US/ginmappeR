@@ -10,8 +10,8 @@ getNCBIGene2CARD(ncbiId, exhaustiveMapping = FALSE)
 }
 \arguments{
   \item{ncbiId}{valid NCBI Gene database ID}
-  \item{exhaustiveMapping}{logical value (TRUE or FALSE) indicating to retrieve all possible translations
-  or only the first and fastest one}
+  \item{exhaustiveMapping}{logical value (TRUE or FALSE) indicating to retrieve
+  all possible translations or only the first and fastest one}
 }
 \value{
 A vector of CARD IDs, empty if no translations were found.

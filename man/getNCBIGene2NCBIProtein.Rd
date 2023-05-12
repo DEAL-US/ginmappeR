@@ -10,8 +10,8 @@ getNCBIGene2NCBIProtein(id, exhaustiveMapping=FALSE)
 }
 \arguments{
   \item{id}{valid NCBI Gene database ID}
-  \item{exhaustiveMapping}{logical value (TRUE or FALSE) indicating to retrieve all possible translations
-  or only the first and fastest one}
+  \item{exhaustiveMapping}{logical value (TRUE or FALSE) indicating to retrieve
+  all possible translations or only the first and fastest one}
 }
 \value{
 A list of NCBI Protein IDs, empty if no translations were found.

@@ -2,8 +2,8 @@
 \alias{getKEGG2UniProt}
 \title{Translates a KEGG Genes database ID to UniProt database}
 \description{
-Retrieves the ID translation of an specific instance of KEGG Genes database ID to
-the UniProt database. It returns a vector of the translations or an
+Retrieves the ID translation of an specific instance of KEGG Genes database ID
+to the UniProt database. It returns a vector of the translations or an
 empty vector if no translation is found.}
 \usage{
 getKEGG2UniProt(keggId)

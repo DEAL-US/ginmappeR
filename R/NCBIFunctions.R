@@ -5,6 +5,8 @@
 .getNCBIDatabasesLinks <- function(dbFrom="protein", id, dbTo="gene"){
     query <- entrez_link(dbfrom=dbFrom, id=id, db=dbTo, config = httr::config(timeout = 10))
     attempts <- 0
+    # entrez_link fails randomly and returns character(0) from time to time, to avoid that,
+    # retry has been added for a maximum of 10 times
     while(!length(query[['links']])>0 & attempts < 10){
         Sys.sleep(1)
         try(
@@ -55,7 +57,7 @@ getNCBIProtein2NCBINucleotide <- function(id, exhaustiveMapping = FALSE){
 
     query <- .getNCBIDatabasesLinks(dbFrom='protein', id=id, dbTo='nucleotide')
     result <- character(0)
-    # Handle multiple protein IDs case
+
     if(!is.null(query[['links']][['protein_nuccore']])){
         for(queryId in query[['links']][['protein_nuccore']]){
             proteinXml <- entrez_fetch(db = "nucleotide", id = queryId, rettype = "xml")
@@ -170,7 +172,6 @@ getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
         switch(format,
                'ids'= return(character(0)),
                'dataframe' = return(data.frame()))
-        # stop('The given NCBI ID has no similar proteins registered')
     }else{
         auxId <- auxId$ids[[1]]
         identicalProteins <- NA
