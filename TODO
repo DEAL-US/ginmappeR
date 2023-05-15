@@ -2,6 +2,8 @@
 
 # TODO: Create a function to modify caché size and timeout
 
+# TODO: api tests?
+
 # TODO: Save CARD datbase (aro_index dataframe) in a variable in order to avoid loading it many times
 # Possibility of making a function out of this code:
     aroIndex <- read.csv(paste(get_cache_dir(get_pkg_info("ginmappeR")),'/card-data/aro_index.tsv', sep=''), sep='\t')
