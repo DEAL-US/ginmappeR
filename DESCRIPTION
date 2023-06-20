@@ -2,12 +2,14 @@ Package: ginmappeR
 Type: Package
 Title: Gene Identifier Mapper
 Version: 0.1.0
-Author: 
+Authors@R: c(
     person("Fernando", "Sola", email = "fsola@us.es", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-1685-3270")),
-    person("Rafael", "Ayala", email = "rafael.ayala@oist.jp", role = "aut", comment = c(ORCID = "0000-0002-9332-4623")),
     person("Daniel", "Ayala", email = "dayala1@us.es", role = "aut", comment = c(ORCID = "0000-0003-2095-1009")),
-    person("Inma", "Hernandez", email = "inmahernandez@us.es", role = "aut", comment = c(ORCID = "0000-0001-8920-6635")),
-    person("David", "Ruiz", email = "druiz@us.es", role = "aut", comment = c(ORCID = "0000-0003-4460-5493")),
+    person("Marina", "Pulido", email = "mpulido-ibis@us.es", role = "aut", comment = c(ORCID = "0000-0003-1633-4294")),
+    person("Rafael", "Ayala", email = "rafael.ayala@oist.jp", role = "aut", comment = c(ORCID = "0000-0002-9332-4623")),
+    person("Lorena", "López-Cerero", email = "llopez@us.es", role = "aut", comment = c(ORCID = "0000-0001-8950-4384")),
+    person("Inma", "Hernández", email = "inmahernandez@us.es", role = "aut", comment = c(ORCID = "0000-0001-8920-6635")),
+    person("David", "Ruiz", email = "druiz@us.es", role = "aut", comment = c(ORCID = "0000-0003-4460-5493")))
 Maintainer: Fernando Sola <fsola@us.es>
 Description: Provides functionalities to translate gene or protein identifiers between
     state-of-art biological databases: CARD (<https://card.mcmaster.ca/>), NCBI Protein,

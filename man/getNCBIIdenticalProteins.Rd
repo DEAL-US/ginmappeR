@@ -1,6 +1,6 @@
 \name{getNCBIIdenticalProteins}
 \alias{getNCBIIdenticalProteins}
-\title{Searches NCBI Identical Protein Groups database by a given NCBI ID}
+\title{Search NCBI Identical Protein database by a given NCBI ID}
 \description{
 Retrieves identical NCBI proteins to that of a given ID.}
 \usage{

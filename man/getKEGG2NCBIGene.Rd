@@ -1,6 +1,6 @@
 \name{getKEGG2NCBIGene}
 \alias{getKEGG2NCBIGene}
-\title{Translates an KEGG database ID to NCBI Gene database}
+\title{Translates a KEGG database ID to NCBI Gene database}
 \description{
 Retrieves the ID translation of an specific instance of KEGG Genes database ID
 to the NCBI Gene database.}

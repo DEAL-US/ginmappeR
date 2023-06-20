@@ -24,13 +24,31 @@ errorHandler <- function(func, res, ...){
     })
 }
 
-###################################
-#        Utility endpoints        #
-###################################
+#########################################################
+#        Deactivated endpoints for server version       #
+#########################################################
 
-#* Updates CARD database version
-#* @post /updateCard
-ginmappeR:::updateCARDDataBase
+# #* Updates CARD database version
+# #* @post /updateCard
+# ginmappeR:::updateCARDDataBase
+
+# #* Get NCBI identical proteins
+# #* @param format
+# #* @get /identicalProteins/<ncbiId>
+# function(ncbiId, format = 'ids', res){
+#     if (!format %in% c("ids", "dataframe")){format <- 'ids'}
+#     errorHandler(func = ginmappeR:::getNCBIIdenticalProteins, res = res, ncbiId, format)
+# }
+
+# #* Get UniProt similar genes
+# #* @param clusterIdentity
+# #* @param clusterNames:bool
+# #* @get /similarGenes/<upId>
+# function(upId, clusterIdentity = '1.0', clusterNames = FALSE, res){
+#     if (!clusterIdentity %in% c("1.0", "0.9", "0.5")){clusterIdentity <- '1.0'}
+#     if (clusterNames %in% c("TRUE", "FALSE")){clusterNames <- as.logical(clusterNames)} else {clusterNames <- FALSE}
+#     errorHandler(func = ginmappeR:::getUniProtSimilarGenes, res = res, upId, clusterIdentity, clusterNames)
+# }
 
 ###################################
 #         CARD endpoints          #
@@ -188,14 +206,6 @@ function(ncbiId, exhaustiveMapping = FALSE, res){
     errorHandler(func = ginmappeR:::getNCBINucleotide2NCBIGene, res = res, ncbiId, exhaustiveMapping)
 }
 
-#* Get NCBI identical proteins
-#* @param format
-#* @get /identicalProteins/<ncbiId>
-function(ncbiId, format = 'ids'){
-    if (!format %in% c("ids", "dataframe")){format <- 'ids'}
-    ginmappeR:::getNCBIIdenticalProteins(ncbiId, format)
-}
-
 #* Translate NCBI Protein to UniProt
 #* @param exhaustiveMapping:bool
 #* @param byIdenticalProteins:bool
@@ -297,16 +307,6 @@ function(ncbiId, exhaustiveMapping = FALSE, res){
 ###################################
 #        UniProt endpoints        #
 ###################################
-
-#* Get UniProt similar genes
-#* @param clusterIdentity
-#* @param clusterNames:bool
-#* @get /similarGenes/<upId>
-function(upId, clusterIdentity = '1.0', clusterNames = FALSE){
-    if (!clusterIdentity %in% c("1.0", "0.9", "0.5")){clusterIdentity <- '1.0'}
-    if (clusterNames %in% c("TRUE", "FALSE")){clusterNames <- as.logical(clusterNames)} else {clusterNames <- FALSE}
-    ginmappeR:::getUniProtSimilarGenes(upId, clusterIdentity, clusterNames)
-}
 
 #* Translate UniProt to KEGG
 #* @param exhaustiveMapping:bool

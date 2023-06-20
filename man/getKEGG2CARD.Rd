@@ -1,6 +1,6 @@
 \name{getKEGG2CARD}
 \alias{getKEGG2CARD}
-\title{Translates an KEGG database ID to CARD database}
+\title{Translates a KEGG database ID to CARD database}
 \description{
 Retrieves the ID translation of an specific instance of KEGG Genes database
 ID to the CARD database.}
