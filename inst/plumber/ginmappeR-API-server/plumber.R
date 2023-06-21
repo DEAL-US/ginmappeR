@@ -24,6 +24,15 @@ errorHandler <- function(func, res, ...){
     })
 }
 
+# ------- DELETE
+#* Test endpoint
+#* @get /test
+function(){
+    return('Test endpoint')
+}
+#
+
+
 #########################################################
 #        Deactivated endpoints for server version       #
 #########################################################
