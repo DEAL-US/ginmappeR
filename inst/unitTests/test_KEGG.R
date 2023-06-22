@@ -12,8 +12,8 @@ source('../../../R/KEGGFunctions.R')
 source('../../../R/utilsFunctions.R')
 
 # # Local execution imports
-# source('../R/KEGGFunctions.R')
-# source('../R/utilsFunctions.R')
+# source('../../ginmappeR/R/KEGGFunctions.R')
+# source('../../ginmappeR/R/utilsFunctions.R')
 
 ###################################
 # KEGG database auxiliar function #

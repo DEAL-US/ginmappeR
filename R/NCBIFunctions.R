@@ -54,39 +54,51 @@ getNCBIProtein2NCBIGene <- function(id, exhaustiveMapping = FALSE){
 getNCBIProtein2NCBINucleotide <- function(id, exhaustiveMapping = FALSE){
     .checkNCBIProteinIdExists(id)
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkIfCARDIsDownloaded()
 
-    query <- .getNCBIDatabasesLinks(dbFrom='protein', id=id, dbTo='nucleotide')
     result <- character(0)
 
-    if(!is.null(query[['links']][['protein_nuccore']])){
-        for(queryId in query[['links']][['protein_nuccore']]){
-            proteinXml <- entrez_fetch(db = "nucleotide", id = queryId, rettype = "xml")
-            result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
-            if(!exhaustiveMapping){
-                return(result)
+    aroIndex <- read.csv(paste(getwd(),'/card-data/aro_index.tsv',sep=''), sep='\t')
+    result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == strsplit(id,'.', fixed = T)[[1]][[1]], "DNA.Accession"])
+    if(!exhaustiveMapping & length(result)>1){result<-result[[1]]}
+
+    if(exhaustiveMapping){
+        query <- .getNCBIDatabasesLinks(dbFrom='protein', id=id, dbTo='nucleotide')
+
+        if(!is.null(query[['links']][['protein_nuccore']])){
+            for(queryId in query[['links']][['protein_nuccore']]){
+                proteinXml <- entrez_fetch(db = "nucleotide", id = queryId, rettype = "xml")
+                result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
             }
         }
     }
-    return(result)
+    result <- unique(unlist(sapply(strsplit(result, "\\."), "[[", 1), use.names = FALSE))
+    if(is.null(result)){return(character(0))}else{return(result)}
 }
 
 getNCBINucleotide2NCBIProtein <- function(id, exhaustiveMapping = FALSE){
     .checkNCBINucleotideIdExists(id)
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkIfCARDIsDownloaded()
 
-    query <- .getNCBIDatabasesLinks(dbFrom='nucleotide', id=id, dbTo='protein')
     result <- character(0)
-    # Handle multiple protein IDs case
-    if(!is.null(query[['links']][['nuccore_protein']])){
-        for(queryId in query[['links']][['nuccore_protein']]){
-            proteinXml <- entrez_fetch(db = "protein", id = queryId, rettype = "xml")
-            result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
-            if(!exhaustiveMapping){
-                return(result)
+
+    aroIndex <- read.csv(paste(getwd(),'/card-data/aro_index.tsv',sep=''), sep='\t')
+    result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == strsplit(id,'.', fixed = T)[[1]][[1]], "Protein.Accession"])
+    if(!exhaustiveMapping & length(result)>1){result<-result[[1]]}
+
+    if(exhaustiveMapping){
+        query <- .getNCBIDatabasesLinks(dbFrom='nucleotide', id=id, dbTo='protein')
+        # Handle multiple protein IDs case
+        if(!is.null(query[['links']][['nuccore_protein']])){
+            for(queryId in query[['links']][['nuccore_protein']]){
+                proteinXml <- entrez_fetch(db = "protein", id = queryId, rettype = "xml")
+                result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
             }
         }
     }
-    return(result)
+    result <- unique(unlist(sapply(strsplit(result, "\\."), "[[", 1), use.names = FALSE))
+    if(is.null(result)){return(character(0))}else{return(result)}
 }
 
 getNCBIGene2NCBINucleotide <- function(id, exhaustiveMapping = FALSE){

@@ -13,9 +13,9 @@ source('../../../R/UniProtFunctions.R')
 source('../../../R/utilsFunctions.R')
 
 # # Local execution imports
-# source('../R/NCBIFunctions.R')
-# source('../R/UniProtFunctions.R')
-# source('../R/utilsFunctions.R')
+# source('../../ginmappeR/R/NCBIFunctions.R')
+# source('../../ginmappeR/R/UniProtFunctions.R')
+# source('../../ginmappeR/R/utilsFunctions.R')
 
 #####################################
 # NCBI databases inter-translations #
@@ -92,15 +92,18 @@ checkEquals(.getNCBI2UniProtDT('test'), character(0))
 ### Test getNCBIIdenticalProteins
 message('Testing getNCBIIdenticalProteins')
 # Positive cases
-checkEquals(getNCBIIdenticalProteins('AHA80958', format = 'ids'), c('WP_063864654.1','AHA80958.1'))
+checkEquals(getNCBIIdenticalProteins('AHA80958', format = 'ids'), c('WP_063864654.1','AHA80958.1', "EKD8974449.1", "EKD8979565.1"))
 Sys.sleep(3)
-dummyDf <- data.frame(Id=c(45721358, 45721358), Source=c('RefSeq','INSDC'),
-                      Nucleotide.Accession=c('NG_050043.1','KF513177.1'),
-                      Start=c(1,1),Stop=c(861,861),Strand=c('+','+'),
-                      Protein=c('WP_063864654.1','AHA80958.1'),
-                      Protein.Name=c('class A beta-lactamase SHV-172','beta-lactamase SHV-172'),
-                      Organism=c('Klebsiella pneumoniae','Klebsiella pneumoniae'),
-                      Strain=c(845332,845332),Assembly=c(NA,NA))
+dummyDf <- data.frame(Id=c(45721358, 45721358, 45721358, 45721358),
+                      Source=c('RefSeq','INSDC','INSDC','INSDC'),
+                      Nucleotide.Accession=c('NG_050043.1','KF513177.1', 'ABJLVL010000001.1', 'ABJLVL010000113.1'),
+                      Start=c(1,1, 124981, 1755),
+                      Stop=c(861,861, 125841, 2615),Strand=c('+','+','-','+'),
+                      Protein=c('WP_063864654.1','AHA80958.1', 'EKD8974449.1', 'EKD8979565.1'),
+                      Protein.Name=c('class A beta-lactamase SHV-172','beta-lactamase SHV-172', 'class A beta-lactamase SHV-172',
+                                     'class A beta-lactamase SHV-172'),
+                      Organism=c('Klebsiella pneumoniae','Klebsiella pneumoniae','Klebsiella pneumoniae','Klebsiella pneumoniae'),
+                      Strain=c(845332,845332, NA, NA),Assembly=c('', '','GCA_026265195.1','GCA_026265195.1'))
 checkEquals(getNCBIIdenticalProteins('AHA80958', format = 'dataframe'), dummyDf)
 # Incorrect format request case
 Sys.sleep(3)

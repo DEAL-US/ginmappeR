@@ -4,6 +4,8 @@
 
 # TODO: api tests?
 
+# TODO: automatically check CARD version when calling any CARD method by Last-Modified header in CARD download endpoint.
+
 # TODO: Save CARD datbase (aro_index dataframe) in a variable in order to avoid loading it many times
 # Possibility of making a function out of this code:
     aroIndex <- read.csv(paste(get_cache_dir(get_pkg_info("ginmappeR")),'/card-data/aro_index.tsv', sep=''), sep='\t')

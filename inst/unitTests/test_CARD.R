@@ -12,8 +12,8 @@ source('../../../R/CARDFunctions.R')
 source('../../../R/utilsFunctions.R')
 
 # # Local execution imports
-# source('../R/CARDFunctions.R')
-# source('../R/utilsFunctions.R')
+# source('../../ginmappeR/R/CARDFunctions.R')
+# source('../../ginmappeR/R/utilsFunctions.R')
 
 #########################
 # CARD database to NCBI #
