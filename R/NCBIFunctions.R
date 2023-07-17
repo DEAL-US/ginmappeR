@@ -7,8 +7,8 @@
     attempts <- 0
     # entrez_link fails randomly and returns character(0) from time to time, to avoid that,
     # retry has been added for a maximum of 10 times
-    while(!length(query[['links']])>0 & attempts < 10){
-        Sys.sleep(1)
+    while(!length(query[['links']])>0 & attempts < 20){
+        Sys.sleep(3)
         try(
             query <- entrez_link(dbfrom=dbFrom, id=id, db=dbTo, config = httr::config(timeout = 10))
         )
@@ -250,58 +250,55 @@ getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
     }
 }
 
-# NCBI Protein to UniProt translation
-getNCBIProtein2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, byIdenticalProteins = TRUE){
-    .checkNCBIProteinIdExists(ncbiId)
+.getNCBI2UniProtAux <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE){
     .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkBoolean(detailedMapping, 'detailedMapping')
+
+    result <- list()
 
     # First translation strategy
-    translatedIDs <- .getNCBI2UniProtDT(ncbiId)
+    result[['DT']] <- .getNCBI2UniProtDT(ncbiId)
 
     # Second translation strategy
     if(byIdenticalProteins){
-        translatedIDs <- c(translatedIDs, .getNCBI2UniProtIP(ncbiId))
+        aux <- .getNCBI2UniProtIP(ncbiId)
+        if(length(aux)>0){
+            result[['1.0']] <- aux
+        }
     }
 
-    if(!exhaustiveMapping&!is.na(unique(translatedIDs)[1])){return(unique(translatedIDs)[1])}
-    else{return(unique(translatedIDs))}
+    if(!detailedMapping){
+        result <- unique(unlist(result, recursive = FALSE, use.names = FALSE))
+        if(is.null(result)){result <- character(0)}
+        if(length(result)>0&!exhaustiveMapping){result <- result[[1]]}
+    }else{
+        result <- lapply(result, unique)
+        result <- result[lengths(result) > 0]
+        if(length(result)==0){result <- list()}
+        if(length(result)>0&!exhaustiveMapping){result <- lapply(result,"[[",1)[1]}
+    }
+    return(result)
 }
 
+# NCBI Protein to UniProt translation
+getNCBIProtein2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE){
+    .checkNCBIProteinIdExists(ncbiId)
+    return(.getNCBI2UniProtAux(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                         byIdenticalProteins = byIdenticalProteins))
+}
 # NCBI Nucleotide to UniProt translation
-getNCBINucleotide2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, byIdenticalProteins = TRUE){
+getNCBINucleotide2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE){
     .checkNCBINucleotideIdExists(ncbiId)
-    .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
-    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
-
-    # First translation strategy
-    translatedIDs <- .getNCBI2UniProtDT(ncbiId)
-
-    # Second translation strategy
-    if(byIdenticalProteins){
-        translatedIDs <- c(translatedIDs, .getNCBI2UniProtIP(ncbiId))
-    }
-
-    if(!exhaustiveMapping&!is.na(unique(translatedIDs)[1])){return(unique(translatedIDs)[1])}
-    else{return(unique(translatedIDs))}
+    return(.getNCBI2UniProtAux(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                         byIdenticalProteins = byIdenticalProteins))
 }
 
 # NCBI Gene to UniProt translation
-getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, byIdenticalProteins = TRUE){
+getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE){
     .checkNCBIGeneIdExists(ncbiId)
-    .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
-    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
-
-    # First translation strategy
-    translatedIDs <- .getNCBI2UniProtDT(ncbiId)
-
-    # Second translation strategy
-    if(byIdenticalProteins){
-        translatedIDs <- c(translatedIDs, .getNCBI2UniProtIP(ncbiId))
-    }
-
-    if(!exhaustiveMapping&!is.na(unique(translatedIDs)[1])){return(unique(translatedIDs)[1])}
-    else{return(unique(translatedIDs))}
+    return(.getNCBI2UniProtAux(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                         byIdenticalProteins = byIdenticalProteins))
 }
 
 ##########################
@@ -321,19 +318,16 @@ getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, byIdenticalPr
 
 .getNCBI2KEGGTUP <- function(ncbiId, ncbiDB, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
     upIDs <- switch (ncbiDB,
-                     'protein' = getNCBIProtein2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, byIdenticalProteins = byIdenticalProteins),
-                     'nucleotide' = getNCBINucleotide2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, byIdenticalProteins = byIdenticalProteins),
-                     'gene' = getNCBIGene2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, byIdenticalProteins = byIdenticalProteins),
+                     'protein' = getNCBIProtein2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping = FALSE, byIdenticalProteins = byIdenticalProteins),
+                     'nucleotide' = getNCBINucleotide2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping =FALSE, byIdenticalProteins = byIdenticalProteins),
+                     'gene' = getNCBIGene2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping = FALSE, byIdenticalProteins = byIdenticalProteins),
     )
-
     translations <- list()
-    if(length(upIDs)>0){
 
-        for(upId in upIDs){
-            keggId <- getUniProt2KEGG(upId, exhaustiveMapping = exhaustiveMapping, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
-            if(length(keggId)>0){
-                translations <- .mergeNamedLists(translations, keggId)
-            }
+    for(upId in group){
+        keggId <- getUniProt2KEGG(upId, exhaustiveMapping = exhaustiveMapping, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
+        if(length(keggId)>0){
+            translations <- .mergeNamedLists(translations, keggId)
         }
     }
 
@@ -385,6 +379,8 @@ getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, byIdenticalPr
         if(is.null(result)){result <- character(0)}
     }else{
         result <- lapply(result, unique)
+        result <- result[lengths(result) > 0]
+        if(length(result)==0){result <- list()}
     }
     return(result)
 }

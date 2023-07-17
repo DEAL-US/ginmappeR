@@ -3,7 +3,8 @@
 \title{Translates an UniProt database ID to NCBI Nucleotide database}
 \description{
 Retrieves the ID translation of an specific instance of UniProt database ID to
-the NCBI Nucleotide database.}
+the NCBI Nucleotide database. Note that, due to the nature of
+NCBI Nucleotide database, a complete genome is often retrieved.}
 \usage{
 getUniProt2NCBINucleotide(upId, exhaustiveMapping = FALSE,
 detailedMapping = FALSE, bySimilarGenes = TRUE)

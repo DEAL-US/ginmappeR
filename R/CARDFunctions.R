@@ -45,19 +45,28 @@ getCARD2NCBIGene <- function(cardId, exhaustiveMapping = FALSE){
 # CARD database to UniProt #
 ############################
 
-getCARD2UniProt <- function(cardId, exhaustiveMapping = FALSE){
+getCARD2UniProt <- function(cardId, exhaustiveMapping = FALSE, detailedMapping = FALSE){
 
     .checkIfCARDIsDownloaded()
     .checkCARDIdExists(cardId)
     .checkBoolean(exhaustiveMapping)
+    .checkBoolean(detailedMapping)
 
     aroIndex <- read.csv(paste(getwd(),'/card-data/aro_index.tsv',sep=''), sep='\t')
     nucleotideId <- aroIndex[aroIndex$ARO.Accession == (if (grepl("^ARO:", cardId)) cardId else paste0("ARO:", cardId)),]$DNA.Accession
     proteinId <- aroIndex[aroIndex$ARO.Accession == (if (grepl("^ARO:", cardId)) cardId else paste0("ARO:", cardId)),]$Protein.Accession
 
-    result <- getNCBIProtein2UniProt(proteinId, exhaustiveMapping = exhaustiveMapping, byIdenticalProteins = TRUE)
+    result <- getNCBIProtein2UniProt(proteinId, exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping, byIdenticalProteins = TRUE)
     if(exhaustiveMapping | length(result)==0){
-        result <- unique(c(result, getNCBINucleotide2UniProt(nucleotideId, exhaustiveMapping = exhaustiveMapping, byIdenticalProteins = TRUE)))
+        if(!detailedMapping){
+            result <- unique(c(result, getNCBINucleotide2UniProt(nucleotideId, exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping, byIdenticalProteins = TRUE)))
+            if(is.null(result)){result <- character(0)}
+        }else{
+            result <- .mergeNamedLists(result, getNCBINucleotide2UniProt(nucleotideId, exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping, byIdenticalProteins = TRUE))
+            result <- lapply(result, unique)
+            result <- result[lengths(result) > 0]
+            if(length(result)==0){result <- list()}
+        }
     }
     return(result)
 }

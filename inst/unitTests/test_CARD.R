@@ -55,10 +55,13 @@ message('Testing getCARD2NCBIGene')
 message('Testing getCARD2UniProt')
 # Positive cases
 checkEquals(getCARD2UniProt('3002867'), c('Q9ZIF9'))
+checkEquals(getCARD2UniProt('3002867', detailedMapping=TRUE), list('DT'=c('Q9ZIF9')))
 checkTrue(length(getCARD2UniProt('3002867', TRUE)) == 38)
 checkEquals(getCARD2UniProt('3003649'), c('A0A0K0TQH5'))
 # No translation case
 checkEquals(getCARD2UniProt('3006267'), character(0))
+checkEquals(getCARD2UniProt('3006267', detailedMapping=TRUE), list())
+
 
 #########################
 # CARD database to KEGG #

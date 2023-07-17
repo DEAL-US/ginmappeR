@@ -4,7 +4,8 @@
 \description{
 Retrieves the ID translation of an specific instance of NCBI Protein database
 ID to the NCBI Nucleotide database. It returns a vector of the translations or
-an empty vector if no translation is found.}
+an empty vector if no translation is found. Note that, due to the nature of
+NCBI Nucleotide database, a complete genome is often retrieved.}
 \usage{
 getNCBIProtein2NCBINucleotide(id, exhaustiveMapping=FALSE)
 }

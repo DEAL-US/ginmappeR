@@ -141,7 +141,7 @@ updateCARDDataBase <- function(){
     erase_file_cache(get_pkg_info("ginmappeR"))
     unlink(paste(getwd(),'/card-data',sep=''), recursive = TRUE)
     .downloadAndExtractCARD()
-    message('CARD database downloaded successfully!')
+    message(paste('CARD database downloaded successfully!\nLocated at ', paste(getwd(),'/card-data',sep=''), sep=''))
 }
 
 .checkIfCARDIsDownloaded <- function(){
