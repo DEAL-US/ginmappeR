@@ -324,7 +324,7 @@ getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMappi
     )
     translations <- list()
 
-    for(upId in group){
+    for(upId in upIDs){
         keggId <- getUniProt2KEGG(upId, exhaustiveMapping = exhaustiveMapping, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
         if(length(keggId)>0){
             translations <- .mergeNamedLists(translations, keggId)
