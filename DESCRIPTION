@@ -1,7 +1,7 @@
 Package: ginmappeR
 Type: Package
 Title: Gene Identifier Mapper
-Version: 0.1.1
+Version: 0.99.0
 Authors@R: c(
     person("Fernando", "Sola", email = "fsola@us.es", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-1685-3270")),
     person("Daniel", "Ayala", email = "dayala1@us.es", role = "aut", comment = c(ORCID = "0000-0003-2095-1009")),
@@ -19,5 +19,6 @@ Description: Provides functionalities to translate gene or protein identifiers b
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
+VignetteBuilder: knitr
 Imports: KEGGREST, UniProt.ws, XML, rentrez, httr, pkgfilecache, utils, memoise, cachem
-Suggests: RUnit, BiocGenerics, plumber
+Suggests: RUnit, BiocGenerics, plumber, markdown, knitr
