@@ -8,12 +8,12 @@ library('XML')
 library('pkgfilecache')
 
 # GitHub Actions imports
-source('../../../R/UniProtFunctions.R')
-source('../../../R/utilsFunctions.R')
+# source('../../../R/UniProtFunctions.R')
+# source('../../../R/utilsFunctions.R')
 
 # # Local execution imports
-# source('../../ginmappeR/R/UniProtFunctions.R')
-# source('../../ginmappeR/R/utilsFunctions.R')
+source('../../ginmappeR/R/UniProtFunctions.R')
+source('../../ginmappeR/R/utilsFunctions.R')
 
 ######################################
 # UniProt database auxiliar function #
