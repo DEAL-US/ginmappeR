@@ -59,7 +59,7 @@ getNCBIProtein2NCBINucleotide <- function(id, exhaustiveMapping = FALSE){
     result <- character(0)
 
     aroIndex <- read.csv(paste(getwd(),'/card-data/aro_index.tsv',sep=''), sep='\t')
-    result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == strsplit(id,'.', fixed = T)[[1]][[1]], "DNA.Accession"])
+    result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == strsplit(id,'.', fixed = TRUE)[[1]][[1]], "DNA.Accession"])
     if(!exhaustiveMapping & length(result)>1){result<-result[[1]]}
 
     if(exhaustiveMapping){
@@ -84,7 +84,7 @@ getNCBINucleotide2NCBIProtein <- function(id, exhaustiveMapping = FALSE){
     result <- character(0)
 
     aroIndex <- read.csv(paste(getwd(),'/card-data/aro_index.tsv',sep=''), sep='\t')
-    result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == strsplit(id,'.', fixed = T)[[1]][[1]], "Protein.Accession"])
+    result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == strsplit(id,'.', fixed = TRUE)[[1]][[1]], "Protein.Accession"])
     if(!exhaustiveMapping & length(result)>1){result<-result[[1]]}
 
     if(exhaustiveMapping){
@@ -307,7 +307,7 @@ getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMappi
 
 # Direct translation method
 .getNCBI2KEGGDT <- function(ncbiId){
-    query <- keggConv("genes", paste('ncbi-proteinid:', strsplit(ncbiId,'.', fixed = T)[[1]], sep=''))
+    query <- keggConv("genes", paste('ncbi-proteinid:', strsplit(ncbiId,'.', fixed = TRUE)[[1]], sep=''))
 
     if(!identical(query, character(0))&!identical(query, NULL)&!identical(query, NA)){
         return(c(query[[1]]))
@@ -410,7 +410,7 @@ getNCBIProtein2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
     .checkIfCARDIsDownloaded()
     .checkNCBIProteinIdExists(ncbiId)
 
-    ncbiId <- strsplit(ncbiId,'.', fixed = T)[[1]][[1]]
+    ncbiId <- strsplit(ncbiId,'.', fixed = TRUE)[[1]][[1]]
 
     aroIndex <- read.csv(paste(getwd(),'/card-data/aro_index.tsv',sep=''), sep='\t')
     aroAccession <- aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == ncbiId, "ARO.Accession"]
@@ -426,7 +426,7 @@ getNCBINucleotide2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
     .checkIfCARDIsDownloaded()
     .checkNCBINucleotideIdExists(ncbiId)
 
-    ncbiId <- strsplit(ncbiId,'.', fixed = T)[[1]][[1]]
+    ncbiId <- strsplit(ncbiId,'.', fixed = TRUE)[[1]][[1]]
 
     aroIndex <- read.csv(paste(getwd(),'/card-data/aro_index.tsv',sep=''), sep='\t')
     aroAccession <- aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == ncbiId, "ARO.Accession"]
@@ -442,7 +442,7 @@ getNCBIGene2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
     .checkIfCARDIsDownloaded()
     .checkNCBIGeneIdExists(ncbiId)
 
-    ncbiId <- strsplit(ncbiId,'.', fixed = T)[[1]][[1]]
+    ncbiId <- strsplit(ncbiId,'.', fixed = TRUE)[[1]][[1]]
 
     proteinId <- getNCBIGene2NCBIProtein(ncbiId, exhaustiveMapping = TRUE)
 
