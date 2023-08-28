@@ -8,12 +8,12 @@ library('XML')
 library('pkgfilecache')
 
 # GitHub Actions imports
-# source('../../../R/CARDFunctions.R')
-# source('../../../R/utilsFunctions.R')
+source('../../../R/CARDFunctions.R')
+source('../../../R/utilsFunctions.R')
 
 # # Local execution imports
-source('../../ginmappeR/R/CARDFunctions.R')
-source('../../ginmappeR/R/utilsFunctions.R')
+# source('../../ginmappeR/R/CARDFunctions.R')
+# source('../../ginmappeR/R/utilsFunctions.R')
 
 #########################
 # CARD database to NCBI #

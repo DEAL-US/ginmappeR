@@ -8,14 +8,14 @@ library('XML')
 library('pkgfilecache')
 
 # GitHub Actions imports
-# source('../../../R/NCBIFunctions.R')
-# source('../../../R/UniProtFunctions.R')
-# source('../../../R/utilsFunctions.R')
+source('../../../R/NCBIFunctions.R')
+source('../../../R/UniProtFunctions.R')
+source('../../../R/utilsFunctions.R')
 
 # # Local execution imports
-source('../../ginmappeR/R/NCBIFunctions.R')
-source('../../ginmappeR/R/UniProtFunctions.R')
-source('../../ginmappeR/R/utilsFunctions.R')
+# source('../../ginmappeR/R/NCBIFunctions.R')
+# source('../../ginmappeR/R/UniProtFunctions.R')
+# source('../../ginmappeR/R/utilsFunctions.R')
 
 #####################################
 # NCBI databases inter-translations #
