@@ -10,7 +10,6 @@ Authors@R: c(
     person("Lorena", "López-Cerero", email = "llopez@us.es", role = "aut", comment = c(ORCID = "0000-0001-8950-4384")),
     person("Inma", "Hernández", email = "inmahernandez@us.es", role = "aut", comment = c(ORCID = "0000-0001-8920-6635")),
     person("David", "Ruiz", email = "druiz@us.es", role = "aut", comment = c(ORCID = "0000-0003-4460-5493")))
-Maintainer: Fernando Sola <fsola@us.es>
 Description: Provides functionalities to translate gene or protein identifiers between
     state-of-art biological databases: CARD (<https://card.mcmaster.ca/>), NCBI Protein,
     Nucleotide and Gene (<https://www.ncbi.nlm.nih.gov/>), UniProt (<https://www.uniprot.org/>)
@@ -18,7 +17,8 @@ Description: Provides functionalities to translate gene or protein identifiers b
     NCBI identical proteins or UniProt similar genes clusters retrieval.
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
-LazyData: true
+LazyData: false
 VignetteBuilder: knitr
+biocViews: Annotation, KEGG, Genetics, ThirdPartyClient, Software
 Imports: KEGGREST, UniProt.ws, XML, rentrez, httr, pkgfilecache, utils, memoise, cachem
 Suggests: RUnit, BiocGenerics, plumber, markdown, knitr

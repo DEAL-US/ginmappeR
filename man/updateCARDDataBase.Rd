@@ -5,6 +5,9 @@
 Cleans previous CARD database versions if there were, and downloads
 its latest version.
 }
+\value{
+Downloaded CARD database.
+}
 \usage{
 updateCARDDataBase()
 }

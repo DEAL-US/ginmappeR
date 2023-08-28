@@ -131,12 +131,12 @@ getKEGG2NCBIGene <- function(keggId, exhaustiveMapping = FALSE, detailedMapping 
     .auxNCBI2CARD <- function(translations, ncbiDB){
         if(identical(ncbiDB, 'protein')){
             translations <- lapply(translations, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
-                auxId <- strsplit(auxId,'.', fixed = T)[[1]][[1]]
+                auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
                 return(aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == auxId, "ARO.Accession"])
             })))
         }else{
             translations <- lapply(translations, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
-                auxId <- strsplit(auxId,'.', fixed = T)[[1]][[1]]
+                auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
                 return(aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == auxId, "ARO.Accession"])
             })))
         }
@@ -195,7 +195,7 @@ getKEGG2CARD <- function(keggId, exhaustiveMapping = FALSE, detailedMapping = FA
         proteinId <- getKEGG2NCBIProtein(keggId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
         if(length(proteinId)>0){
             result <- lapply(proteinId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
-                auxId <- strsplit(auxId,'.', fixed = T)[[1]][[1]]
+                auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
                 return(aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == auxId, "ARO.Accession"])
             })))
             result <- result[lengths(result) > 0]
@@ -204,7 +204,7 @@ getKEGG2CARD <- function(keggId, exhaustiveMapping = FALSE, detailedMapping = FA
         nucleotideId <- getKEGG2NCBINucleotide(keggId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
         if(length(nucleotideId)>0){
             nucleotideId <- lapply(nucleotideId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
-                auxId <- strsplit(auxId,'.', fixed = T)[[1]][[1]]
+                auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
                 return(aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == auxId, "ARO.Accession"])
             })))
         }
