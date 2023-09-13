@@ -115,6 +115,16 @@
     return(result)
 }
 
+testEquals <- function(testFunction, result){
+    tryCatch(
+        {RUnit::checkEquals(testFunction, result)},
+        error = function(e){
+            message('API(s) connection failed:')
+            message(e)
+        }
+    )
+}
+
 #####################################
 # CARD database retrieval functions #
 #####################################
