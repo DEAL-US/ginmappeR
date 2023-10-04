@@ -1,0 +1,13 @@
+# TODO: suppress UniProt.ws '(\) waiting for query completion.......... 00:00:02' messages
+
+# TODO: Create a function to modify caché size and timeout
+
+# TODO: api tests?
+
+# TODO: automatically check CARD version when calling any CARD method by Last-Modified header in CARD download endpoint.
+
+# TODO: Save CARD datbase (aro_index dataframe) in a variable in order to avoid loading it many times
+# Possibility of making a function out of this code:
+    aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv', sep=''), sep='\t')
+    nucleotideId <- aroIndex[aroIndex$ARO.Accession == (if (grepl("^ARO:", cardId)) cardId else paste0("ARO:", cardId)),]$DNA.Accession
+    proteinId <- aroIndex[aroIndex$ARO.Accession == (if (grepl("^ARO:", cardId)) cardId else paste0("ARO:", cardId)),]$Protein.Accession
