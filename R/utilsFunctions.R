@@ -1,3 +1,5 @@
+utils::globalVariables('cardPath')
+
 .checkNotNull <- function(variable, message="The given ID is "){
     if(identical(variable, "")){
         stop(paste(message, "empty", sep=""))
@@ -72,7 +74,7 @@
 
     checkedCardId <- if (grepl("^ARO:", cardId)) cardId else paste0("ARO:", cardId)
 
-    aroIndex <- read.csv(paste(getwd(),'/card-data/aro_index.tsv',sep=''), sep='\t')
+    aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
 
     if(!checkedCardId %in% aroIndex$ARO.Accession) {
         stop(paste('The given ARO accession "', cardId, '" is not registered in CARD database', sep = ''))
@@ -130,36 +132,52 @@ testEquals <- function(testFunction, result){
 #####################################
 
 .downloadAndExtractCARD <- function(){
+    if(is.null(options("cardPath")[[1]])){
+        options("cardPath" = tempdir())
+    }
 
-    pkgInfo <- get_pkg_info("ginmappeR")
     localRelativeFilenames <- c(paste('card-data.tar.bz2-', format(Sys.time(), "%a %m-%d-%Y %H-%M-%S"),sep=''))
     url <- c('https://card.mcmaster.ca/latest/data')
-    # Download CARD zip if not present
-    ensure_files_available(pkgInfo, localRelativeFilenames, url)
 
-    # If it has not been extracted, extract it
-    if(!file.exists(paste(getwd(),'/card-data/aro_index.tsv',sep=''))){
-        zipF<- paste(get_cache_dir(pkgInfo),'/',localRelativeFilenames[1], sep='')
+    # Delete previous versions
+    unlink(paste(options("cardPath")[[1]],'/card-data*',sep=''), recursive = TRUE)
 
-        # Unzip the compressed file
-        untar(zipF, exdir = paste(getwd(),'/card-data',sep=''))
-    }
+    # Download CARD zip
+    download.file(url, paste(options("cardPath")[[1]],'/',localRelativeFilenames,sep=''), quiet = TRUE)
+    # Extract it
+    zipF<- paste(options("cardPath")[[1]],'/',localRelativeFilenames, sep='')
+    # Unzip the compressed file
+    untar(zipF, exdir = paste(options("cardPath")[[1]],'/card-data',sep=''))
 }
 
 updateCARDDataBase <- function(){
     message('Updating CARD database data...')
-    erase_file_cache(get_pkg_info("ginmappeR"))
-    unlink(paste(getwd(),'/card-data',sep=''), recursive = TRUE)
     .downloadAndExtractCARD()
-    message(paste('CARD database downloaded successfully!\nLocated at ', paste(getwd(),'/card-data',sep=''), sep=''))
+    message(paste('CARD database downloaded successfully!\nLocated at ', paste(options("cardPath")[[1]],'/card-data',sep=''), sep=''))
 }
 
 .checkIfCARDIsDownloaded <- function(){
-    pkgInfo <- get_pkg_info("ginmappeR")
-    if(!file.exists(paste(getwd(),'/card-data/aro_index.tsv',sep=''))){
+    if(is.null(options("cardPath")[[1]])){
         updateCARDDataBase()
     }else{
-        message(sprintf('Using a CARD database version downloaded on %s, please consider updating it with updateCARDDataBase() function.',
-                        strsplit(list.files(get_cache_dir(get_pkg_info('ginmappeR')))[[1]],'bz2-')[[1]][[2]]))
+        if(!file.exists(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''))){
+            updateCARDDataBase()
+        }else{
+            message(sprintf('Using a CARD database version downloaded on %s, please consider updating it with updateCARDDataBase() function.',
+                            strsplit(list.files(options("cardPath")[[1]], pattern = 'card-data.tar.bz2-')[[1]],'bz2-')[[1]][[2]]))
+        }
     }
 }
+
+changeCARDPath <- function(path=tempdir()){
+    if(dir.exists(path)){
+        if(!is.null(options("cardPath")[[1]])){
+            unlink(paste(options("cardPath")[[1]],'/card-data*',sep=''), recursive = TRUE)
+        }
+        options("cardPath" = path)
+        updateCARDDataBase()
+    }else{
+        warning(paste('Path ',path,' does not exist',sep=''))
+    }
+}
+

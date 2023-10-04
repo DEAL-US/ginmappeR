@@ -20,5 +20,5 @@ Encoding: UTF-8
 LazyData: false
 VignetteBuilder: knitr
 biocViews: Annotation, KEGG, Genetics, ThirdPartyClient, Software
-Imports: KEGGREST, UniProt.ws, XML, rentrez, httr, pkgfilecache, utils, memoise, cachem
+Imports: KEGGREST, UniProt.ws, XML, rentrez, httr, utils, memoise, cachem
 Suggests: RUnit, BiocGenerics, plumber, markdown, knitr
