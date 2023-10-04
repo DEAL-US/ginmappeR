@@ -17,6 +17,7 @@ editor_options:
 ```{r setup, echo=FALSE}
 knitr::opts_chunk$set(message=FALSE, fig.path='figures/', fig.align='center', 
                       class.output="bg-success")
+cardPath = tempdir()
 ```
 
 <!-- Title block -->
