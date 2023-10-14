@@ -15,9 +15,9 @@ cardPath <<- tempdir()
 # source('../../../R/utilsFunctions.R')
 
 # # Local execution imports
-source('../../ginmappeR/R/NCBIFunctions.R')
-source('../../ginmappeR/R/UniProtFunctions.R')
-source('../../ginmappeR/R/utilsFunctions.R')
+source('../ginmappeR/R/NCBIFunctions.R')
+source('../ginmappeR/R/UniProtFunctions.R')
+source('../ginmappeR/R/utilsFunctions.R')
 
 #####################################
 # NCBI databases inter-translations #
