@@ -10,7 +10,7 @@ getKEGG2NCBINucleotide(keggId, exhaustiveMapping = FALSE,
 detailedMapping = FALSE, bySimilarGenes = TRUE)
 }
 \arguments{
-  \item{keggId}{valid KEGG Genes database ID}
+  \item{keggId}{valid KEGG Genes database ID or a vector of them}
   \item{exhaustiveMapping}{logical value (TRUE or FALSE) indicating to retrieve
   all possible translations or only the first and fastest one}
   \item{detailedMapping}{logical value (TRUE or FALSE) indicating to return a
@@ -34,13 +34,5 @@ vector of NCBI Nucleotide IDs, empty vector if no translations were found.
 }
 \examples{
 # Translate KEGG ID 'llo:LLO_2673' to NCBI Nucleotide
-if(interactive()){
 getKEGG2NCBINucleotide('llo:LLO_2673')
-}
-# Translate KEGG ID 'llo:LLO_2673' to NCBI Nucleotide obtaining all possible
-# translations
-if(interactive()){
-getKEGG2NCBINucleotide('llo:LLO_2673', exhaustiveMapping = TRUE,
-detailedMapping = TRUE)
-}
 }

@@ -15,6 +15,7 @@
 # Method to retrieve similar genes by clusters of a % of identity
 getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0', clusterNames = FALSE){
     .checkBoolean(clusterNames, 'clusterNames')
+    .checkClusterIdentity(clusterIdentity)
 
     # Auxiliar function
     getClusterTypeBySimilarity <- function(similarity){
@@ -26,42 +27,49 @@ getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0', clusterNames =
         ))
     }
 
-    .checkClusterIdentity(clusterIdentity)
-    .checkUniProtIdExists(upId)
+    tryCatch(
+        {
+            .checkUniProtIdExists(upId)
 
-    # Get clusters list
-    clusterSearchUrl <- sprintf('https://rest.uniprot.org/uniref/search?fields=id%%2Ccount&format=tsv&query=(%s%%20AND%%20identity=%s)&size=500', upId, clusterIdentity)
-    clusterList <- NA
-    while(identical(clusterList, NA)){
-        try(clusterList <- read.csv(clusterSearchUrl, sep="\t"))
-    }
+            # Get clusters list
+            clusterSearchUrl <- sprintf('https://rest.uniprot.org/uniref/search?fields=id%%2Ccount&format=tsv&query=(%s%%20AND%%20identity=%s)&size=500', upId, clusterIdentity)
+            clusterList <- NA
+            while(identical(clusterList, NA)){
+                try(clusterList <- read.csv(clusterSearchUrl, sep="\t"))
+            }
 
-    genesList <- list()
-    # Iterate over clusters list to retrieve all similar genes
-    for(i in 1:length(clusterList$Cluster.ID)){
-        clusterName <- clusterList$Cluster.ID[i]
-        clusterSize <- clusterList$Size[i]
-        similarGenesSearchUrl <- sprintf('https://rest.uniprot.org/uniprotkb/search?fields=accession&format=tsv&query=%%28%%28%s%%3A%s%%29%%20AND%%20NOT%%20%%28accession%%3A%s%%29%%29&size=500',
-                                               getClusterTypeBySimilarity(clusterIdentity) , clusterName, upId)
+            genesList <- list()
+            # Iterate over clusters list to retrieve all similar genes
+            for(i in 1:length(clusterList$Cluster.ID)){
+                clusterName <- clusterList$Cluster.ID[i]
+                clusterSize <- clusterList$Size[i]
+                similarGenesSearchUrl <- sprintf('https://rest.uniprot.org/uniprotkb/search?fields=accession&format=tsv&query=%%28%%28%s%%3A%s%%29%%20AND%%20NOT%%20%%28accession%%3A%s%%29%%29&size=500',
+                                                 getClusterTypeBySimilarity(clusterIdentity) , clusterName, upId)
 
-        # Handle UniProt's API 500 genes per request issue
-        auxList <- character(0)
-        request <- GET(similarGenesSearchUrl)
-        auxList <- c(auxList, c(read.csv(text=content(request, as='text', encoding='UTF-8'), sep='\t')$Entry))
+                # Handle UniProt's API 500 genes per request issue
+                auxList <- character(0)
+                request <- GET(similarGenesSearchUrl)
+                auxList <- c(auxList, c(read.csv(text=content(request, as='text', encoding='UTF-8'), sep='\t')$Entry))
 
-        while(!is.null(request$headers$link)){
-            link <- strsplit(strsplit(request$headers$link, '<')[[1]],'>')[[2]][[1]]
-            request <- GET(link)
-            auxList <- c(auxList, c(read.csv(text=content(request, as='text', encoding='UTF-8'), sep='\t')$Entry))
+                while(!is.null(request$headers$link)){
+                    link <- strsplit(strsplit(request$headers$link, '<')[[1]],'>')[[2]][[1]]
+                    request <- GET(link)
+                    auxList <- c(auxList, c(read.csv(text=content(request, as='text', encoding='UTF-8'), sep='\t')$Entry))
+                }
+
+                if(identical(logical(0), auxList)){auxList<-character(0)}
+                genesList[[clusterName]] <- auxList
+            }
+            if(!clusterNames){
+                genesList <- unname(unlist(genesList, recursive = FALSE))
+            }
+            return(genesList)
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
         }
-
-        if(identical(logical(0), auxList)){auxList<-character(0)}
-        genesList[[clusterName]] <- auxList
-    }
-    if(!clusterNames){
-        genesList <- unname(unlist(genesList, recursive = FALSE))
-    }
-    return(genesList)
+    )
 }
 
 # Method to translate UniProt to KEGG through Similar Genes Translation method, that is,
@@ -103,46 +111,54 @@ getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0', clusterNames =
 # Tries direct translation method and, if requested, by similar genes clusters
 # method too
 getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TRUE, detailedMapping = FALSE){
-    .checkUniProtIdExists(upId)
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkBoolean(bySimilarGenes, 'bySimilarGenes')
     .checkBoolean(detailedMapping, 'detailedMapping')
 
-    result <- list()
-    translationsDT <- .getUniProt2KEGGDT(upId)
+    tryCatch(
+        {
+            .checkUniProtIdExists(upId)
+            result <- list()
+            translationsDT <- .getUniProt2KEGGDT(upId)
 
-    # First, try to retrieve a direct translation
-    if(!identical(translationsDT, character(0))){
-        if(!exhaustiveMapping){
+            # First, try to retrieve a direct translation
+            if(!identical(translationsDT, character(0))){
+                if(!exhaustiveMapping){
+                    if(!detailedMapping){
+                        return(translationsDT[1])
+                    }else{
+                        result[['DT']] <- translationsDT[1]
+                    }
+                    return(result)
+                }else{
+                    result[['DT']] <- translationsDT
+                }
+            }
+
+            # If required, try to translate using similar genes method
+            if(bySimilarGenes){
+                if(!exhaustiveMapping){
+                    translationsSGT <- .getUniProt2KEGGSGT(upId, FALSE)
+                    if(length(translationsSGT)>0){
+                        result[[names(translationsSGT[1])]] <- translationsSGT[[names(translationsSGT[1])]][[1]]
+                    }
+                }else{
+                    result <- append(result, .getUniProt2KEGGSGT(upId, TRUE))
+                }
+            }
+            # To return a char vector of IDs if detailedMapping is false, simply extract
+            # all IDs from result in a char vector and return it
             if(!detailedMapping){
-                return(translationsDT[1])
-            }else{
-                result[['DT']] <- translationsDT[1]
+                result <- unique(unlist(result, recursive = FALSE, use.names = FALSE))
+                if(is.null(result)){result <- character(0)}
             }
             return(result)
-        }else{
-            result[['DT']] <- translationsDT
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
         }
-    }
-
-    # If required, try to translate using similar genes method
-    if(bySimilarGenes){
-        if(!exhaustiveMapping){
-            translationsSGT <- .getUniProt2KEGGSGT(upId, FALSE)
-            if(length(translationsSGT)>0){
-                result[[names(translationsSGT[1])]] <- translationsSGT[[names(translationsSGT[1])]][[1]]
-            }
-        }else{
-            result <- append(result, .getUniProt2KEGGSGT(upId, TRUE))
-        }
-    }
-    # To return a char vector of IDs if detailedMapping is false, simply extract
-    # all IDs from result in a char vector and return it
-    if(!detailedMapping){
-        result <- unique(unlist(result, recursive = FALSE, use.names = FALSE))
-        if(is.null(result)){result <- character(0)}
-    }
-    return(result)
+    )
 }
 
 ############################
@@ -214,9 +230,6 @@ getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TR
 ### Main function
 .getUniProt2NCBI <- function(upId, ncbiDB = 'protein', exhaustiveMapping = FALSE, bySimilarGenes = TRUE, detailedMapping = FALSE){
     .checkUniProtIdExists(upId)
-    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
-    .checkBoolean(bySimilarGenes, 'bySimilarGenes')
-    .checkBoolean(detailedMapping, 'detailedMapping')
 
     result <- list()
     translationsDT <- .getUniProt2NCBIDT(upId)
@@ -257,18 +270,54 @@ getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TR
 }
 
 getUniProt2NCBIProtein <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
-    return(.getUniProt2NCBI(upId, 'protein', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
-                         bySimilarGenes = bySimilarGenes))
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkBoolean(bySimilarGenes, 'bySimilarGenes')
+    .checkBoolean(detailedMapping, 'detailedMapping')
+
+    tryCatch(
+        {
+            return(.getUniProt2NCBI(upId, 'protein', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                                    bySimilarGenes = bySimilarGenes))
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
+        }
+    )
 }
 
 getUniProt2NCBINucleotide <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
-    return(.getUniProt2NCBI(upId, 'nucleotide', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
-                            bySimilarGenes = bySimilarGenes))
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkBoolean(bySimilarGenes, 'bySimilarGenes')
+    .checkBoolean(detailedMapping, 'detailedMapping')
+
+    tryCatch(
+        {
+            return(.getUniProt2NCBI(upId, 'nucleotide', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                                    bySimilarGenes = bySimilarGenes))
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
+        }
+    )
 }
 
 getUniProt2NCBIGene <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
-    return(.getUniProt2NCBI(upId, 'gene', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
-                            bySimilarGenes = bySimilarGenes))
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkBoolean(bySimilarGenes, 'bySimilarGenes')
+    .checkBoolean(detailedMapping, 'detailedMapping')
+
+    tryCatch(
+        {
+            return(.getUniProt2NCBI(upId, 'gene', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                                    bySimilarGenes = bySimilarGenes))
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
+        }
+    )
 }
 
 
@@ -327,56 +376,67 @@ getUniProt2NCBIGene <- function(upId, exhaustiveMapping = FALSE, detailedMapping
 
 getUniProt2CARD <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
     .checkIfCARDIsDownloaded()
-    .checkUniProtIdExists(upId)
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkBoolean(detailedMapping, 'detailedMapping')
-    aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
-    result <- list()
+    .checkBoolean(bySimilarGenes, 'bySimilarGenes')
 
-    # Handle not exhaustiveMapping case, trying to get the fastest result present in CARD
-    if(!exhaustiveMapping){
-        proteinId <-.getUniProt2CARDexhaustiveMappingAux(upId, 'protein', bySimilarGenes)
-        if(length(proteinId)>0){
-            proteinId <- Filter(Negate(is.null), proteinId[c("DT", "1.0", "0.9", "0.5")])
-            result[names(proteinId)[1]] <- proteinId[[1]][[1]]
-        }else{
-            nucleotideId <-.getUniProt2CARDexhaustiveMappingAux(upId, 'nucleotide', bySimilarGenes)
-            if(length(nucleotideId)>0){
-                nucleotideId <- Filter(Negate(is.null), nucleotideId[c("DT", "1.0", "0.9", "0.5")])
-                result[names(nucleotideId)[1]] <- nucleotideId[[1]][[1]]
+    tryCatch(
+        {
+            .checkUniProtIdExists(upId)
+
+            aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
+            result <- list()
+
+            # Handle not exhaustiveMapping case, trying to get the fastest result present in CARD
+            if(!exhaustiveMapping){
+                proteinId <-.getUniProt2CARDexhaustiveMappingAux(upId, 'protein', bySimilarGenes)
+                if(length(proteinId)>0){
+                    proteinId <- Filter(Negate(is.null), proteinId[c("DT", "1.0", "0.9", "0.5")])
+                    result[names(proteinId)[1]] <- proteinId[[1]][[1]]
+                }else{
+                    nucleotideId <-.getUniProt2CARDexhaustiveMappingAux(upId, 'nucleotide', bySimilarGenes)
+                    if(length(nucleotideId)>0){
+                        nucleotideId <- Filter(Negate(is.null), nucleotideId[c("DT", "1.0", "0.9", "0.5")])
+                        result[names(nucleotideId)[1]] <- nucleotideId[[1]][[1]]
+                    }
+                }
+            }else{
+                # Handle exhaustiveMapping case, trying to retrieve all possible cases
+                proteinId <- getUniProt2NCBIProtein(upId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
+                if(length(proteinId)>0){
+                    result <- lapply(proteinId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
+                        auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
+                        return(aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == auxId, "ARO.Accession"])
+                    })))
+                    result <- result[lengths(result) > 0]
+                }
+
+                nucleotideId <- getUniProt2NCBINucleotide(upId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
+                if(length(nucleotideId)>0){
+                    nucleotideId <- lapply(nucleotideId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
+                        auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
+                        return(aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == auxId, "ARO.Accession"])
+                    })))
+                }
+                nucleotideId <- nucleotideId[lengths(nucleotideId) > 0]
+                result <- .mergeNamedLists(result, nucleotideId)
             }
-        }
-    }else{
-        # Handle exhaustiveMapping case, trying to retrieve all possible cases
-        proteinId <- getUniProt2NCBIProtein(upId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
-        if(length(proteinId)>0){
-            result <- lapply(proteinId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
-                auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
-                return(aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == auxId, "ARO.Accession"])
-            })))
-            result <- result[lengths(result) > 0]
-        }
 
-        nucleotideId <- getUniProt2NCBINucleotide(upId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
-        if(length(nucleotideId)>0){
-            nucleotideId <- lapply(nucleotideId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
-                auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
-                return(aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == auxId, "ARO.Accession"])
-            })))
+            # Finally, parse the output according to detailedMapping parameter
+            if(!detailedMapping){
+                result <- unique(unlist(result, recursive = FALSE, use.names = FALSE))
+                if(is.null(result)){result <- character(0)}
+            }else{
+                result <- lapply(result, unique)
+                result <- result[lengths(result) > 0]
+                if(length(result)==0){result <- list()}
+            }
+            return(result)
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
         }
-        nucleotideId <- nucleotideId[lengths(nucleotideId) > 0]
-        result <- .mergeNamedLists(result, nucleotideId)
-    }
-
-    # Finally, parse the output according to detailedMapping parameter
-    if(!detailedMapping){
-        result <- unique(unlist(result, recursive = FALSE, use.names = FALSE))
-        if(is.null(result)){result <- character(0)}
-    }else{
-        result <- lapply(result, unique)
-        result <- result[lengths(result) > 0]
-        if(length(result)==0){result <- list()}
-    }
-    return(result)
+    )
 }
 

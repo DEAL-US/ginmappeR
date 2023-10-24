@@ -9,18 +9,15 @@ empty vector if no translation is found.}
 getCARD2NCBIProtein(cardId)
 }
 \arguments{
-  \item{cardId}{valid CARD database ARO ID}
+  \item{cardId}{valid CARD database ARO ID or a vector of them}
 }
 \value{
 A vector of NCBI Protein IDs, empty if no translations were found.
 }
 \examples{
 # Translate CARD ID '3002535' to NCBI Protein
-if(interactive()){
-    getCARD2NCBIProtein('3002535')
-}
+getCARD2NCBIProtein('3002535')
+
 # Translate CARD ID 'ARO:3002535' to NCBI Protein
-if(interactive()){
-    getCARD2NCBIProtein('ARO:3002535')
-    }
+getCARD2NCBIProtein('ARO:3002535')
 }

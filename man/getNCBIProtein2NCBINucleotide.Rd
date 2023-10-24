@@ -10,7 +10,7 @@ NCBI Nucleotide database, a complete genome is often retrieved.}
 getNCBIProtein2NCBINucleotide(id, exhaustiveMapping=FALSE)
 }
 \arguments{
-  \item{id}{valid NCBI Protein database ID}
+  \item{id}{valid NCBI Protein database ID or a vector of them}
   \item{exhaustiveMapping}{logical value (TRUE or FALSE) indicating to retrieve
   all possible translations or only the first and fastest one}
 }
@@ -19,7 +19,5 @@ A list of NCBI Nucleotide IDs, empty if no translations were found.
 }
 \examples{
 # Translate NCBI Protein ID 'CAA79696' to NCBI Nucleotide
-if(interactive()){
-    getNCBIProtein2NCBINucleotide('CAA79696')
-}
+getNCBIProtein2NCBINucleotide('CAA79696')
 }

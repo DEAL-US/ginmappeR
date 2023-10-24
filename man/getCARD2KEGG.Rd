@@ -9,7 +9,7 @@ getCARD2KEGG(cardId, exhaustiveMapping = FALSE, detailedMapping = FALSE,
 byIdenticalProteins = TRUE, bySimilarGenes = TRUE)
 }
 \arguments{
-  \item{cardId}{valid CARD database ARO ID}
+  \item{cardId}{valid CARD database ARO ID or a vector of them}
   \item{exhaustiveMapping}{logical value (TRUE or FALSE) indicating to retrieve
   all possible translations or only the first and fastest one}
   \item{detailedMapping}{logical value (TRUE or FALSE) indicating to return a
@@ -36,10 +36,5 @@ KEGG IDs, empty vector if no translations were found.
 }
 \examples{
 # Translate CARD ID '3000938' to KEGG
-if(interactive()){
-    getCARD2KEGG('3000938')
-}
-# Translate CARD ID '3001109' to KEGG
-if(interactive()){
-    getCARD2KEGG('3001109', detailedMapping = TRUE)}
+getCARD2KEGG('3000938')
 }

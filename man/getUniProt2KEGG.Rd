@@ -9,7 +9,7 @@ getUniProt2KEGG(upId, exhaustiveMapping = FALSE, bySimilarGenes = TRUE,
 detailedMapping = FALSE)
 }
 \arguments{
-  \item{upId}{valid UniProt database ID}
+  \item{upId}{valid UniProt database ID or a vector of them}
   \item{exhaustiveMapping}{logical value (TRUE or FALSE) indicating to retrieve
   all possible translations or only the first and fastest one}
   \item{bySimilarGenes}{logical value (TRUE or FALSE) indicating to translate
@@ -33,11 +33,5 @@ IDs, empty vector if no translations were found.
 }
 \examples{
 # Translate UniProt ID 'G9JVE6' to KEGG
-if(interactive()){
-    getUniProt2KEGG('G9JVE6')
-}
-# Translate UniProt ID 'A0SNL9' to KEGG obtaining all possible translations
-if(interactive()){
-    getUniProt2KEGG("A0SNL9", exhaustiveMapping = TRUE, detailedMapping = TRUE)
-}
+getUniProt2KEGG('G9JVE6')
 }

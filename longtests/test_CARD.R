@@ -14,8 +14,8 @@ cardPath <<- tempdir()
 # source('../../../R/utilsFunctions.R')
 
 # # Local execution imports
-source('../ginmappeR/R/CARDFunctions.R')
-source('../ginmappeR/R/utilsFunctions.R')
+source('../00_pkg_src/ginmappeR/R/CARDFunctions.R')
+source('../00_pkg_src/ginmappeR/R/utilsFunctions.R')
 
 #########################
 # CARD database to NCBI #
@@ -28,7 +28,7 @@ testEquals(getCARD2NCBIProtein('3002535'), 'CAA38525.1')
 testEquals(getCARD2NCBIProtein('ARO:3002535'), 'CAA38525.1')
 testEquals(getCARD2NCBIProtein('3003988'), 'APB03221.1')
 # Incorrect CARD ID case
-checkException(getCARD2NCBIProtein('test'))
+testEquals(getCARD2NCBIProtein('test'), NULL)
 
 ### Test getCARD2NCBINucleotide
 message('Testing getCARD2NCBINucleotide')
@@ -37,7 +37,7 @@ testEquals(getCARD2NCBINucleotide('3002535'), 'X54723.1')
 testEquals(getCARD2NCBINucleotide('ARO:3002535'), 'X54723.1')
 testEquals(getCARD2NCBINucleotide('3003988'), 'KX531051.1')
 # Incorrect CARD ID case
-checkException(getCARD2NCBINucleotide('test'))
+testEquals(getCARD2NCBINucleotide('test'), NULL)
 
 ### Test getCARD2NCBIGene
 message('Testing getCARD2NCBIGene')

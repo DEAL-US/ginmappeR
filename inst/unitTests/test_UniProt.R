@@ -74,7 +74,7 @@ testEquals(getUniProt2KEGG('G9JVE6'), c('ag:AEX08599'))
 # testEquals(getUniProt2KEGG('Q6XL56', exhaustiveMapping = TRUE, bySimilarGenes = FALSE, detailedMapping = TRUE), list('DT'=c('ag:AAP69916')))
 # testEquals(getUniProt2KEGG('Q6XL56', exhaustiveMapping = TRUE, bySimilarGenes = FALSE), c('ag:AAP69916'))
 # ID not valid case
-checkException(getUniProt2KEGG('P0ZTUH2'))
+testEquals(getUniProt2KEGG('P0ZTUH2'), NULL)
 
 ############################
 # UniProt database to NCBI #
@@ -110,7 +110,7 @@ testEquals(getUniProt2NCBIGene('A0SNL9', exhaustiveMapping = FALSE, detailedMapp
 testEquals(getUniProt2NCBIGene('A0A1S7BGS4', bySimilarGenes = FALSE), character(0))
 # testEquals(getUniProt2NCBIGene('A0A1S7BGS4', bySimilarGenes = FALSE, detailedMapping = TRUE), list())
 # ID not valid case
-checkException(getUniProt2NCBIProtein('P0ZTUH2'))
+testEquals(getUniProt2NCBIProtein('P0ZTUH2'), NULL)
 
 ############################
 # UniProt database to CARD #

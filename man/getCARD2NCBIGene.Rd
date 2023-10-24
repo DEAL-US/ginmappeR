@@ -9,7 +9,7 @@ empty vector if no translation is found.}
 getCARD2NCBIGene(cardId, exhaustiveMapping = FALSE)
 }
 \arguments{
-  \item{cardId}{valid CARD database ARO ID}
+  \item{cardId}{valid CARD database ARO ID or a vector of them}
   \item{exhaustiveMapping}{logical value (TRUE or FALSE) indicating to retrieve
   all possible translations or only the first and fastest one}
 }
@@ -18,11 +18,5 @@ A vector of NCBI Gene IDs, empty if no translations were found.
 }
 \examples{
 # Translate CARD ID '3002524' to NCBI Gene
-if(interactive()){
-    getCARD2NCBIGene('3002524')
-}
-# Translate CARD ID 'ARO:3002524' to NCBI Gene
-if(interactive()){
-    getCARD2NCBIGene('ARO:3002524', TRUE)
-    }
+getCARD2NCBIGene('3002524')
 }

@@ -10,18 +10,15 @@ NCBI Nucleotide database, a complete genome is often retrieved.}
 getCARD2NCBINucleotide(cardId)
 }
 \arguments{
-  \item{cardId}{valid CARD database ARO ID}
+  \item{cardId}{valid CARD database ARO ID or a vector of them}
 }
 \value{
 A vector of NCBI Nucleotide IDs, empty if no translations were found.
 }
 \examples{
 # Translate CARD ID '3002535' to NCBI Nucleotide
-if(interactive()){
-    getCARD2NCBINucleotide('3002535')
-}
+getCARD2NCBINucleotide('3002535')
+
 # Translate CARD ID 'ARO:3002535' to NCBI Nucleotide
-if(interactive()){
-    getCARD2NCBINucleotide('ARO:3002535')
-    }
+getCARD2NCBINucleotide('ARO:3002535')
 }

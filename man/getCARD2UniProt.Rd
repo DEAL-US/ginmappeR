@@ -8,7 +8,7 @@ the UniProt database.}
 getCARD2UniProt(cardId, exhaustiveMapping = FALSE, detailedMapping = FALSE)
 }
 \arguments{
-  \item{cardId}{valid CARD database ARO ID}
+  \item{cardId}{valid CARD database ARO ID or a vector of them}
   \item{exhaustiveMapping}{logical value (TRUE or FALSE) indicating to retrieve
   all possible translations or only the first and fastest one}
   \item{detailedMapping}{logical value (TRUE or FALSE) indicating whether to
@@ -25,11 +25,5 @@ empty list if no translations were found; if FALSE, returns a vector of UniProt
 IDs, empty vector if no translations were found.}
 \examples{
 # Translate CARD ID '3002867' to UniProt
-if(interactive()){
-    getCARD2UniProt('3002867')
-}
-# Translate CARD ID '3002867' to UniProt with detailedMapping
-if(interactive()){
-    getCARD2UniProt('3002867', detailedMapping=TRUE)
-}
+getCARD2UniProt('3002867')
 }

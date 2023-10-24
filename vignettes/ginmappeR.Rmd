@@ -2,6 +2,10 @@
 bibliography: knitcitations.bib
 csl: template.csl
 css: mystyle.css
+title: "ginmappeR"
+author: "Fernando Sola, Daniel Ayala, Marina Pulido, Rafael Ayala, Lorena 
+López-Cerero, Inma Hernández, David Ruiz"
+date: "August 28, 2023"
 output: 
   BiocStyle::html_document
 vignette: |
@@ -14,30 +18,12 @@ editor_options:
   chunk_output_type: inline
 ---
 
+
 ```{r setup, echo=FALSE}
 knitr::opts_chunk$set(message=FALSE, fig.path='figures/', fig.align='center', 
                       class.output="bg-success")
 cardPath = tempdir()
 ```
-
-<!-- Title block -->
-
-<br>
-
-<p style="text-align:center;font-size:200%;color:Red">
-ginmappeR
-</p>
-
-<p style="text-align:center;font-size:90%;color:Gray">
-Fernando Sola, Daniel Ayala, Marina Pulido, Rafael Ayala, Lorena
-López-Cerero, Inma Hernández, David Ruiz
-</p>
-
-<p style="text-align:center;font-size:90%;color:Gray">
-August 28, 2023
-</p>
-
-<br>
 
 # Abstract
 

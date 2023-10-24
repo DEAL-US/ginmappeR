@@ -7,7 +7,7 @@ Retrieves identical NCBI proteins to that of a given ID.}
 getNCBIIdenticalProteins(ncbiId, format='ids')
 }
 \arguments{
-    \item{ncbiId}{valid NCBI ID}
+    \item{ncbiId}{valid NCBI ID or a vector of them}
     \item{format}{return format of the response. Default value 'ids' returns
     a vector of the identical proteins IDs; 'dataframe' value returns a
     dataframe with different information about the found identical proteins}
@@ -21,12 +21,5 @@ proteins found: 'Id', 'Source', 'Nucleotide.Accession', 'Start', 'Stop',
 }
 \examples{
 # Get IDs on identical proteins to the one with ID 'AHA80958'
-if(interactive()){
-    getNCBIIdenticalProteins('AHA80958', format = 'ids')
-}
-# Get data on identical proteins to the one with ID 'AHA80958'
-if(interactive()){
-    getNCBIIdenticalProteins('AHA80958', format = 'dataframe')
-
-}
+getNCBIIdenticalProteins('AHA80958', format = 'ids')
 }

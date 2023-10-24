@@ -15,9 +15,9 @@ cardPath <<- tempdir()
 # source('../../../R/utilsFunctions.R')
 
 # # Local execution imports
-source('../ginmappeR/R/NCBIFunctions.R')
-source('../ginmappeR/R/UniProtFunctions.R')
-source('../ginmappeR/R/utilsFunctions.R')
+source('../00_pkg_src/ginmappeR/R/NCBIFunctions.R')
+source('../00_pkg_src/ginmappeR/R/UniProtFunctions.R')
+source('../00_pkg_src/ginmappeR/R/utilsFunctions.R')
 
 #####################################
 # NCBI databases inter-translations #
@@ -29,7 +29,7 @@ message('Testing getNCBIGene2NCBIProtein')
 testEquals(getNCBIGene2NCBIProtein('76524190'), c('WP_001082319'))
 testEquals(getNCBIGene2NCBIProtein('76524190', exhaustiveMapping = TRUE), c('WP_001082319'))
 # ID not registered case
-checkException(getNCBIGene2NCBIProtein('test'))
+testEquals(getNCBIGene2NCBIProtein('test'), NULL)
 # No translation case
 testEquals(getNCBIGene2NCBIProtein('WP_001082319'), character(0))
 
@@ -39,7 +39,7 @@ message('Testing getNCBIProtein2NCBIGene')
 testEquals(getNCBIProtein2NCBIGene('CAA79696'), c('1272'))
 testEquals(getNCBIProtein2NCBIGene('CAA79696', exhaustiveMapping = TRUE), c('1272'))
 # ID not registered case
-checkException(getNCBIProtein2NCBIGene('test'))
+testEquals(getNCBIProtein2NCBIGene('test'), NULL)
 # No translation case
 testEquals(getNCBIProtein2NCBIGene('WP_011997479'), character(0))
 
@@ -49,14 +49,14 @@ message('Testing getNCBIProtein2NCBINucleotide')
 testEquals(getNCBIProtein2NCBINucleotide('AFH35853'), c('JQ394987'))
 testEquals(getNCBIProtein2NCBINucleotide('AFH35853', exhaustiveMapping = TRUE), c('JQ394987'))
 # ID not registered case
-checkException(getNCBIProtein2NCBINucleotide('test'))
+testEquals(getNCBIProtein2NCBINucleotide('test'), NULL)
 
 ### Test getNCBINucleotide2NCBIProtein
 message('Testing getNCBINucleotide2NCBIProtein')
 # Positive case
 testEquals(getNCBINucleotide2NCBIProtein('JQ394987'), c('AFH35853'))
 # ID not registered case
-checkException(getNCBINucleotide2NCBIProtein('test'))
+testEquals(getNCBINucleotide2NCBIProtein('test'), NULL)
 
 ### Test getNCBIGene2NCBINucleotide
 message('Testing getNCBIGene2NCBINucleotide')
@@ -64,7 +64,7 @@ message('Testing getNCBIGene2NCBINucleotide')
 testEquals(getNCBIGene2NCBINucleotide('76524190'), c('NZ_CP059690'))
 testEquals(getNCBIGene2NCBINucleotide('76524190', exhaustiveMapping = TRUE), c('NZ_CP059690'))
 # ID not registered case
-checkException(getNCBIGene2NCBINucleotide('test'))
+testEquals(getNCBIGene2NCBINucleotide('test'), NULL)
 # No translation case
 testEquals(getNCBIGene2NCBINucleotide('WP_001082319'), character(0))
 
@@ -74,7 +74,7 @@ message('Testing getNCBINucleotide2NCBIGene')
 testEquals(getNCBINucleotide2NCBIGene('Z21488'), c('1272'))
 testEquals(getNCBINucleotide2NCBIGene('Z21488', exhaustiveMapping = TRUE), c('1272'))
 # ID not registered case
-checkException(getNCBINucleotide2NCBIGene('test'))
+testEquals(getNCBINucleotide2NCBIGene('test'), NULL)
 # No translation case
 testEquals(getNCBINucleotide2NCBIGene('KF513177'), character(0))
 
@@ -150,7 +150,7 @@ testEquals(getNCBIProtein2UniProt('WP_039189232.1', byIdenticalProteins = FALSE)
 testEquals(getNCBIProtein2UniProt('WP_188331862.1'), character(0))
 testEquals(getNCBIProtein2UniProt('WP_188331862.1', detailedMapping = TRUE), list())
 # NCBI Protein ID not registered case
-checkException(getNCBIProtein2UniProt('test'))
+testEquals(getNCBIProtein2UniProt('test'), NULL)
 
 ### Test getNCBINucleotide2UniProt
 message('Testing getNCBINucleotide2UniProt')
@@ -164,7 +164,7 @@ testEquals(getNCBINucleotide2UniProt('AY536519', detailedMapping = TRUE), list('
 testEquals(getNCBINucleotide2UniProt('Z21488'), character(0))
 testEquals(getNCBINucleotide2UniProt('Z21488', detailedMapping = TRUE), list())
 # NCBI Nucleotide ID not registered case
-checkException(getNCBINucleotide2UniProt('test'))
+testEquals(getNCBINucleotide2UniProt('test'), NULL)
 
 ### Test getNCBIGene2UniProt
 message('Testing getNCBIGene2UniProt')
@@ -176,7 +176,7 @@ testEquals(getNCBIGene2UniProt('76524190', byIdenticalProteins =  FALSE), charac
 testEquals(getNCBIGene2UniProt('69412715'), character(0))
 testEquals(getNCBIGene2UniProt('69412715', detailedMapping = TRUE), list())
 # NCBI Gene ID not registered case
-checkException(getNCBIGene2UniProt('test'))
+testEquals(getNCBIGene2UniProt('test'), NULL)
 
 ##########################
 # NCBI databases to KEGG #

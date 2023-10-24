@@ -18,122 +18,175 @@
 }
 
 getNCBIGene2NCBIProtein <- function(id, exhaustiveMapping = FALSE){
-    .checkNCBIGeneIdExists(id)
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
 
-    query <- .getNCBIDatabasesLinks(dbFrom='gene', id=id, dbTo='protein')
-    result <- character(0)
-    # Handle multiple protein IDs case
-    if(!is.null(query[['links']][['gene_protein']])){
-        for(queryId in query[['links']][['gene_protein']]){
-            proteinXml <- entrez_fetch(db = "protein", id = queryId, rettype = "xml")
-            result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
-            if(!exhaustiveMapping){
-                return(result)
+    tryCatch(
+        {
+            .checkNCBIGeneIdExists(id)
+
+            query <- .getNCBIDatabasesLinks(dbFrom='gene', id=id, dbTo='protein')
+            result <- character(0)
+            # Handle multiple protein IDs case
+            if(!is.null(query[['links']][['gene_protein']])){
+                for(queryId in query[['links']][['gene_protein']]){
+                    proteinXml <- entrez_fetch(db = "protein", id = queryId, rettype = "xml")
+                    result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
+                    if(!exhaustiveMapping){
+                        return(result)
+                    }
+                }
             }
+            return(result)
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
         }
-    }
-    return(result)
+    )
 }
 
 getNCBIProtein2NCBIGene <- function(id, exhaustiveMapping = FALSE){
-    .checkNCBIProteinIdExists(id)
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
 
-    query <- .getNCBIDatabasesLinks(dbFrom='protein', id=id, dbTo='gene')
-    if(!is.null(query[['links']][['protein_gene']])){
-        if(!exhaustiveMapping){
-            return(c(query[['links']][['protein_gene']])[1])
+    tryCatch(
+        {
+            .checkNCBIProteinIdExists(id)
+
+            query <- .getNCBIDatabasesLinks(dbFrom='protein', id=id, dbTo='gene')
+            if(!is.null(query[['links']][['protein_gene']])){
+                if(!exhaustiveMapping){
+                    return(c(query[['links']][['protein_gene']])[1])
+                }
+                return(c(query[['links']][['protein_gene']]))
+            }else{
+                return(character(0))
+            }
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
         }
-        return(c(query[['links']][['protein_gene']]))
-    }else{
-        return(character(0))
-    }
+    )
 }
 
 getNCBIProtein2NCBINucleotide <- function(id, exhaustiveMapping = FALSE){
-    .checkNCBIProteinIdExists(id)
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkIfCARDIsDownloaded()
+    tryCatch(
+        {
+            .checkNCBIProteinIdExists(id)
 
-    result <- character(0)
+            result <- character(0)
 
-    aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
-    result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == strsplit(id,'.', fixed = TRUE)[[1]][[1]], "DNA.Accession"])
-    if(!exhaustiveMapping & length(result)>1){result<-result[[1]]}
+            aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
+            result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == strsplit(id,'.', fixed = TRUE)[[1]][[1]], "DNA.Accession"])
+            if(!exhaustiveMapping & length(result)>1){result<-result[[1]]}
 
-    if(exhaustiveMapping){
-        query <- .getNCBIDatabasesLinks(dbFrom='protein', id=id, dbTo='nucleotide')
+            if(exhaustiveMapping){
+                query <- .getNCBIDatabasesLinks(dbFrom='protein', id=id, dbTo='nucleotide')
 
-        if(!is.null(query[['links']][['protein_nuccore']])){
-            for(queryId in query[['links']][['protein_nuccore']]){
-                proteinXml <- entrez_fetch(db = "nucleotide", id = queryId, rettype = "xml")
-                result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
+                if(!is.null(query[['links']][['protein_nuccore']])){
+                    for(queryId in query[['links']][['protein_nuccore']]){
+                        proteinXml <- entrez_fetch(db = "nucleotide", id = queryId, rettype = "xml")
+                        result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
+                    }
+                }
             }
+            result <- unique(unlist(sapply(strsplit(result, "\\."), "[[", 1), use.names = FALSE))
+            if(is.null(result)){return(character(0))}else{return(result)}
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
         }
-    }
-    result <- unique(unlist(sapply(strsplit(result, "\\."), "[[", 1), use.names = FALSE))
-    if(is.null(result)){return(character(0))}else{return(result)}
+    )
 }
 
 getNCBINucleotide2NCBIProtein <- function(id, exhaustiveMapping = FALSE){
-    .checkNCBINucleotideIdExists(id)
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkIfCARDIsDownloaded()
 
-    result <- character(0)
+    tryCatch(
+        {
+            .checkNCBINucleotideIdExists(id)
 
-    aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
-    result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == strsplit(id,'.', fixed = TRUE)[[1]][[1]], "Protein.Accession"])
-    if(!exhaustiveMapping & length(result)>1){result<-result[[1]]}
+            result <- character(0)
 
-    if(exhaustiveMapping){
-        query <- .getNCBIDatabasesLinks(dbFrom='nucleotide', id=id, dbTo='protein')
-        # Handle multiple protein IDs case
-        if(!is.null(query[['links']][['nuccore_protein']])){
-            for(queryId in query[['links']][['nuccore_protein']]){
-                proteinXml <- entrez_fetch(db = "protein", id = queryId, rettype = "xml")
-                result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
+            aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
+            result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == strsplit(id,'.', fixed = TRUE)[[1]][[1]], "Protein.Accession"])
+            if(!exhaustiveMapping & length(result)>1){result<-result[[1]]}
+
+            if(exhaustiveMapping){
+                query <- .getNCBIDatabasesLinks(dbFrom='nucleotide', id=id, dbTo='protein')
+                # Handle multiple protein IDs case
+                if(!is.null(query[['links']][['nuccore_protein']])){
+                    for(queryId in query[['links']][['nuccore_protein']]){
+                        proteinXml <- entrez_fetch(db = "protein", id = queryId, rettype = "xml")
+                        result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
+                    }
+                }
             }
+            result <- unique(unlist(sapply(strsplit(result, "\\."), "[[", 1), use.names = FALSE))
+            if(is.null(result)){return(character(0))}else{return(result)}
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
         }
-    }
-    result <- unique(unlist(sapply(strsplit(result, "\\."), "[[", 1), use.names = FALSE))
-    if(is.null(result)){return(character(0))}else{return(result)}
+    )
 }
 
 getNCBIGene2NCBINucleotide <- function(id, exhaustiveMapping = FALSE){
-    .checkNCBIGeneIdExists(id)
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
 
-    query <- .getNCBIDatabasesLinks(dbFrom='gene', id=id, dbTo='nucleotide')
-    result <- character(0)
-    # Handle multiple protein IDs case
-    if(!is.null(query[['links']][['gene_nuccore']])){
-        for(queryId in query[['links']][['gene_nuccore']]){
-            proteinXml <- entrez_fetch(db = "nucleotide", id = queryId, rettype = "xml")
-            result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
-            if(!exhaustiveMapping){
-                return(result)
+    tryCatch(
+        {
+            .checkNCBIGeneIdExists(id)
+
+            query <- .getNCBIDatabasesLinks(dbFrom='gene', id=id, dbTo='nucleotide')
+            result <- character(0)
+            # Handle multiple protein IDs case
+            if(!is.null(query[['links']][['gene_nuccore']])){
+                for(queryId in query[['links']][['gene_nuccore']]){
+                    proteinXml <- entrez_fetch(db = "nucleotide", id = queryId, rettype = "xml")
+                    result <- c(result, xpathSApply(xmlParse(proteinXml),'//GBSet/GBSeq/GBSeq_primary-accession',xmlValue)[[1]])
+                    if(!exhaustiveMapping){
+                        return(result)
+                    }
+                }
             }
+            return(result)
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
         }
-    }
-    return(result)
+    )
 }
 
 getNCBINucleotide2NCBIGene <- function(id, exhaustiveMapping = FALSE){
-    .checkNCBINucleotideIdExists(id)
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
 
-    query <- .getNCBIDatabasesLinks(dbFrom='nucleotide', id=id, dbTo='gene')
+    tryCatch(
+        {
+            .checkNCBINucleotideIdExists(id)
 
-    if(!is.null(query[['links']][['nuccore_gene']])){
-        if(!exhaustiveMapping){
-            return(c(query[['links']][['nuccore_gene']])[1])
+            query <- .getNCBIDatabasesLinks(dbFrom='nucleotide', id=id, dbTo='gene')
+
+            if(!is.null(query[['links']][['nuccore_gene']])){
+                if(!exhaustiveMapping){
+                    return(c(query[['links']][['nuccore_gene']])[1])
+                }
+                return(c(query[['links']][['nuccore_gene']]))
+            }else{
+                return(character(0))
+            }
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
         }
-        return(c(query[['links']][['nuccore_gene']]))
-    }else{
-        return(character(0))
-    }
+    )
 }
 
 #############################
@@ -173,29 +226,37 @@ getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
         stop('Incorrect format requested')
     }
 
-    # Retrieve intermediate ID
-    auxId <- NA
-    while(identical(auxId,NA)){
-        auxId <- entrez_search(db = "ipg", term=paste(ncbiId,'[ACCN] OR ', ncbiId, '[UID]',sep=''))
-    }
+    tryCatch(
+        {
+            # Retrieve intermediate ID
+            auxId <- NA
+            while(identical(auxId,NA)){
+                auxId <- entrez_search(db = "ipg", term=paste(ncbiId,'[ACCN] OR ', ncbiId, '[UID]',sep=''))
+            }
 
-    # Check if intermediate ID has been retrieved (shows us if there are or not identical proteins registered)
-    if(length(auxId$ids)==0){
-        switch(format,
-               'ids'= return(character(0)),
-               'dataframe' = return(data.frame()))
-    }else{
-        auxId <- auxId$ids[[1]]
-        identicalProteins <- NA
-        while(identical(identicalProteins,NA)){
-            identicalProteins <- entrez_fetch(db = 'ipg', id = auxId, rettype = 'native')
+            # Check if intermediate ID has been retrieved (shows us if there are or not identical proteins registered)
+            if(length(auxId$ids)==0){
+                switch(format,
+                       'ids'= return(character(0)),
+                       'dataframe' = return(data.frame()))
+            }else{
+                auxId <- auxId$ids[[1]]
+                identicalProteins <- NA
+                while(identical(identicalProteins,NA)){
+                    identicalProteins <- entrez_fetch(db = 'ipg', id = auxId, rettype = 'native')
+                }
+                identicalProteins <- read.csv(text=identicalProteins, sep = '\t')
+                identicalProteins <- identicalProteins[which(identicalProteins$Source=='RefSeq' | identicalProteins$Source=='INSDC'),]
+                switch(format,
+                       'ids'= return(c(identicalProteins$Protein)),
+                       'dataframe' = return(identicalProteins))
+            }
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
         }
-        identicalProteins <- read.csv(text=identicalProteins, sep = '\t')
-        identicalProteins <- identicalProteins[which(identicalProteins$Source=='RefSeq' | identicalProteins$Source=='INSDC'),]
-        switch(format,
-               'ids'= return(c(identicalProteins$Protein)),
-               'dataframe' = return(identicalProteins))
-    }
+    )
 }
 
 # Translate a batch of NCBI IDs to UniProt
@@ -251,9 +312,6 @@ getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
 }
 
 .getNCBI2UniProtAux <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE){
-    .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
-    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
-    .checkBoolean(detailedMapping, 'detailedMapping')
 
     result <- list()
 
@@ -283,22 +341,59 @@ getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
 
 # NCBI Protein to UniProt translation
 getNCBIProtein2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE){
-    .checkNCBIProteinIdExists(ncbiId)
-    return(.getNCBI2UniProtAux(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
-                         byIdenticalProteins = byIdenticalProteins))
+    .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkBoolean(detailedMapping, 'detailedMapping')
+
+    tryCatch(
+        {
+            .checkNCBIProteinIdExists(ncbiId)
+            return(.getNCBI2UniProtAux(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                                       byIdenticalProteins = byIdenticalProteins))
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
+        }
+    )
 }
+
 # NCBI Nucleotide to UniProt translation
 getNCBINucleotide2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE){
-    .checkNCBINucleotideIdExists(ncbiId)
-    return(.getNCBI2UniProtAux(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
-                         byIdenticalProteins = byIdenticalProteins))
+    .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkBoolean(detailedMapping, 'detailedMapping')
+
+    tryCatch(
+        {
+            .checkNCBINucleotideIdExists(ncbiId)
+            return(.getNCBI2UniProtAux(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                                       byIdenticalProteins = byIdenticalProteins))
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
+        }
+    )
 }
 
 # NCBI Gene to UniProt translation
 getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE){
-    .checkNCBIGeneIdExists(ncbiId)
-    return(.getNCBI2UniProtAux(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
-                         byIdenticalProteins = byIdenticalProteins))
+    .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkBoolean(detailedMapping, 'detailedMapping')
+
+    tryCatch(
+        {
+            .checkNCBIGeneIdExists(ncbiId)
+            return(.getNCBI2UniProtAux(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                                       byIdenticalProteins = byIdenticalProteins))
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
+        }
+    )
 }
 
 ##########################
@@ -346,10 +441,6 @@ getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMappi
          'nucleotide' = .checkNCBINucleotideIdExists(ncbiId),
          'gene' = .checkNCBIGeneIdExists(ncbiId),
     )
-    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
-    .checkBoolean(detailedMapping, 'detailedMapping')
-    .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
-    .checkBoolean(bySimilarGenes, 'bySimilarGenes')
 
     result <- list()
     translationsDT <- .getNCBI2KEGGDT(ncbiId)
@@ -386,18 +477,57 @@ getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMappi
 }
 
 getNCBIProtein2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
-    return(.getNCBI2KEGG(ncbiId, 'protein', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
-                         byIdenticalProteins = byIdenticalProteins, bySimilarGenes = bySimilarGenes))
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkBoolean(detailedMapping, 'detailedMapping')
+    .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
+    .checkBoolean(bySimilarGenes, 'bySimilarGenes')
+
+    tryCatch(
+        {
+            return(.getNCBI2KEGG(ncbiId, 'protein', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                                 byIdenticalProteins = byIdenticalProteins, bySimilarGenes = bySimilarGenes))
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
+        }
+    )
 }
 
 getNCBINucleotide2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
-    return(.getNCBI2KEGG(ncbiId, 'nucleotide', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
-                         byIdenticalProteins = byIdenticalProteins, bySimilarGenes = bySimilarGenes))
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkBoolean(detailedMapping, 'detailedMapping')
+    .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
+    .checkBoolean(bySimilarGenes, 'bySimilarGenes')
+
+    tryCatch(
+        {
+            return(.getNCBI2KEGG(ncbiId, 'nucleotide', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                                 byIdenticalProteins = byIdenticalProteins, bySimilarGenes = bySimilarGenes))
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
+        }
+    )
 }
 
 getNCBIGene2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
-    return(.getNCBI2KEGG(ncbiId, 'gene', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
-                         byIdenticalProteins = byIdenticalProteins, bySimilarGenes = bySimilarGenes))
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkBoolean(detailedMapping, 'detailedMapping')
+    .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
+    .checkBoolean(bySimilarGenes, 'bySimilarGenes')
+
+    tryCatch(
+        {
+            return(.getNCBI2KEGG(ncbiId, 'gene', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                                 byIdenticalProteins = byIdenticalProteins, bySimilarGenes = bySimilarGenes))
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
+        }
+    )
 }
 
 
@@ -406,60 +536,87 @@ getNCBIGene2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping 
 ##########################
 
 getNCBIProtein2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
-
     .checkIfCARDIsDownloaded()
-    .checkNCBIProteinIdExists(ncbiId)
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
 
-    ncbiId <- strsplit(ncbiId,'.', fixed = TRUE)[[1]][[1]]
+    tryCatch(
+        {
+            .checkNCBIProteinIdExists(ncbiId)
 
-    aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
-    aroAccession <- aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == ncbiId, "ARO.Accession"]
-    if(exhaustiveMapping){
-        return(aroAccession)
-    }else{
-        return(if(length(aroAccession>0)) aroAccession[[1]] else aroAccession)
-    }
+            ncbiId <- strsplit(ncbiId,'.', fixed = TRUE)[[1]][[1]]
+
+            aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
+            aroAccession <- aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == ncbiId, "ARO.Accession"]
+            if(exhaustiveMapping){
+                return(aroAccession)
+            }else{
+                return(if(length(aroAccession>0)) aroAccession[[1]] else aroAccession)
+            }
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
+        }
+    )
 }
 
 getNCBINucleotide2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
-
     .checkIfCARDIsDownloaded()
-    .checkNCBINucleotideIdExists(ncbiId)
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
 
-    ncbiId <- strsplit(ncbiId,'.', fixed = TRUE)[[1]][[1]]
+    tryCatch(
+        {
+            .checkNCBINucleotideIdExists(ncbiId)
 
-    aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
-    aroAccession <- aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == ncbiId, "ARO.Accession"]
-    if(exhaustiveMapping){
-        return(aroAccession)
-    }else{
-        return(if(length(aroAccession>0)) aroAccession[[1]] else aroAccession)
-    }
+            ncbiId <- strsplit(ncbiId,'.', fixed = TRUE)[[1]][[1]]
+
+            aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
+            aroAccession <- aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == ncbiId, "ARO.Accession"]
+            if(exhaustiveMapping){
+                return(aroAccession)
+            }else{
+                return(if(length(aroAccession>0)) aroAccession[[1]] else aroAccession)
+            }
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
+        }
+    )
 }
 
 getNCBIGene2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
-
     .checkIfCARDIsDownloaded()
-    .checkNCBIGeneIdExists(ncbiId)
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
 
-    ncbiId <- strsplit(ncbiId,'.', fixed = TRUE)[[1]][[1]]
+    tryCatch(
+        {
+            .checkNCBIGeneIdExists(ncbiId)
 
-    proteinId <- getNCBIGene2NCBIProtein(ncbiId, exhaustiveMapping = TRUE)
+            ncbiId <- strsplit(ncbiId,'.', fixed = TRUE)[[1]][[1]]
 
-    result <- character(0)
-    aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
-    for(auxId in proteinId){
-        result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == auxId, "ARO.Accession"])
-    }
-    if(length(result)==0){
-        nucleotideId <- getNCBIGene2NCBINucleotide(ncbiId, exhaustiveMapping = TRUE)
-        for(auxId in nucleotideId){
-            result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == auxId, "ARO.Accession"])
+            proteinId <- getNCBIGene2NCBIProtein(ncbiId, exhaustiveMapping = TRUE)
+
+            result <- character(0)
+            aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
+            for(auxId in proteinId){
+                result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == auxId, "ARO.Accession"])
+            }
+            if(length(result)==0){
+                nucleotideId <- getNCBIGene2NCBINucleotide(ncbiId, exhaustiveMapping = TRUE)
+                for(auxId in nucleotideId){
+                    result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == auxId, "ARO.Accession"])
+                }
+            }
+            if(exhaustiveMapping){
+                return(unique(result))
+            }else{
+                return(if(length(result>0)) unique(result)[[1]] else unique(result))
+            }
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
         }
-    }
-    if(exhaustiveMapping){
-        return(unique(result))
-    }else{
-        return(if(length(result>0)) unique(result)[[1]] else unique(result))
-    }
+    )
 }

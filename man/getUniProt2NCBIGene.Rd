@@ -9,7 +9,7 @@ getUniProt2NCBIGene(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE,
 bySimilarGenes = TRUE)
 }
 \arguments{
-  \item{upId}{valid UniProt database ID}
+  \item{upId}{valid UniProt database ID or a vector of them}
   \item{exhaustiveMapping}{logical value (TRUE or FALSE) indicating to retrieve
   all possible translations or only the first and fastest one}
   \item{detailedMapping}{logical value (TRUE or FALSE) indicating to return a
@@ -33,7 +33,5 @@ Gene IDs, empty vector if no translations were found.
 }
 \examples{
 # Translate UniProt ID 'A0SNL9' to NCBI Gene
-if(interactive()){
 getUniProt2NCBIGene('A0SNL9')
-}
 }

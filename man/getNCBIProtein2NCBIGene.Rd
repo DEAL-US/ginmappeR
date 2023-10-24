@@ -9,7 +9,7 @@ empty vector if no translation is found.}
 getNCBIProtein2NCBIGene(id, exhaustiveMapping=FALSE)
 }
 \arguments{
-  \item{id}{valid NCBI Protein database ID}
+  \item{id}{valid NCBI Protein database ID or a vector of them}
   \item{exhaustiveMapping}{logical value (TRUE or FALSE) indicating to retrieve
   all possible translations or only the first and fastest one}
 }
@@ -18,7 +18,5 @@ A list of NCBI Gene IDs, empty if no translations were found.
 }
 \examples{
 # Translate NCBI Protein ID 'CAA79696' to NCBI Gene
-if(interactive()){
-    getNCBIProtein2NCBIGene('CAA79696')
-}
+getNCBIProtein2NCBIGene('CAA79696')
 }

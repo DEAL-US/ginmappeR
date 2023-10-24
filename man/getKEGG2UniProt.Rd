@@ -9,18 +9,12 @@ empty vector if no translation is found.}
 getKEGG2UniProt(keggId)
 }
 \arguments{
-  \item{keggId}{valid KEGG Genes database ID}
+  \item{keggId}{valid KEGG Genes database ID or a vector of them}
 }
 \value{
 A vector of UniProt IDs, empty if no translations were found.
 }
 \examples{
 # Translate KEGG Genes ID 'lacy:A4V08_06425' to UniProt
-if(interactive()){
-    getKEGG2UniProt('lacy:A4V08_06425')
-}
-# Translate KEGG Genes ID 'aag:5579347' to UniProt
-if(interactive()){
-    getKEGG2UniProt('aag:5579347')
-}
+getKEGG2UniProt('lacy:A4V08_06425')
 }

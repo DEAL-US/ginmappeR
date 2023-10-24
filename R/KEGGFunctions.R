@@ -3,15 +3,24 @@
 ############################
 
 getKEGG2UniProt <- function(keggId){
-    .checkKEGGIdExists(keggId)
 
-    query <- keggConv('uniprot', keggId)
-    if(identical(query, character(0))|identical(query, "")){
-        return(character(0))
-    }else{
-        splittedQuery <- strsplit(query,':')
-        return(unname(unlist(splittedQuery)[2*(1:length(query))]))
-    }
+    tryCatch(
+        {
+            .checkKEGGIdExists(keggId)
+
+            query <- keggConv('uniprot', keggId)
+            if(identical(query, character(0))|identical(query, "")){
+                return(character(0))
+            }else{
+                splittedQuery <- strsplit(query,':')
+                return(unname(unlist(splittedQuery)[2*(1:length(query))]))
+            }
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
+        }
+    )
 }
 
 ###################################
@@ -68,9 +77,6 @@ getKEGG2UniProt <- function(keggId){
 
 .getKEGG2NCBI <- function(keggId, ncbiDB, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
     .checkKEGGIdExists(keggId)
-    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
-    .checkBoolean(detailedMapping, 'detailedMapping')
-    .checkBoolean(bySimilarGenes, 'bySimilarGenes')
 
     result <- list()
     translationsDT <- .getKEGG2NCBIDT(keggId)
@@ -104,18 +110,51 @@ getKEGG2UniProt <- function(keggId){
 }
 
 getKEGG2NCBIProtein <- function(keggId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
-    return(.getKEGG2NCBI(keggId, 'protein', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
-                            bySimilarGenes = bySimilarGenes))
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkBoolean(detailedMapping, 'detailedMapping')
+    .checkBoolean(bySimilarGenes, 'bySimilarGenes')
+    tryCatch(
+        {
+            return(.getKEGG2NCBI(keggId, 'protein', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                                 bySimilarGenes = bySimilarGenes))
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
+        }
+    )
 }
 
 getKEGG2NCBINucleotide <- function(keggId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
-    return(.getKEGG2NCBI(keggId, 'nucleotide', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
-                            bySimilarGenes = bySimilarGenes))
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkBoolean(detailedMapping, 'detailedMapping')
+    .checkBoolean(bySimilarGenes, 'bySimilarGenes')
+    tryCatch(
+        {
+            return(.getKEGG2NCBI(keggId, 'nucleotide', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                                 bySimilarGenes = bySimilarGenes))
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
+        }
+    )
 }
 
 getKEGG2NCBIGene <- function(keggId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
-    return(.getKEGG2NCBI(keggId, 'gene', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
-                            bySimilarGenes = bySimilarGenes))
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .checkBoolean(detailedMapping, 'detailedMapping')
+    .checkBoolean(bySimilarGenes, 'bySimilarGenes')
+    tryCatch(
+        {
+            return(.getKEGG2NCBI(keggId, 'gene', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
+                                 bySimilarGenes = bySimilarGenes))
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
+        }
+    )
 }
 
 #########################
@@ -171,56 +210,67 @@ getKEGG2NCBIGene <- function(keggId, exhaustiveMapping = FALSE, detailedMapping 
 # translation is found
 getKEGG2CARD <- function(keggId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
     .checkIfCARDIsDownloaded()
-    .checkKEGGIdExists(keggId)
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkBoolean(detailedMapping, 'detailedMapping')
-    aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
-    result <- list()
+    .checkBoolean(bySimilarGenes, 'bySimilarGenes')
 
-    # Handle not exhaustiveMapping case, trying to get the fastest result present in CARD
-    if(!exhaustiveMapping){
-        proteinId <-.getKEGG2CARDexhaustiveMappingAux(keggId, 'protein', bySimilarGenes)
-        if(length(proteinId)>0){
-            proteinId <- Filter(Negate(is.null), proteinId[c("DT", "1.0", "0.9", "0.5")])
-            result[names(proteinId)[1]] <- proteinId[[1]][[1]]
-        }else{
-            nucleotideId <-.getKEGG2CARDexhaustiveMappingAux(keggId, 'nucleotide', bySimilarGenes)
-            if(length(nucleotideId)>0){
-                nucleotideId <- Filter(Negate(is.null), nucleotideId[c("DT", "1.0", "0.9", "0.5")])
-                result[names(nucleotideId)[1]] <- nucleotideId[[1]][[1]]
+    tryCatch(
+        {
+            .checkKEGGIdExists(keggId)
+
+            aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
+            result <- list()
+
+            # Handle not exhaustiveMapping case, trying to get the fastest result present in CARD
+            if(!exhaustiveMapping){
+                proteinId <-.getKEGG2CARDexhaustiveMappingAux(keggId, 'protein', bySimilarGenes)
+                if(length(proteinId)>0){
+                    proteinId <- Filter(Negate(is.null), proteinId[c("DT", "1.0", "0.9", "0.5")])
+                    result[names(proteinId)[1]] <- proteinId[[1]][[1]]
+                }else{
+                    nucleotideId <-.getKEGG2CARDexhaustiveMappingAux(keggId, 'nucleotide', bySimilarGenes)
+                    if(length(nucleotideId)>0){
+                        nucleotideId <- Filter(Negate(is.null), nucleotideId[c("DT", "1.0", "0.9", "0.5")])
+                        result[names(nucleotideId)[1]] <- nucleotideId[[1]][[1]]
+                    }
+                }
+            }else{
+                # Handle exhaustiveMapping case, trying to retrieve all possible cases
+                proteinId <- getKEGG2NCBIProtein(keggId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
+                if(length(proteinId)>0){
+                    result <- lapply(proteinId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
+                        auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
+                        return(aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == auxId, "ARO.Accession"])
+                    })))
+                    result <- result[lengths(result) > 0]
+                }
+
+                nucleotideId <- getKEGG2NCBINucleotide(keggId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
+                if(length(nucleotideId)>0){
+                    nucleotideId <- lapply(nucleotideId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
+                        auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
+                        return(aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == auxId, "ARO.Accession"])
+                    })))
+                }
+                nucleotideId <- nucleotideId[lengths(nucleotideId) > 0]
+                result <- .mergeNamedLists(result, nucleotideId)
             }
-        }
-    }else{
-        # Handle exhaustiveMapping case, trying to retrieve all possible cases
-        proteinId <- getKEGG2NCBIProtein(keggId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
-        if(length(proteinId)>0){
-            result <- lapply(proteinId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
-                auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
-                return(aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == auxId, "ARO.Accession"])
-            })))
-            result <- result[lengths(result) > 0]
-        }
 
-        nucleotideId <- getKEGG2NCBINucleotide(keggId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
-        if(length(nucleotideId)>0){
-            nucleotideId <- lapply(nucleotideId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
-                auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
-                return(aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == auxId, "ARO.Accession"])
-            })))
+            # Finally, parse the output according to detailedMapping parameter
+            if(!detailedMapping){
+                result <- unique(unlist(result, recursive = FALSE, use.names = FALSE))
+                if(is.null(result)){result <- character(0)}
+            }else{
+                result <- lapply(result, unique)
+                result <- result[lengths(result) > 0]
+                if(length(result)==0){result <- list()}
+            }
+            return(result)
+        },
+        error = function(e) {
+            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+            return(NULL)
         }
-        nucleotideId <- nucleotideId[lengths(nucleotideId) > 0]
-        result <- .mergeNamedLists(result, nucleotideId)
-    }
-
-    # Finally, parse the output according to detailedMapping parameter
-    if(!detailedMapping){
-        result <- unique(unlist(result, recursive = FALSE, use.names = FALSE))
-        if(is.null(result)){result <- character(0)}
-    }else{
-        result <- lapply(result, unique)
-        result <- result[lengths(result) > 0]
-        if(length(result)==0){result <- list()}
-    }
-    return(result)
+    )
 }
 

@@ -9,7 +9,7 @@ getUniProt2CARD(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE,
 bySimilarGenes = TRUE)
 }
 \arguments{
-  \item{upId}{valid UniProt database ID}
+  \item{upId}{valid UniProt database ID or a vector of them}
   \item{exhaustiveMapping}{logical value (TRUE or FALSE) indicating to retrieve
   all possible translations or only the first and fastest one}
   \item{detailedMapping}{logical value (TRUE or FALSE) indicating to return a
@@ -33,12 +33,5 @@ IDs, empty vector if no translations were found.
 }
 \examples{
 # Translate UniProt ID 'A0A1S7BGS4' to CARD
-if(interactive()){
-    getUniProt2CARD('A0A1S7BGS4')
-}
-# Translate UniProt ID 'A0A6H2TXZ6' to CARD obtaining all possible translations
-if(interactive()){
-    getUniProt2CARD('A0A6H2TXZ6', exhaustiveMapping = TRUE,
-    detailedMapping = TRUE)
-}
+getUniProt2CARD('A0A1S7BGS4')
 }
