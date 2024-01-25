@@ -15,9 +15,10 @@ cardPath <<- tempdir()
 # source('../../../R/utilsFunctions.R')
 
 # # Local execution imports
-source('../00_pkg_src/ginmappeR/R/NCBIFunctions.R')
-source('../00_pkg_src/ginmappeR/R/UniProtFunctions.R')
-source('../00_pkg_src/ginmappeR/R/utilsFunctions.R')
+setwd('../00_pkg_src/ginmappeR/')
+source('R/NCBIFunctions.R')
+source('R/UniProtFunctions.R')
+source('R/utilsFunctions.R')
 
 #####################################
 # NCBI databases inter-translations #
@@ -27,6 +28,7 @@ source('../00_pkg_src/ginmappeR/R/utilsFunctions.R')
 message('Testing getNCBIGene2NCBIProtein')
 # Positive case
 testEquals(getNCBIGene2NCBIProtein('76524190'), c('WP_001082319'))
+testEquals(getNCBIGene2NCBIProtein(c('76524190', '76524190')), list(c('WP_001082319'),c('WP_001082319')))
 testEquals(getNCBIGene2NCBIProtein('76524190', exhaustiveMapping = TRUE), c('WP_001082319'))
 # ID not registered case
 testEquals(getNCBIGene2NCBIProtein('test'), NULL)
@@ -37,6 +39,7 @@ testEquals(getNCBIGene2NCBIProtein('WP_001082319'), character(0))
 message('Testing getNCBIProtein2NCBIGene')
 # Positive case
 testEquals(getNCBIProtein2NCBIGene('CAA79696'), c('1272'))
+testEquals(getNCBIProtein2NCBIGene(c('CAA79696','CAA79696')), list(c('1272'),c('1272')))
 testEquals(getNCBIProtein2NCBIGene('CAA79696', exhaustiveMapping = TRUE), c('1272'))
 # ID not registered case
 testEquals(getNCBIProtein2NCBIGene('test'), NULL)
@@ -47,6 +50,7 @@ testEquals(getNCBIProtein2NCBIGene('WP_011997479'), character(0))
 message('Testing getNCBIProtein2NCBINucleotide')
 # Positive case
 testEquals(getNCBIProtein2NCBINucleotide('AFH35853'), c('JQ394987'))
+testEquals(getNCBIProtein2NCBINucleotide(c('AFH35853','AFH35853')), list(c('JQ394987'),c('JQ394987')))
 testEquals(getNCBIProtein2NCBINucleotide('AFH35853', exhaustiveMapping = TRUE), c('JQ394987'))
 # ID not registered case
 testEquals(getNCBIProtein2NCBINucleotide('test'), NULL)
@@ -55,6 +59,7 @@ testEquals(getNCBIProtein2NCBINucleotide('test'), NULL)
 message('Testing getNCBINucleotide2NCBIProtein')
 # Positive case
 testEquals(getNCBINucleotide2NCBIProtein('JQ394987'), c('AFH35853'))
+testEquals(getNCBINucleotide2NCBIProtein(c('JQ394987','JQ394987')), list(c('AFH35853'), c('AFH35853')))
 # ID not registered case
 testEquals(getNCBINucleotide2NCBIProtein('test'), NULL)
 
@@ -62,6 +67,7 @@ testEquals(getNCBINucleotide2NCBIProtein('test'), NULL)
 message('Testing getNCBIGene2NCBINucleotide')
 # Positive case
 testEquals(getNCBIGene2NCBINucleotide('76524190'), c('NZ_CP059690'))
+testEquals(getNCBIGene2NCBINucleotide(c('76524190','76524190')), list(c('NZ_CP059690'),c('NZ_CP059690')))
 testEquals(getNCBIGene2NCBINucleotide('76524190', exhaustiveMapping = TRUE), c('NZ_CP059690'))
 # ID not registered case
 testEquals(getNCBIGene2NCBINucleotide('test'), NULL)
@@ -72,6 +78,7 @@ testEquals(getNCBIGene2NCBINucleotide('WP_001082319'), character(0))
 message('Testing getNCBINucleotide2NCBIGene')
 # Positive case
 testEquals(getNCBINucleotide2NCBIGene('Z21488'), c('1272'))
+testEquals(getNCBINucleotide2NCBIGene(c('Z21488','Z21488')), list(c('1272'),c('1272')))
 testEquals(getNCBINucleotide2NCBIGene('Z21488', exhaustiveMapping = TRUE), c('1272'))
 # ID not registered case
 testEquals(getNCBINucleotide2NCBIGene('test'), NULL)
@@ -95,6 +102,8 @@ testEquals(getNCBINucleotide2NCBIGene('KF513177'), character(0))
 message('Testing getNCBIIdenticalProteins')
 # Positive cases
 testEquals(getNCBIIdenticalProteins('AHA80958', format = 'ids'), c('WP_063864654.1','AHA80958.1', "EKD8974449.1", "EKD8979565.1"))
+testEquals(getNCBIIdenticalProteins(c('AHA80958', 'AHA80958'), format = 'ids'), list(c('WP_063864654.1','AHA80958.1', "EKD8974449.1", "EKD8979565.1"),
+                                                                                     c('WP_063864654.1','AHA80958.1', "EKD8974449.1", "EKD8979565.1")))
 Sys.sleep(3)
 dummyDf <- data.frame(Id=c(45721358, 45721358, 45721358, 45721358),
                       Source=c('RefSeq','INSDC','INSDC','INSDC'),
@@ -109,7 +118,7 @@ dummyDf <- data.frame(Id=c(45721358, 45721358, 45721358, 45721358),
 testEquals(getNCBIIdenticalProteins('AHA80958', format = 'dataframe'), dummyDf)
 # Incorrect format request case
 Sys.sleep(3)
-checkException(getNCBIIdenticalProteins('AHA80958', format='test'))
+RUnit::checkException(getNCBIIdenticalProteins('AHA80958', format='test'))
 # No identical proteins found case
 testEquals(getNCBIIdenticalProteins('test'), character(0))
 
@@ -140,6 +149,7 @@ testEquals(getNCBIIdenticalProteins('test'), character(0))
 message('Testing getNCBIProtein2UniProt')
 # Positive cases
 testEquals(getNCBIProtein2UniProt('WP_010896559.1'), c('Q7AJZ0'))
+testEquals(getNCBIProtein2UniProt(c('WP_010896559.1','WP_010896559.1')), list(c('Q7AJZ0'),c('Q7AJZ0')))
 # testEquals(getNCBIProtein2UniProt('WP_010896559.1', exhaustiveMapping = TRUE), c('Q7AJZ0','Q9RC37'))
 # testEquals(getNCBIProtein2UniProt('WP_010896559.1', exhaustiveMapping = TRUE, detailedMapping = TRUE), list('DT'=c('Q7AJZ0', 'Q9RC37'),'1.0'=c('Q7AJZ0', 'Q9RC37')))
 # testEquals(getNCBIProtein2UniProt('WP_010896559.1', exhaustiveMapping = FALSE, detailedMapping = TRUE), list('DT'=c('Q7AJZ0')))
@@ -156,6 +166,7 @@ testEquals(getNCBIProtein2UniProt('test'), NULL)
 message('Testing getNCBINucleotide2UniProt')
 # Positive case
 testEquals(getNCBINucleotide2UniProt('AY536519'), c('Q6QJ79'))
+testEquals(getNCBINucleotide2UniProt(c('AY536519', 'AY536519')), list(c('Q6QJ79'),c('Q6QJ79')))
 testEquals(getNCBINucleotide2UniProt('AY536519', detailedMapping = TRUE), list('1.0'=c('Q6QJ79')))
 # testEquals(getNCBINucleotide2UniProt('AY536519', exhaustiveMapping = TRUE), c('Q6QJ79','A0A7G1KXU2','A0A6I4WTI5','D0UY02'))
 # testEquals(getNCBINucleotide2UniProt('AY536519', exhaustiveMapping = TRUE, detailedMapping = TRUE), list('1.0'=c('Q6QJ79','A0A7G1KXU2','A0A6I4WTI5','D0UY02')))
@@ -170,6 +181,7 @@ testEquals(getNCBINucleotide2UniProt('test'), NULL)
 message('Testing getNCBIGene2UniProt')
 # Positive case
 testEquals(getNCBIGene2UniProt('76524190'), c('A0A1W6DPG3'))
+testEquals(getNCBIGene2UniProt(c('76524190','76524190')), list(c('A0A1W6DPG3'),c('A0A1W6DPG3')))
 testEquals(getNCBIGene2UniProt('76524190', detailedMapping = TRUE), list('1.0'=c('A0A1W6DPG3')))
 testEquals(getNCBIGene2UniProt('76524190', byIdenticalProteins =  FALSE), character(0))
 # No translation case
@@ -214,6 +226,8 @@ message('Testing getNCBIProtein2KEGG')
 # Positive cases
 testEquals(getNCBIProtein2KEGG('WP_010896559.1', exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = FALSE),
             c("bha:BH0380"))
+testEquals(getNCBIProtein2KEGG(c('WP_010896559.1','WP_010896559.1'), exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = FALSE),
+           list(c("bha:BH0380"),c("bha:BH0380")))
 testEquals(getNCBIProtein2KEGG('WP_010896559.1', exhaustiveMapping = FALSE, detailedMapping = TRUE, byIdenticalProteins = FALSE),
             list('DT'=c("bha:BH0380")))
 # testEquals(getNCBIProtein2KEGG('WP_010896559.1',exhaustiveMapping = TRUE, detailedMapping = TRUE, byIdenticalProteins = FALSE),
@@ -224,28 +238,38 @@ testEquals(getNCBIProtein2KEGG('WP_010896559.1', exhaustiveMapping = FALSE, deta
 # No translation case
 testEquals(getNCBIProtein2KEGG('WP_188331862.1'), character(0))
 testEquals(getNCBIProtein2KEGG('WP_188331862.1', detailedMapping = TRUE), list())
+# NCBI Protein ID not registered case
+testEquals(getNCBIProtein2KEGG('test'), NULL)
 
 ### Test getNCBINucleotide2KEGG
 message('Testing getNCBINucleotide2KEGG')
 # Positive cases
 testEquals(getNCBINucleotide2KEGG('AY536519', exhaustiveMapping = FALSE, detailedMapping = FALSE),
             c("ag:AAS48620"))
+testEquals(getNCBINucleotide2KEGG(c('AY536519','AY536519'), exhaustiveMapping = FALSE, detailedMapping = FALSE),
+           list(c("ag:AAS48620"),c("ag:AAS48620")))
 # testEquals(getNCBINucleotide2KEGG('NZ_CP059690', exhaustiveMapping = FALSE, detailedMapping = TRUE, byIdenticalProteins = FALSE),
 #             list('1.0'=c("apa:APP7_0365")))
 # No translation case
 testEquals(getNCBINucleotide2KEGG('AY536519', byIdenticalProteins = FALSE), character(0))
 testEquals(getNCBINucleotide2KEGG('AY536519', detailedMapping = TRUE, byIdenticalProteins = FALSE), list())
+# NCBI Nucleotide ID not registered case
+testEquals(getNCBINucleotide2KEGG('test'), NULL)
 
 ### Test getNCBIGene2KEGG
 message('Testing getNCBIGene2KEGG')
 # Positive cases
 testEquals(getNCBIGene2KEGG('76524190', exhaustiveMapping = FALSE, detailedMapping = FALSE),
             c("cet:B8281_09025"))
+testEquals(getNCBIGene2KEGG(c('76524190','76524190'), exhaustiveMapping = FALSE, detailedMapping = FALSE),
+           list(c("cet:B8281_09025"),c("cet:B8281_09025")))
 # testEquals(getNCBIGene2KEGG('76524190', exhaustiveMapping = FALSE, detailedMapping = TRUE),
 #             list('DT'=c("cet:B8281_09025")))
 # No translation case
 testEquals(getNCBIGene2KEGG('76524190', byIdenticalProteins = FALSE, bySimilarGenes = FALSE), character(0))
 testEquals(getNCBIGene2KEGG('76524190', detailedMapping = TRUE, byIdenticalProteins = FALSE, bySimilarGenes = FALSE), list())
+# NCBI Gene ID not registered case
+testEquals(getNCBIGene2KEGG('test'), NULL)
 
 ##########################
 # NCBI databases to CARD #
@@ -255,34 +279,36 @@ testEquals(getNCBIGene2KEGG('76524190', detailedMapping = TRUE, byIdenticalProte
 message('Testing getNCBIProtein2CARD')
 # Positive cases
 testEquals(getNCBIProtein2CARD('AAK64581'), c('ARO:3004568'))
+testEquals(getNCBIProtein2CARD(c('AAK64581','AAK64581')), list(c('ARO:3004568'),c('ARO:3004568')))
 testEquals(getNCBIProtein2CARD('AAK64581.1'), c('ARO:3004568'))
 testEquals(getNCBIProtein2CARD('CAC81324'), c('ARO:3003015'))
 testEquals(getNCBIProtein2CARD('CAC81324.1'), c('ARO:3003015'))
 # No translation case
 testEquals(getNCBIProtein2CARD('EAT32321.1'), character(0))
+# NCBI ID not registered case
+testEquals(getNCBIProtein2CARD('test'), NULL)
 
 ### Test getNCBINucleotide2CARD
 message('Testing getNCBINucleotide2CARD')
 # Positive cases
 testEquals(getNCBINucleotide2CARD('AY034138'), c('ARO:3004568'))
+testEquals(getNCBINucleotide2CARD(c('AY034138','AY034138')), list(c('ARO:3004568'),c('ARO:3004568')))
 testEquals(getNCBINucleotide2CARD('AY034138.1'), c('ARO:3004568'))
 testEquals(getNCBINucleotide2CARD('AJ310778'), c('ARO:3003015'))
 testEquals(getNCBINucleotide2CARD('AJ310778.1'), c('ARO:3003015'))
 # No translation case
-testEquals(getNCBINucleotide2CARD('XM_001230804.1'), character(0))
+testEquals(getNCBINucleotide2CARD('JH725437.1'), character(0))
+# NCBI ID not registered case
+testEquals(getNCBINucleotide2CARD('test'), NULL)
 
 ### Test getNCBIGene2CARD
 message('Testing getNCBIGene2CARD')
 # Positive case
 testEquals(getNCBIGene2CARD('3510143'), c('ARO:3003942'))
+testEquals(getNCBIGene2CARD(c('3510143','3510143')), list(c('ARO:3003942'),c('ARO:3003942')))
 testEquals(getNCBIGene2CARD('WP_001082319'), character(0))
-
-
-
-
-
-
-
+# NCBI ID not registered case
+testEquals(getNCBIGene2CARD('test'), NULL)
 
 
 

@@ -13,8 +13,12 @@ getKEGG2UniProt(keggId)
 }
 \value{
 A vector of UniProt IDs, empty if no translations were found.
+If an error occurs, returns NULL.
 }
 \examples{
-# Translate KEGG Genes ID 'lacy:A4V08_06425' to UniProt
-getKEGG2UniProt('lacy:A4V08_06425')
+# Translate KEGG Genes ID 'llo:LLO_2673' to UniProt
+getKEGG2UniProt('llo:LLO_2673')
+
+# Translate KEGG IDs 'llo:LLO_2673' and 'abh:M3Q_2831' to NCBI UniProt
+getKEGG2UniProt(c('llo:LLO_2673', 'abh:M3Q_2831'))
 }

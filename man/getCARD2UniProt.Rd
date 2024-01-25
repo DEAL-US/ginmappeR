@@ -22,8 +22,13 @@ Depending on parameter 'detailedMapping': if TRUE it will return a named list
 dividing UniProt IDs in 'DT', if it is a Direct Translation (100\% of identity),
 or '1.0', if it has been retrieved through NCBI Identical Protein database, or
 empty list if no translations were found; if FALSE, returns a vector of UniProt
-IDs, empty vector if no translations were found.}
+IDs, empty vector if no translations were found.
+If an error occurs, returns NULL.
+}
 \examples{
 # Translate CARD ID '3002867' to UniProt
 getCARD2UniProt('3002867')
+
+# Translate CARD IDs '3002867' and '3002535' to UniProt
+getCARD2UniProt(c('3002867', '3002535'))
 }

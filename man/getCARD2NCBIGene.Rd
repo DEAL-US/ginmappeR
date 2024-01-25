@@ -15,8 +15,12 @@ getCARD2NCBIGene(cardId, exhaustiveMapping = FALSE)
 }
 \value{
 A vector of NCBI Gene IDs, empty if no translations were found.
+If an error occurs, returns NULL.
 }
 \examples{
 # Translate CARD ID '3002524' to NCBI Gene
 getCARD2NCBIGene('3002524')
+
+# Translate CARD IDs '3002524' and '3002525' to NCBI Gene
+getCARD2NCBIGene(c('3002524', '3002525'))
 }

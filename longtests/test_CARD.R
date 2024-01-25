@@ -14,8 +14,9 @@ cardPath <<- tempdir()
 # source('../../../R/utilsFunctions.R')
 
 # # Local execution imports
-source('../00_pkg_src/ginmappeR/R/CARDFunctions.R')
-source('../00_pkg_src/ginmappeR/R/utilsFunctions.R')
+setwd('../00_pkg_src/ginmappeR/')
+source('R/CARDFunctions.R')
+source('R/utilsFunctions.R')
 
 #########################
 # CARD database to NCBI #
@@ -27,6 +28,7 @@ message('Testing getCARD2NCBIProtein')
 testEquals(getCARD2NCBIProtein('3002535'), 'CAA38525.1')
 testEquals(getCARD2NCBIProtein('ARO:3002535'), 'CAA38525.1')
 testEquals(getCARD2NCBIProtein('3003988'), 'APB03221.1')
+testEquals(getCARD2NCBIProtein(c('3003988', 'ARO:3002535')), list('APB03221.1', 'CAA38525.1'))
 # Incorrect CARD ID case
 testEquals(getCARD2NCBIProtein('test'), NULL)
 
@@ -36,18 +38,22 @@ message('Testing getCARD2NCBINucleotide')
 testEquals(getCARD2NCBINucleotide('3002535'), 'X54723.1')
 testEquals(getCARD2NCBINucleotide('ARO:3002535'), 'X54723.1')
 testEquals(getCARD2NCBINucleotide('3003988'), 'KX531051.1')
+testEquals(getCARD2NCBINucleotide(c('3003988', 'ARO:3002535')), list('KX531051.1', 'X54723.1'))
 # Incorrect CARD ID case
 testEquals(getCARD2NCBINucleotide('test'), NULL)
 
 ### Test getCARD2NCBIGene
 message('Testing getCARD2NCBIGene')
 # Positive cases
-# testEquals(getCARD2NCBIGene('3002524'), c('29426913'))
+testEquals(getCARD2NCBIGene('3002524'), c('29426913'))
+testEquals(getCARD2NCBIGene(c('3002524','3002524')), list(c('29426913'),c('29426913')))
 # testEquals(getCARD2NCBIGene('ARO:3002524'), c('29426913'))
 # testEquals(getCARD2NCBIGene('ARO:3002524', TRUE), c('29426913'))
 # testEquals(getCARD2NCBIGene('3002525'), c('886648'))
 # # No translation case
-# testEquals(getCARD2NCBIGene('3005061'), character(0))
+testEquals(getCARD2NCBIGene('3005061'), character(0))
+# Incorrect CARD ID case
+testEquals(getCARD2NCBIGene('test'), NULL)
 
 ############################
 # CARD database to UniProt #
@@ -58,12 +64,14 @@ message('Testing getCARD2UniProt')
 # Positive cases
 testEquals(getCARD2UniProt('3002867'), c('Q9ZIF9'))
 testEquals(getCARD2UniProt('3002867', detailedMapping=TRUE), list('DT'=c('Q9ZIF9')))
+testEquals(getCARD2UniProt(c('3002867', '3002867'), detailedMapping=TRUE), list(list('DT'=c('Q9ZIF9')),list('DT'=c('Q9ZIF9'))))
 # checkTrue(length(getCARD2UniProt('3002867', TRUE)) == 35)
 # testEquals(getCARD2UniProt('3003649'), c('A0A0K0TQH5'))
 # No translation case
 testEquals(getCARD2UniProt('3006267'), character(0))
 testEquals(getCARD2UniProt('3006267', detailedMapping=TRUE), list())
-
+# Incorrect CARD ID case
+testEquals(getCARD2UniProt('test'), NULL)
 
 #########################
 # CARD database to KEGG #
@@ -74,13 +82,15 @@ message('Testing getCARD2KEGG')
 # Positive cases
 testEquals(getCARD2KEGG('3000938'), c('ag:AAF19151'))
 testEquals(getCARD2KEGG('3000938', detailedMapping = TRUE), list('DT'=c('ag:AAF19151')))
+testEquals(getCARD2KEGG(c('3000938','3000938'), detailedMapping = TRUE), list(list('DT'=c('ag:AAF19151')), list('DT'=c('ag:AAF19151'))))
 # testEquals(getCARD2KEGG('3001109', detailedMapping = TRUE), list('0.9'=c('ag:BAA84973')))
 # testEquals(getCARD2KEGG('3002511', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = TRUE),
             # list('0.5'=c("chk:D4L85_28045","proe:H9L23_08075"))) # Takes a long time
 # No translation cases
 testEquals(getCARD2KEGG('3006267', detailedMapping = FALSE, bySimilarGenes = FALSE), character(0))
 testEquals(getCARD2KEGG('3006267', detailedMapping = TRUE, bySimilarGenes = FALSE), list())
-
+# Incorrect CARD ID case
+testEquals(getCARD2KEGG('test'), NULL)
 
 
 

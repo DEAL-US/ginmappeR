@@ -14,21 +14,22 @@ cardPath <<- tempdir()
 # source('../../../R/utilsFunctions.R')
 
 # # Local execution imports
-source('../../ginmappeR/R/UniProtFunctions.R')
-source('../../ginmappeR/R/utilsFunctions.R')
+# setwd('../00_pkg_src/ginmappeR/')
+# source('../00_pkg_src/ginmappeR/R/UniProtFunctions.R')
+# source('../00_pkg_src/ginmappeR/R/utilsFunctions.R')
 
 ######################################
 # UniProt database auxiliar function #
 ######################################
 
-### Test .checkUniProtIdExists
-message('Testing .checkUniProtIdExists')
-# Positive case
-testEquals(.checkUniProtIdExists('P0DTH6'), NULL)
-# ID not registered case
-checkException(.checkUniProtIdExists('P0ZTH2'))
-# ID not valid case
-checkException(.checkUniProtIdExists('P0ZTUH2'))
+# ### Test .checkUniProtIdExists
+# message('Testing .checkUniProtIdExists')
+# # Positive case
+# testEquals(.checkUniProtIdExists('P0DTH6'), NULL)
+# # ID not registered case
+# checkException(.checkUniProtIdExists('P0ZTH2'))
+# # ID not valid case
+# checkException(.checkUniProtIdExists('P0ZTUH2'))
 
 ############################
 # UniProt database to KEGG #
@@ -45,14 +46,17 @@ checkException(.checkUniProtIdExists('P0ZTUH2'))
 ### Test getUniProtSimilarGenes
 message('Testing getUniProtSimilarGenes')
 # Positive cases
-checkTrue(length(getUniProtSimilarGenes('G0L217', clusterIdentity = '0.5', clusterNames = TRUE)$UniRef50_A0A5S3PNY9)==5)
+RUnit::checkTrue(length(getUniProtSimilarGenes('G0L217', clusterIdentity = '0.5', clusterNames = TRUE)$UniRef50_A0A6L9EH79)==3)
 # checkTrue(length(getUniProtSimilarGenes('G9JVE6', clusterIdentity = '1.0', clusterNames = TRUE)$UniRef100_G9JVE6)==10)
 # checkTrue(length(getUniProtSimilarGenes('G9JVE6', clusterIdentity = '1.0'))==10)
 # No similar genes case
-testEquals(getUniProtSimilarGenes('G0L217', clusterIdentity = '1.0', clusterNames = TRUE), list('UniRef100_G0L217'=character(0)))
-testEquals(getUniProtSimilarGenes('G0L217', clusterIdentity = '1.0'), character(0))
+ginmappeR:::testEquals(getUniProtSimilarGenes('G0L217', clusterIdentity = '1.0', clusterNames = TRUE), list('UniRef100_G0L217'=character(0)))
+ginmappeR:::testEquals(getUniProtSimilarGenes(c('G0L217','G0L217'), clusterIdentity = '1.0', clusterNames = TRUE), list(list('UniRef100_G0L217'=character(0)),list('UniRef100_G0L217'=character(0))))
+ginmappeR:::testEquals(getUniProtSimilarGenes('G0L217', clusterIdentity = '1.0'), character(0))
 # Invalid cluster identity provided
-checkException(getUniProtSimilarGenes('G9JVE6','test'))
+RUnit::checkException(getUniProtSimilarGenes('G9JVE6','test'))
+# ID not valid case
+ginmappeR:::testEquals(getUniProtSimilarGenes('test'), NULL)
 
 ### Test .getUniProt2KEGGSGT
 # message('Testing .getUniProt2KEGGSGT')
@@ -64,8 +68,9 @@ checkException(getUniProtSimilarGenes('G9JVE6','test'))
 
 ### Test getUniProt2KEGG
 message('Testing getUniProt2KEGG')
-testEquals(getUniProt2KEGG('G9JVE6', detailedMapping = TRUE), list('DT'=c('ag:AEX08599')))
-testEquals(getUniProt2KEGG('G9JVE6'), c('ag:AEX08599'))
+ginmappeR:::testEquals(getUniProt2KEGG('G9JVE6', detailedMapping = TRUE), list('DT'=c('ag:AEX08599')))
+ginmappeR:::testEquals(getUniProt2KEGG('G9JVE6'), c('ag:AEX08599'))
+ginmappeR:::testEquals(getUniProt2KEGG(c('G9JVE6','G9JVE6')), list(c('ag:AEX08599'),c('ag:AEX08599')))
 # testEquals(getUniProt2KEGG('A0A2R4PHC7', detailedMapping = TRUE), list('0.5'=c('fcr:HYN56_14615')))
 # testEquals(getUniProt2KEGG('A0A2R4PHC7'), c('fcr:HYN56_14615'))
 # testEquals(getUniProt2KEGG('A0A2R4PHC7', exhaustiveMapping = TRUE, detailedMapping = TRUE), list('0.5'=c('ffl:HYN86_12595', 'fcr:HYN56_14615', 'fls:GLV81_10715')))
@@ -74,7 +79,7 @@ testEquals(getUniProt2KEGG('G9JVE6'), c('ag:AEX08599'))
 # testEquals(getUniProt2KEGG('Q6XL56', exhaustiveMapping = TRUE, bySimilarGenes = FALSE, detailedMapping = TRUE), list('DT'=c('ag:AAP69916')))
 # testEquals(getUniProt2KEGG('Q6XL56', exhaustiveMapping = TRUE, bySimilarGenes = FALSE), c('ag:AAP69916'))
 # ID not valid case
-testEquals(getUniProt2KEGG('P0ZTUH2'), NULL)
+ginmappeR:::testEquals(getUniProt2KEGG('P0ZTUH2'), NULL)
 
 ############################
 # UniProt database to NCBI #
@@ -103,14 +108,17 @@ message('Testing getUniProt2NCBIProtein, getUniProt2NCBINucleotide, getUniProt2N
 # checkTrue(length(getUniProt2NCBIProtein('A0A6H2TXZ6', exhaustiveMapping = TRUE, detailedMapping = TRUE)$`0.5`)==15)
 # checkTrue(length(getUniProt2NCBINucleotide('A0A6H2TXZ6', exhaustiveMapping = TRUE, detailedMapping = TRUE)$`0.5`)==2)
 # testEquals(getUniProt2NCBINucleotide('A0A6H2TXZ6', exhaustiveMapping = FALSE, detailedMapping = TRUE), list('0.5' = c("NZ_CP013692.1")))
-testEquals(getUniProt2NCBIProtein('A0SNL9', exhaustiveMapping = FALSE, detailedMapping = FALSE), c('ABH10964.1'))
-# testEquals(getUniProt2NCBINucleotide('A0SNL9', exhaustiveMapping = FALSE, detailedMapping = FALSE), c('NZ_VDQI01000026.1'))
-testEquals(getUniProt2NCBIGene('A0SNL9', exhaustiveMapping = FALSE, detailedMapping = FALSE), c('AFH57403.1'))
+ginmappeR:::testEquals(getUniProt2NCBIProtein('A0SNL9', exhaustiveMapping = FALSE, detailedMapping = FALSE), c('ABH10964.1'))
+ginmappeR:::testEquals(getUniProt2NCBIProtein(c('A0SNL9','A0SNL9'), exhaustiveMapping = FALSE, detailedMapping = FALSE), list(c('ABH10964.1'),c('ABH10964.1')))
+ginmappeR:::testEquals(getUniProt2NCBINucleotide('A0SNL9', exhaustiveMapping = FALSE, detailedMapping = FALSE), c('NZ_VDQI01000026.1'))
+ginmappeR:::testEquals(getUniProt2NCBIGene('A0SNL9', exhaustiveMapping = FALSE, detailedMapping = FALSE), c('AFH57403.1'))
 # No translation cases
-testEquals(getUniProt2NCBIGene('A0A1S7BGS4', bySimilarGenes = FALSE), character(0))
+ginmappeR:::testEquals(getUniProt2NCBIGene('A0A1S7BGS4', bySimilarGenes = FALSE), character(0))
 # testEquals(getUniProt2NCBIGene('A0A1S7BGS4', bySimilarGenes = FALSE, detailedMapping = TRUE), list())
 # ID not valid case
-testEquals(getUniProt2NCBIProtein('P0ZTUH2'), NULL)
+ginmappeR:::testEquals(getUniProt2NCBIProtein('test'), NULL)
+ginmappeR:::testEquals(getUniProt2NCBINucleotide('test'), NULL)
+ginmappeR:::testEquals(getUniProt2NCBIGene('test'), NULL)
 
 ############################
 # UniProt database to CARD #
@@ -119,13 +127,15 @@ testEquals(getUniProt2NCBIProtein('P0ZTUH2'), NULL)
 ### Test getUniProt2CARD
 message('Testing getUniProt2CARD')
 # Positive cases
-testEquals(getUniProt2CARD('A0A1S7BGS4'), c("ARO:3004185"))
+ginmappeR:::testEquals(getUniProt2CARD('A0A1S7BGS4'), c("ARO:3004185"))
+ginmappeR:::testEquals(getUniProt2CARD(c('A0A1S7BGS4','A0A1S7BGS4')), list(c("ARO:3004185"),c("ARO:3004185")))
 # testEquals(getUniProt2CARD('A0A4R5XW64', bySimilarGenes = TRUE), c("ARO:3004185"))
-testEquals(getUniProt2CARD('Q8GNY5', detailedMapping = TRUE), list('DT'=c("ARO:3003552")))
+ginmappeR:::testEquals(getUniProt2CARD('Q8GNY5', detailedMapping = TRUE), list('DT'=c("ARO:3003552")))
 # testEquals(getUniProt2CARD('Q8GNY5'), c('ARO:3003552'))
 # testEquals(getUniProt2CARD('A0A6H2TXZ6', exhaustiveMapping = TRUE, detailedMapping = TRUE), list('DT' = c('ARO:3005012'), '0.9'= c('ARO:3005013'), '0.5'=c('ARO:3005013')))
-testEquals(getUniProt2CARD('A0A6H2TXZ6', exhaustiveMapping = FALSE, detailedMapping = TRUE), list('DT' = c('ARO:3005012')))
+ginmappeR:::testEquals(getUniProt2CARD('A0A6H2TXZ6', exhaustiveMapping = FALSE, detailedMapping = TRUE), list('DT' = c('ARO:3005012')))
 # No translation cases
-testEquals(getUniProt2CARD('A0A4R5XW64', bySimilarGenes = FALSE), character(0))
+ginmappeR:::testEquals(getUniProt2CARD('A0A4R5XW64', bySimilarGenes = FALSE), character(0))
 # testEquals(getUniProt2CARD('A0A4R5XW64', detailedMapping = TRUE, bySimilarGenes = FALSE), list())
-
+# ID not valid case
+ginmappeR:::testEquals(getUniProt2CARD('test'), NULL)

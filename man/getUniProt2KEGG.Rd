@@ -30,8 +30,12 @@ dividing KEGG IDs in 'DT', if it is a Direct Translation, or '1.0', '0.9' or
 '0.5', if it has been retrieved through any of the identical gene clusters, or
 empty list if no translations were found; if FALSE, returns a vector of KEGG
 IDs, empty vector if no translations were found.
+If an error occurs, returns NULL.
 }
 \examples{
 # Translate UniProt ID 'G9JVE6' to KEGG
 getUniProt2KEGG('G9JVE6')
+
+# Translate UniProt IDs 'A0A1S7BGS4' and 'G9JVE6' to KEGG
+getUniProt2KEGG(c('A0A1S7BGS4', 'G9JVE6'))
 }

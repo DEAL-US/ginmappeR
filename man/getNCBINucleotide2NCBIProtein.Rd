@@ -15,8 +15,12 @@ getNCBINucleotide2NCBIProtein(id, exhaustiveMapping=FALSE)
 }
 \value{
 A list of NCBI Protein IDs, empty if no translations were found.
+If an error occurs, returns NULL.
 }
 \examples{
 # Translate NCBI Nucleotide ID 'AY536519' to NCBI Protein
 getNCBINucleotide2NCBIProtein('AY536519')
+
+# Translate NCBI Nucleotide IDs 'AY536519' and 'X54723.1' to NCBI Protein
+getNCBINucleotide2NCBIProtein(c('AY536519', 'X54723.1'))
 }

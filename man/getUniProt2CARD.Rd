@@ -30,8 +30,12 @@ dividing CARD IDs in 'DT', if it is a Direct Translation, or '1.0', '0.9' or
 '0.5', if it has been retrieved through any of the identical gene clusters, or
 empty list if no translations were found; if FALSE, returns a vector of CARD
 IDs, empty vector if no translations were found.
+If an error occurs, returns NULL.
 }
 \examples{
 # Translate UniProt ID 'A0A1S7BGS4' to CARD
 getUniProt2CARD('A0A1S7BGS4')
+
+# Translate UniProt IDs 'A0A1S7BGS4' and 'A0A6H2TXZ6' to CARD
+getUniProt2CARD(c('A0A1S7BGS4', 'A0A6H2TXZ6'))
 }

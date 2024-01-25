@@ -15,8 +15,12 @@ getNCBIProtein2NCBIGene(id, exhaustiveMapping=FALSE)
 }
 \value{
 A list of NCBI Gene IDs, empty if no translations were found.
+If an error occurs, returns NULL.
 }
 \examples{
 # Translate NCBI Protein ID 'CAA79696' to NCBI Gene
 getNCBIProtein2NCBIGene('CAA79696')
+
+# Translate NCBI Protein IDs 'CAA79696' and 'WP_001082319' to NCBI Gene
+getNCBIProtein2NCBIGene(c('CAA79696', 'WP_001082319'))
 }

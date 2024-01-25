@@ -26,8 +26,11 @@ Depending on parameter 'detailedMapping': if TRUE it will return a named list
 dividing UniProt IDs in 'DT', if it is a Direct Translation, or '1.0', if it
 has been retrieved through NCBI Identical Protein database , or empty list if
 no translations were found; if FALSE, returns a vector of UniProt IDs, empty
-vector if no translations were found.}
+vector if no translations were found. If an error occurs, returns NULL.}
 \examples{
 # Translate NCBI Protein ID 'WP_010896559.1' to UniProt
 getNCBIProtein2UniProt('WP_010896559.1')
+
+# Translate NCBI Protein IDs 'AAS48620' and 'WP_010896559' to UniProt
+getNCBIProtein2UniProt(c('AAS48620', 'WP_010896559'))
 }

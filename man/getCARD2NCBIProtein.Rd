@@ -13,6 +13,7 @@ getCARD2NCBIProtein(cardId)
 }
 \value{
 A vector of NCBI Protein IDs, empty if no translations were found.
+If an error occurs, returns NULL.
 }
 \examples{
 # Translate CARD ID '3002535' to NCBI Protein
@@ -20,4 +21,7 @@ getCARD2NCBIProtein('3002535')
 
 # Translate CARD ID 'ARO:3002535' to NCBI Protein
 getCARD2NCBIProtein('ARO:3002535')
+
+# Translate CARD IDs '3002535' and '3003988' to NCBI Protein
+getCARD2NCBIProtein(c('3002535', '3003988'))
 }

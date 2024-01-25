@@ -18,8 +18,12 @@ Depending on parameter 'format', it will return a vector of identical NCBI
 Protein IDs or a dataframe containing different information about the identical
 proteins found: 'Id', 'Source', 'Nucleotide.Accession', 'Start', 'Stop',
 'Strand', 'Protein', 'Protein.Name', 'Organism', 'Strain' and 'Assembly'.
+If an error occurs, returns NULL.
 }
 \examples{
 # Get IDs on identical proteins to the one with ID 'AHA80958'
 getNCBIIdenticalProteins('AHA80958', format = 'ids')
+
+# Get IDs on identical proteins to the ones with IDs 'AHA80958' and 'CAA76794'
+getNCBIIdenticalProteins(c('AHA80958', 'CAA76794'), format = 'ids')
 }

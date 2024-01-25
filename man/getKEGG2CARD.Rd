@@ -30,8 +30,12 @@ dividing CARD IDs in 'DT', if it is a Direct Translation, or '1.0', '0.9' or
 '0.5', if it has been retrieved through any of the identical gene clusters, or
 empty list if no translations were found; if FALSE, returns a vector of
 CARD IDs, empty vector if no translations were found.
+If an error occurs, returns NULL.
 }
 \examples{
 # Translate KEGG ID 'ag:ACC85616' to CARD
 getKEGG2CARD('ag:ACC85616')
+
+# Translate KEGG IDs 'ag:ACC85616' and 'ag:CAJ47134' to CARD
+getKEGG2CARD(c('ag:ACC85616', 'ag:CAJ47134'))
 }

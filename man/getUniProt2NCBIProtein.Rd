@@ -31,8 +31,12 @@ dividing NCBI Protein IDs in 'DT', if it is a Direct Translation, or '1.0',
 '0.9' or '0.5', if it has been retrieved through any of the identical gene
 clusters, or empty list if no translations were found; if FALSE, returns a
 vector of NCBI Protein IDs, empty vector if no translations were found.
+If an error occurs, returns NULL.
 }
 \examples{
 # Translate UniProt ID 'A0SNL9' to NCBI Protein
 getUniProt2NCBIProtein('A0SNL9')
+
+# Translate UniProt IDs 'A0SNL9' and 'G9JVE6' to NCBI Protein
+getUniProt2NCBIProtein(c('A0SNL9', 'G9JVE6'))
 }

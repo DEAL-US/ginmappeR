@@ -33,8 +33,12 @@ dividing KEGG IDs in 'DT', if it is a Direct Translation, or '1.0', '0.9' or
 '0.5', if it has been retrieved through any of the identical gene clusters, or
 empty list if no translations were found; if FALSE, returns a vector of KEGG
 IDs, empty vector if no translations were found.
+If an error occurs, returns NULL.
 }
 \examples{
 # Translate NCBI Nucleotide ID 'AY536519' to KEGG
 getNCBINucleotide2KEGG('AY536519')
+
+# Translate NCBI Nucleotide IDs 'AY536519' and 'NC_013861.1' to KEGG
+getNCBINucleotide2KEGG(c('AY536519', 'NC_013861.1'))
 }

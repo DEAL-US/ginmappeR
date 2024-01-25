@@ -15,6 +15,7 @@ getNCBINucleotide2NCBIGene(id, exhaustiveMapping=FALSE)
 }
 \value{
 A list of NCBI Gene IDs, empty if no translations were found.
+If an error occurs, returns NULL.
 }
 \examples{
 # Translate NCBI Nucleotide ID 'Z21488' to NCBI Gene

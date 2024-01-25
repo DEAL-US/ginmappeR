@@ -5,7 +5,7 @@ css: mystyle.css
 title: "ginmappeR"
 author: "Fernando Sola, Daniel Ayala, Marina Pulido, Rafael Ayala, Lorena 
 López-Cerero, Inma Hernández, David Ruiz"
-date: "August 28, 2023"
+date: "January 26, 2024"
 output: 
   BiocStyle::html_document
 vignette: |
@@ -139,6 +139,15 @@ in the code's documentation. Let's see an example employing these parameters:
 
 ```{r}
 getCARD2UniProt('3002372', exhaustiveMapping = TRUE, detailedMapping = TRUE)
+```
+
+<p style="font-size:110%">
+All the functions in ginmappeR are vectorized, that is, can map a vector of 
+identifiers, for example:
+</p>
+
+```{r}
+getCARD2NCBIProtein(c('3003955', '3002535'))
 ```
 
 <br>

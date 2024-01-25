@@ -1,3 +1,5 @@
+source("R/utilsFunctions.R")
+
 ############################
 # UniProt database to KEGG #
 ############################
@@ -13,7 +15,7 @@
 }
 
 # Method to retrieve similar genes by clusters of a % of identity
-getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0', clusterNames = FALSE){
+.getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0', clusterNames = FALSE){
     .checkBoolean(clusterNames, 'clusterNames')
     .checkClusterIdentity(clusterIdentity)
 
@@ -65,10 +67,8 @@ getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0', clusterNames =
             }
             return(genesList)
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
@@ -79,7 +79,7 @@ getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0', clusterNames =
 
     # Iterate over clusters identities
     for(clusterIdentity in c('1.0','0.9','0.5')){
-        similarGenes <- getUniProtSimilarGenes(upId, clusterIdentity, TRUE)
+        similarGenes <- suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getUniProtSimilarGenes(upId, clusterIdentity, TRUE)))
         # Iterate over clusters of the same identity if there were
         for(cluster in names(similarGenes)){
             cluster <- similarGenes[[cluster]]
@@ -110,7 +110,7 @@ getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0', clusterNames =
 # Main function
 # Tries direct translation method and, if requested, by similar genes clusters
 # method too
-getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TRUE, detailedMapping = FALSE){
+.getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TRUE, detailedMapping = FALSE){
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkBoolean(bySimilarGenes, 'bySimilarGenes')
     .checkBoolean(detailedMapping, 'detailedMapping')
@@ -154,10 +154,8 @@ getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TR
             }
             return(result)
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
@@ -198,7 +196,7 @@ getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TR
 
     # Iterate over clusters identities
     for(clusterIdentity in c('1.0','0.9','0.5')){
-        similarGenes <- getUniProtSimilarGenes(upId, clusterIdentity, clusterNames = FALSE)
+        similarGenes <- suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getUniProtSimilarGenes(upId, clusterIdentity, clusterNames = FALSE)))
         # Check whether there are similar genes
         if(length(similarGenes)!=0){
             # For every similar gene, try to translate to NCBI
@@ -269,7 +267,7 @@ getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TR
     return(result)
 }
 
-getUniProt2NCBIProtein <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
+.getUniProt2NCBIProtein <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkBoolean(bySimilarGenes, 'bySimilarGenes')
     .checkBoolean(detailedMapping, 'detailedMapping')
@@ -279,14 +277,12 @@ getUniProt2NCBIProtein <- function(upId, exhaustiveMapping = FALSE, detailedMapp
             return(.getUniProt2NCBI(upId, 'protein', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
                                     bySimilarGenes = bySimilarGenes))
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
-getUniProt2NCBINucleotide <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
+.getUniProt2NCBINucleotide <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkBoolean(bySimilarGenes, 'bySimilarGenes')
     .checkBoolean(detailedMapping, 'detailedMapping')
@@ -296,14 +292,12 @@ getUniProt2NCBINucleotide <- function(upId, exhaustiveMapping = FALSE, detailedM
             return(.getUniProt2NCBI(upId, 'nucleotide', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
                                     bySimilarGenes = bySimilarGenes))
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
-getUniProt2NCBIGene <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
+.getUniProt2NCBIGene <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkBoolean(bySimilarGenes, 'bySimilarGenes')
     .checkBoolean(detailedMapping, 'detailedMapping')
@@ -313,10 +307,8 @@ getUniProt2NCBIGene <- function(upId, exhaustiveMapping = FALSE, detailedMapping
             return(.getUniProt2NCBI(upId, 'gene', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
                                     bySimilarGenes = bySimilarGenes))
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
@@ -328,7 +320,7 @@ getUniProt2NCBIGene <- function(upId, exhaustiveMapping = FALSE, detailedMapping
 # Auxiliar function to retrieve intermediate NCBI ids and check their translations
 # to CARD on the go
 .getUniProt2CARDexhaustiveMappingAux <- function(upId, ncbiDB, bySimilarGenes){
-    aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
+    aroIndex <- .loadAROIndex()
 
     # This function translates a bunch of NCBI ids to CARD
     .auxNCBI2CARD <- function(translations, ncbiDB){
@@ -374,8 +366,7 @@ getUniProt2NCBIGene <- function(upId, exhaustiveMapping = FALSE, detailedMapping
 
 }
 
-getUniProt2CARD <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
-    .checkIfCARDIsDownloaded()
+.getUniProt2CARD <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE){
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkBoolean(detailedMapping, 'detailedMapping')
     .checkBoolean(bySimilarGenes, 'bySimilarGenes')
@@ -384,7 +375,7 @@ getUniProt2CARD <- function(upId, exhaustiveMapping = FALSE, detailedMapping = F
         {
             .checkUniProtIdExists(upId)
 
-            aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
+            aroIndex <- .loadAROIndex()
             result <- list()
 
             # Handle not exhaustiveMapping case, trying to get the fastest result present in CARD
@@ -402,7 +393,7 @@ getUniProt2CARD <- function(upId, exhaustiveMapping = FALSE, detailedMapping = F
                 }
             }else{
                 # Handle exhaustiveMapping case, trying to retrieve all possible cases
-                proteinId <- getUniProt2NCBIProtein(upId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
+                proteinId <- suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getUniProt2NCBIProtein(upId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)))
                 if(length(proteinId)>0){
                     result <- lapply(proteinId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
                         auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
@@ -411,7 +402,7 @@ getUniProt2CARD <- function(upId, exhaustiveMapping = FALSE, detailedMapping = F
                     result <- result[lengths(result) > 0]
                 }
 
-                nucleotideId <- getUniProt2NCBINucleotide(upId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
+                nucleotideId <- suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getUniProt2NCBINucleotide(upId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)))
                 if(length(nucleotideId)>0){
                     nucleotideId <- lapply(nucleotideId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
                         auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
@@ -433,10 +424,80 @@ getUniProt2CARD <- function(upId, exhaustiveMapping = FALSE, detailedMapping = F
             }
             return(result)
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
+}
+
+
+########################
+# Functions interfaces #
+########################
+
+getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0', clusterNames = FALSE) {
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(upId, clusterIdentity = '1.0', clusterNames = FALSE) {
+                return(.retryHandler(f, upId, clusterIdentity, clusterNames))})
+        })(.getUniProtSimilarGenes), vectorize.args = c("upId", "clusterIdentity"), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(upId, clusterIdentity = '1.0', clusterNames = FALSE) {
+        return(.resultParser(vectorizedFunc(upId, clusterIdentity, clusterNames)))
+    })(upId, clusterIdentity, clusterNames))
+}
+
+getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TRUE, detailedMapping = FALSE) {
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TRUE, detailedMapping = FALSE) {
+                return(.retryHandler(f, upId, exhaustiveMapping, bySimilarGenes, detailedMapping))})
+        })(.getUniProt2KEGG), vectorize.args = c("upId"), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TRUE, detailedMapping = FALSE) {
+        return(.resultParser(vectorizedFunc(upId, exhaustiveMapping, bySimilarGenes, detailedMapping)))
+    })(upId, exhaustiveMapping, bySimilarGenes, detailedMapping))
+}
+
+getUniProt2NCBIProtein <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
+                return(.retryHandler(f, upId, exhaustiveMapping, detailedMapping, bySimilarGenes))})
+        })(.getUniProt2NCBIProtein), vectorize.args = c("upId"), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
+        return(.resultParser(vectorizedFunc(upId, exhaustiveMapping, detailedMapping, bySimilarGenes)))
+    })(upId, exhaustiveMapping, detailedMapping, bySimilarGenes))
+}
+
+getUniProt2NCBINucleotide <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
+                return(.retryHandler(f, upId, exhaustiveMapping, detailedMapping, bySimilarGenes))})
+        })(.getUniProt2NCBINucleotide), vectorize.args = c("upId"), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
+        return(.resultParser(vectorizedFunc(upId, exhaustiveMapping, detailedMapping, bySimilarGenes)))
+    })(upId, exhaustiveMapping, detailedMapping, bySimilarGenes))
+}
+
+getUniProt2NCBIGene <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
+                return(.retryHandler(f, upId, exhaustiveMapping, detailedMapping, bySimilarGenes))})
+        })(.getUniProt2NCBIGene), vectorize.args = c("upId"), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
+        return(.resultParser(vectorizedFunc(upId, exhaustiveMapping, detailedMapping, bySimilarGenes)))
+    })(upId, exhaustiveMapping, detailedMapping, bySimilarGenes))
+}
+
+getUniProt2CARD <- function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
+    .checkIfCARDIsDownloaded()
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
+                return(.retryHandler(f, upId, exhaustiveMapping, detailedMapping, bySimilarGenes))})
+        })(.getUniProt2CARD), vectorize.args = c("upId"), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
+        return(.resultParser(vectorizedFunc(upId, exhaustiveMapping, detailedMapping, bySimilarGenes)))
+    })(upId, exhaustiveMapping, detailedMapping, bySimilarGenes))
 }
 

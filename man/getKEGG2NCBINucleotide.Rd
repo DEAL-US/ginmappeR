@@ -31,8 +31,12 @@ dividing NCBI Nucleotide IDs in 'DT', if it is a Direct Translation, or '1.0',
 '0.9' or '0.5', if it has been retrieved through any of the identical gene
 clusters, or empty list if no translations were found; if FALSE, returns a
 vector of NCBI Nucleotide IDs, empty vector if no translations were found.
+If an error occurs, returns NULL.
 }
 \examples{
 # Translate KEGG ID 'llo:LLO_2673' to NCBI Nucleotide
 getKEGG2NCBINucleotide('llo:LLO_2673')
+
+# Translate KEGG IDs 'llo:LLO_2673' and 'abh:M3Q_2831' to NCBI Nucleotide
+getKEGG2NCBINucleotide(c('llo:LLO_2673', 'abh:M3Q_2831'))
 }

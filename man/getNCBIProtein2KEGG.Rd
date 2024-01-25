@@ -33,9 +33,13 @@ dividing KEGG IDs in 'DT', if it is a Direct Translation, or '1.0', '0.9' or
 '0.5', if it has been retrieved through any of the identical gene clusters, or
 empty list if no translations were found; if FALSE, returns a vector of KEGG
 IDs, empty vector if no translations were found.
+If an error occurs, returns NULL.
 }
 \examples{
 # Translate NCBI Protein ID 'WP_010896559.1' to KEGG
 getNCBIProtein2KEGG('WP_010896559.1', exhaustiveMapping = FALSE,
 detailedMapping = FALSE, byIdenticalProteins = FALSE)
+
+# Translate NCBI Protein IDs 'AFU38919' and 'WP_010896559.1' to KEGG
+getNCBIProtein2KEGG(c('AFU38919', 'WP_010896559.1'), byIdenticalProteins = FALSE)
 }

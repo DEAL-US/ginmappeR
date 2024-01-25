@@ -14,6 +14,7 @@ getCARD2NCBINucleotide(cardId)
 }
 \value{
 A vector of NCBI Nucleotide IDs, empty if no translations were found.
+If an error occurs, returns NULL.
 }
 \examples{
 # Translate CARD ID '3002535' to NCBI Nucleotide
@@ -21,4 +22,7 @@ getCARD2NCBINucleotide('3002535')
 
 # Translate CARD ID 'ARO:3002535' to NCBI Nucleotide
 getCARD2NCBINucleotide('ARO:3002535')
+
+# Translate CARD IDs '3002535' and '3003988' to NCBI Nucleotide
+getCARD2NCBINucleotide(c('3002535', '3003988'))
 }

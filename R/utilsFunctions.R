@@ -2,13 +2,13 @@ utils::globalVariables('cardPath')
 
 .checkNotNull <- function(variable, message="The given ID is "){
     if(identical(variable, "")){
-        stop(paste(message, "empty", sep=""))
+        stop(message, "empty")
     }else if(is.null(variable)){
-        stop(paste(message, "NULL", sep=""))
+        stop(message, "NULL")
     }else if(is.nan(variable)){
-        stop(paste(message, "NaN", sep=""))
+        stop(message, "NaN")
     }else if(is.na(variable)){
-        stop(paste(message, "NA", sep=""))
+        stop(message, "NA")
     }
 }
 
@@ -18,7 +18,7 @@ utils::globalVariables('cardPath')
     # [ACCN] means we look for an Accesion Number OR [UID] Unique number assigned to publication
     invisible(capture.output(query <- entrez_search(db='protein', term=paste(proteinId,'[ACCN] OR ', proteinId, '[UID]',sep=''))))
     if(!length(query[['ids']])>0) {
-        stop(paste('The given ID "', proteinId, '" is not registered in NCBI Protein database', sep = ''))
+        stop('The given ID "', proteinId, '" is not registered in NCBI Protein database')
     }
 }
 
@@ -27,7 +27,7 @@ utils::globalVariables('cardPath')
     # Example id: HM036080.1
     invisible(capture.output(query <- entrez_search(db='nucleotide', term=paste(nucleotideId,'[ACCN] OR ', nucleotideId, '[UID]',sep=''))))
     if(!length(query[['ids']])>0) {
-        stop(paste('The given ID "', nucleotideId, '" is not registered in NCBI Nucleotide database', sep = ''))
+        stop('The given ID "', nucleotideId, '" is not registered in NCBI Nucleotide database')
     }
 }
 
@@ -36,7 +36,7 @@ utils::globalVariables('cardPath')
     # Example id: WP_001082319
     invisible(capture.output(query <- entrez_search(db='gene', term=paste(geneId,'[ACCN] OR ', geneId, '[UID]',sep=''))))
     if(!length(query[['ids']])>0) {
-        stop(paste('The given ID "', geneId, '" is not registered in NCBI Gene database', sep = ''))
+        stop('The given ID "', geneId, '" is not registered in NCBI Gene database')
     }
 }
 
@@ -45,17 +45,19 @@ utils::globalVariables('cardPath')
     # Example id not registered: P0ZTH2
     # Example id not valid: P0ZTUH2
     # Example valid id: P0DTH6
-    output <- invisible(capture.output(queryUniProt(
-        query = paste('accession:', upId, sep=''),
-        fields = c('accession'),
-        collapse = ' OR '
-    )))
-    if(grepl('invalid format', output[2], fixed = TRUE)){
-        stop(paste('The given ID "', upId, '" has not a valid UniProt database accesion format', sep = ''))
-    }else if(grepl('0 rows', output[2], fixed = TRUE)){
-        stop(paste('The given ID "', upId, '" is not registered in UniProt database', sep = ''))
-    }
+    tryCatch(
+        {
+            invisible(capture.output(queryUniProt(
+                query = paste('accession:', upId, sep=''),
+                fields = c('accession'),
+                collapse = ' OR '
+            )))
+        },
+        error = function(e) {
+            stop('The given ID "', upId, '" is not registered in UniProt database')
+        })
 }
+
 
 .checkKEGGIdExists <- function(keggId){
     .checkNotNull(keggId, 'The given KEGG ID is ')
@@ -65,7 +67,7 @@ utils::globalVariables('cardPath')
 
     # Check if there is a coincidence and if it corresponds to an unique gene
     if(!length(query)==1){
-        stop(paste('The given ID "', keggId, '" is not registered in KEGG genes database', sep = ''))
+        stop('The given ID "', keggId, '" is not registered in KEGG genes database')
     }
 }
 
@@ -74,22 +76,22 @@ utils::globalVariables('cardPath')
 
     checkedCardId <- if (grepl("^ARO:", cardId)) cardId else paste0("ARO:", cardId)
 
-    aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
+    aroIndex <- .loadAROIndex()
 
     if(!checkedCardId %in% aroIndex$ARO.Accession) {
-        stop(paste('The given ARO accession "', cardId, '" is not registered in CARD database', sep = ''))
+        stop('The given ID "', cardId, '" is not registered in CARD database')
     }
 }
 
 .checkClusterIdentity <- function(clusterIdentity){
     if(!clusterIdentity %in% c('1.0','0.9','0.5')){
-        stop(paste('The requested cluster identity "', clusterIdentity, '" is not valid', sep = ''))
+        stop('The requested cluster identity "', clusterIdentity, '" is not valid')
     }
 }
 
 .checkBoolean <- function(value, name){
     if(!value %in% c(TRUE, FALSE)){
-        stop(paste(name, ' variable value must be TRUE or FALSE, value given: ', value, sep = ''))
+        stop(name, ' variable value must be TRUE or FALSE, value given: ', value)
     }
 }
 
@@ -132,7 +134,7 @@ testEquals <- function(testFunction, result){
 #####################################
 
 .downloadAndExtractCARD <- function(){
-    if(is.null(options("cardPath")[[1]])){
+    if(is.null(getOption("cardPath"))){
         options("cardPath" = tempdir())
     }
 
@@ -140,31 +142,41 @@ testEquals <- function(testFunction, result){
     url <- c('https://card.mcmaster.ca/latest/data')
 
     # Delete previous versions
-    unlink(paste(options("cardPath")[[1]],'/card-data*',sep=''), recursive = TRUE)
+    unlink(paste(getOption("cardPath"),'/card-data*',sep=''), recursive = TRUE)
 
     # Download CARD zip
-    download.file(url, paste(options("cardPath")[[1]],'/',localRelativeFilenames,sep=''), quiet = TRUE)
+    download.file(url, paste(getOption("cardPath"),'/',localRelativeFilenames,sep=''), quiet = TRUE)
     # Extract it
-    zipF<- paste(options("cardPath")[[1]],'/',localRelativeFilenames, sep='')
+    zipF<- paste(getOption("cardPath"),'/',localRelativeFilenames, sep='')
     # Unzip the compressed file
-    untar(zipF, exdir = paste(options("cardPath")[[1]],'/card-data',sep=''))
+    untar(zipF, exdir = paste(getOption("cardPath"),'/card-data',sep=''))
 }
 
 updateCARDDataBase <- function(){
-    message('Updating CARD database data...')
-    .downloadAndExtractCARD()
-    message(paste('CARD database downloaded successfully!\nLocated at ', paste(options("cardPath")[[1]],'/card-data',sep=''), sep=''))
+    tryCatch(
+        {
+            message('Updating CARD database data...')
+            .downloadAndExtractCARD()
+            message('CARD database downloaded successfully!\nLocated at ', getOption("cardPath"),'/card-data')
+        },
+        error = function(e) {return(message('The download of CARD database failed, please try again.\n', "\n"))},
+        warning = function(e) {return(message('The download of CARD database failed, please try again.\n', "\n"))}
+    )
 }
 
 .checkIfCARDIsDownloaded <- function(){
-    if(is.null(options("cardPath")[[1]])){
+    if(is.null(getOption("cardPath"))){
         updateCARDDataBase()
     }else{
-        if(!file.exists(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''))){
+        if(!file.exists(paste(getOption("cardPath"),'/card-data/aro_index.tsv',sep=''))){
             updateCARDDataBase()
         }else{
+            # Get date and time
+            downloadDate <- strsplit(list.files(getOption("cardPath"), pattern = 'card-data.tar.bz2-')[[1]],'bz2-')[[1]][[2]]
+            # Format it correctly
+            downloadDate <- format(strptime(downloadDate, format = "%a %m-%d-%Y %H-%M-%S"), format = "%a %m/%d/%Y %H:%M:%S")
             message(sprintf('Using a CARD database version downloaded on %s, please consider updating it with updateCARDDataBase() function.',
-                            strsplit(list.files(options("cardPath")[[1]], pattern = 'card-data.tar.bz2-')[[1]],'bz2-')[[1]][[2]]))
+                            downloadDate))
         }
     }
 }
@@ -177,7 +189,148 @@ changeCARDPath <- function(path=tempdir()){
         options("cardPath" = path)
         updateCARDDataBase()
     }else{
-        warning(paste('Path ',path,' does not exist',sep=''))
+        warning('Path ',path,' does not exist')
     }
 }
 
+.loadAROIndex <- function(){
+    return(read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t'))
+}
+
+
+###########################################
+#  Functions for caching and vectorizing  #
+###########################################
+
+# Function for cache management when errors or warnings do happen
+.cacheErrorHandler <- function(res, raiseError = FALSE){
+    if(is.list(res) && !is.data.frame(res) && is.null(names(res)) && length(res)>0 && is.na(res[[1]])){
+        # If an error was produced, manually delete wrong cache values by comparing the keys
+        # before the function call and after it
+        for (x in setdiff(.getCache()$keys(), res[[2]])){
+            .getCache()$remove(x)
+        }
+        if(raiseError){
+            stop('Error ocurred')
+        }else{
+            return(NULL)
+        }
+    }else{
+        # If no error, return the result
+        return(res)
+    }
+}
+
+.resultParser <- function(result){
+    if (length(result) == 1) {
+        return(result[[1]])
+    } else {
+        return(result)
+    }
+}
+
+.retryHandler <- function(f, ...){
+    res <- NULL
+    counter <- 0
+    while (is.null(res) && counter<20) {
+        if(counter == 19){
+            res <- .cacheErrorHandler(f(...))
+        }else{
+            res <- suppressMessages(.cacheErrorHandler(f(...)))
+        }
+        counter <- counter + 1
+        Sys.sleep(0.1)
+    }
+    return(res)
+}
+
+.errorMessageHandler <- function(e){
+    if(grepl("given ID", e)){
+        message(e$message)
+    }else{
+        message('One of the web APIs failed, please try again.\n')
+    }
+    # message('One of the web APIs failed, please try again.\n', ifelse(grepl("given ID", e), e, ""), "\n")
+    return(list(NA, .getCache()$keys()))
+}
+
+.warningMessageHandler <- function(e){
+    # strsplit(conditionMessage(e), '\n', fixed=T)
+    # warning('One of the web APIs failed, please try again.\n', "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
+    message('One of the web APIs failed, please try again.\n')
+    return(list(NA, .getCache()$keys()))
+}
+
+.getCache <- function(){
+    # LRU cache of 4gb of maximum size and a day of maximum age of a translation
+    return(cachem::cache_disk(paste(tempdir(),'/cache',sep=''),max_size = 4096 * 1024^2, max_age = 86400, evict='lru'))
+}
+
+.createCache <- function(){
+
+    # --- Between NCBI databases ---
+    # .getNCBIDatabasesLinks <<- memoise::memoise(.getNCBIDatabasesLinks, cache = cm)
+    .getNCBIGene2NCBIProtein <<- memoise::memoise(.getNCBIGene2NCBIProtein, cache = .getCache())
+    .getNCBIProtein2NCBIGene <<- memoise::memoise(.getNCBIProtein2NCBIGene, cache = .getCache())
+    .getNCBIProtein2NCBINucleotide <<- memoise::memoise(.getNCBIProtein2NCBINucleotide, cache = .getCache())
+    .getNCBINucleotide2NCBIProtein <<- memoise::memoise(.getNCBINucleotide2NCBIProtein, cache = .getCache())
+    .getNCBIGene2NCBINucleotide <<- memoise::memoise(.getNCBIGene2NCBINucleotide, cache = .getCache())
+    .getNCBINucleotide2NCBIGene <<- memoise::memoise(.getNCBINucleotide2NCBIGene, cache = .getCache())
+
+    # --- NCBI to UniProt ---
+    # .getNCBI2UniProtDT <<- memoise::memoise(.getNCBI2UniProtDT, cache = .getCache())
+    .getNCBIIdenticalProteins <<- memoise::memoise(.getNCBIIdenticalProteins, cache = .getCache())
+    # .getNCBI2UniProtBatch <<- memoise::memoise(.getNCBI2UniProtBatch, cache = .getCache())
+    # .getNCBI2UniProtIP <<- memoise::memoise(.getNCBI2UniProtIP, cache = .getCache())
+    .getNCBIProtein2UniProt <<- memoise::memoise(.getNCBIProtein2UniProt, cache = .getCache())
+    .getNCBINucleotide2UniProt <<- memoise::memoise(.getNCBINucleotide2UniProt, cache = .getCache())
+    .getNCBIGene2UniProt <<- memoise::memoise(.getNCBIGene2UniProt, cache = .getCache())
+
+    # --- NCBI to KEGG ---
+    # .getNCBI2KEGGDT <<- memoise::memoise(.getNCBI2KEGGDT, cache = .getCache())
+    # .getNCBI2KEGGTUP <<- memoise::memoise(.getNCBI2KEGGTUP, cache = .getCache())
+    # .getNCBI2KEGG <<- memoise::memoise(.getNCBI2KEGG, cache = .getCache())
+    .getNCBIProtein2KEGG <<- memoise::memoise(.getNCBIProtein2KEGG, cache = .getCache())
+    .getNCBINucleotide2KEGG <<- memoise::memoise(.getNCBINucleotide2KEGG, cache = .getCache())
+    .getNCBIGene2KEGG <<- memoise::memoise(.getNCBIGene2KEGG, cache = .getCache())
+
+    # --- NCBI to CARD ---
+    .getNCBIProtein2CARD <<- memoise::memoise(.getNCBIProtein2CARD, cache = .getCache())
+    .getNCBINucleotide2CARD <<- memoise::memoise(.getNCBINucleotide2CARD, cache = .getCache())
+    .getNCBIGene2CARD <<- memoise::memoise(.getNCBIGene2CARD, cache = .getCache())
+
+    # --- CARD functions caching ----
+    .getCARD2NCBIAux <<- memoise::memoise(.getCARD2NCBIAux, cache = .getCache())
+    .getCARD2NCBIGene <<- memoise::memoise(.getCARD2NCBIGene, cache = .getCache())
+    .getCARD2UniProt <<- memoise::memoise(.getCARD2UniProt, cache = .getCache())
+    .getCARD2KEGG <<- memoise::memoise(.getCARD2KEGG, cache = .getCache())
+
+    # --- KEGG functions caching ----
+    .getKEGG2UniProt <<- memoise::memoise(.getKEGG2UniProt, cache = .getCache())
+    # .getKEGG2NCBIDT <<- memoise::memoise(.getKEGG2NCBIDT, cache = .getCache())
+    # .getKEGG2NCBITUP <<- memoise::memoise(.getKEGG2NCBITUP, cache = .getCache())
+    # .getKEGG2NCBI <<- memoise::memoise(.getKEGG2NCBI, cache = .getCache())
+    .getKEGG2NCBIProtein <<- memoise::memoise(.getKEGG2NCBIProtein, cache = .getCache())
+    .getKEGG2NCBINucleotide <<- memoise::memoise(.getKEGG2NCBINucleotide, cache = .getCache())
+    .getKEGG2NCBIGene <<- memoise::memoise(.getKEGG2NCBIGene, cache = .getCache())
+    # .getKEGG2CARDexhaustiveMappingAux <<- memoise::memoise(.getKEGG2CARDexhaustiveMappingAux, cache = .getCache())
+    .getKEGG2CARD <<- memoise::memoise(.getKEGG2CARD, cache = .getCache())
+
+    # --- UniProt to KEGG ----
+    # .getUniProt2KEGGDT <<- memoise::memoise(.getUniProt2KEGGDT, cache = .getCache())
+    .getUniProtSimilarGenes <<- memoise::memoise(.getUniProtSimilarGenes, cache = .getCache())
+    # .getUniProt2KEGGSGT <<- memoise::memoise(.getUniProt2KEGGSGT, cache = .getCache())
+    .getUniProt2KEGG <<- memoise::memoise(.getUniProt2KEGG, cache = .getCache())
+
+    # --- UniProt to NCBI ----
+    # .getUniProt2NCBIDT <<- memoise::memoise(.getUniProt2NCBIDT, cache = .getCache())
+    # .getUniProt2NCBISGT <<- memoise::memoise(.getUniProt2NCBISGT, cache = .getCache())
+    # .getUniProt2NCBI <<- memoise::memoise(.getUniProt2NCBI, cache = .getCache())
+    .getUniProt2NCBIProtein <<- memoise::memoise(.getUniProt2NCBIProtein, cache = .getCache())
+    .getUniProt2NCBINucleotide <<- memoise::memoise(.getUniProt2NCBINucleotide, cache = .getCache())
+    .getUniProt2NCBIGene <<- memoise::memoise(.getUniProt2NCBIGene, cache = .getCache())
+
+    # --- UniProt to CARD ----
+    # .getUniProt2CARDexhaustiveMappingAux <<- memoise::memoise(.getUniProt2CARDexhaustiveMappingAux, cache = .getCache())
+    .getUniProt2CARD <<- memoise::memoise(.getUniProt2CARD, cache = .getCache())
+}

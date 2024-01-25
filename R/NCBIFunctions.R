@@ -1,3 +1,5 @@
+source("R/utilsFunctions.R")
+
 #####################################
 # NCBI databases inter-translations #
 #####################################
@@ -7,7 +9,7 @@
     attempts <- 0
     # entrez_link fails randomly and returns character(0) from time to time, to avoid that,
     # retry has been added for a maximum of 10 times
-    while(!length(query[['links']])>0 & attempts < 20){
+    while(!length(query[['links']])>0 & attempts < 10){
         Sys.sleep(3)
         try(
             query <- entrez_link(dbfrom=dbFrom, id=id, db=dbTo, config = httr::config(timeout = 10))
@@ -17,7 +19,7 @@
     return(return(query))
 }
 
-getNCBIGene2NCBIProtein <- function(id, exhaustiveMapping = FALSE){
+.getNCBIGene2NCBIProtein <- function(id, exhaustiveMapping = FALSE){
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
 
     tryCatch(
@@ -38,14 +40,12 @@ getNCBIGene2NCBIProtein <- function(id, exhaustiveMapping = FALSE){
             }
             return(result)
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
-getNCBIProtein2NCBIGene <- function(id, exhaustiveMapping = FALSE){
+.getNCBIProtein2NCBIGene <- function(id, exhaustiveMapping = FALSE){
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
 
     tryCatch(
@@ -62,23 +62,20 @@ getNCBIProtein2NCBIGene <- function(id, exhaustiveMapping = FALSE){
                 return(character(0))
             }
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
-getNCBIProtein2NCBINucleotide <- function(id, exhaustiveMapping = FALSE){
+.getNCBIProtein2NCBINucleotide <- function(id, exhaustiveMapping = FALSE){
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
-    .checkIfCARDIsDownloaded()
     tryCatch(
         {
             .checkNCBIProteinIdExists(id)
 
             result <- character(0)
 
-            aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
+            aroIndex <- .loadAROIndex()
             result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == strsplit(id,'.', fixed = TRUE)[[1]][[1]], "DNA.Accession"])
             if(!exhaustiveMapping & length(result)>1){result<-result[[1]]}
 
@@ -95,16 +92,13 @@ getNCBIProtein2NCBINucleotide <- function(id, exhaustiveMapping = FALSE){
             result <- unique(unlist(sapply(strsplit(result, "\\."), "[[", 1), use.names = FALSE))
             if(is.null(result)){return(character(0))}else{return(result)}
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
-getNCBINucleotide2NCBIProtein <- function(id, exhaustiveMapping = FALSE){
+.getNCBINucleotide2NCBIProtein <- function(id, exhaustiveMapping = FALSE){
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
-    .checkIfCARDIsDownloaded()
 
     tryCatch(
         {
@@ -112,7 +106,7 @@ getNCBINucleotide2NCBIProtein <- function(id, exhaustiveMapping = FALSE){
 
             result <- character(0)
 
-            aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
+            aroIndex <- .loadAROIndex()
             result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == strsplit(id,'.', fixed = TRUE)[[1]][[1]], "Protein.Accession"])
             if(!exhaustiveMapping & length(result)>1){result<-result[[1]]}
 
@@ -129,14 +123,12 @@ getNCBINucleotide2NCBIProtein <- function(id, exhaustiveMapping = FALSE){
             result <- unique(unlist(sapply(strsplit(result, "\\."), "[[", 1), use.names = FALSE))
             if(is.null(result)){return(character(0))}else{return(result)}
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
-getNCBIGene2NCBINucleotide <- function(id, exhaustiveMapping = FALSE){
+.getNCBIGene2NCBINucleotide <- function(id, exhaustiveMapping = FALSE){
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
 
     tryCatch(
@@ -157,14 +149,12 @@ getNCBIGene2NCBINucleotide <- function(id, exhaustiveMapping = FALSE){
             }
             return(result)
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
-getNCBINucleotide2NCBIGene <- function(id, exhaustiveMapping = FALSE){
+.getNCBINucleotide2NCBIGene <- function(id, exhaustiveMapping = FALSE){
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
 
     tryCatch(
@@ -182,10 +172,8 @@ getNCBINucleotide2NCBIGene <- function(id, exhaustiveMapping = FALSE){
                 return(character(0))
             }
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
@@ -221,7 +209,7 @@ getNCBINucleotide2NCBIGene <- function(id, exhaustiveMapping = FALSE){
 }
 
 # Get identical NCBI proteins
-getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
+.getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
     if(!format %in% c('ids','dataframe')){
         stop('Incorrect format requested')
     }
@@ -252,10 +240,8 @@ getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
                        'dataframe' = return(identicalProteins))
             }
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
@@ -294,7 +280,7 @@ getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
 
     identicalProteins <- data.frame()
     tryCatch({
-        identicalProteins <- getNCBIIdenticalProteins(ncbiId, format="dataframe")
+        identicalProteins <- suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getNCBIIdenticalProteins(ncbiId, format="dataframe")))
     },error=function(e){})
 
     if(nrow(identicalProteins)>0){
@@ -340,7 +326,7 @@ getNCBIIdenticalProteins <- function(ncbiId, format = 'ids'){
 }
 
 # NCBI Protein to UniProt translation
-getNCBIProtein2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE){
+.getNCBIProtein2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE){
     .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkBoolean(detailedMapping, 'detailedMapping')
@@ -351,15 +337,13 @@ getNCBIProtein2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMa
             return(.getNCBI2UniProtAux(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
                                        byIdenticalProteins = byIdenticalProteins))
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
 # NCBI Nucleotide to UniProt translation
-getNCBINucleotide2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE){
+.getNCBINucleotide2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE){
     .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkBoolean(detailedMapping, 'detailedMapping')
@@ -370,15 +354,13 @@ getNCBINucleotide2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detaile
             return(.getNCBI2UniProtAux(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
                                        byIdenticalProteins = byIdenticalProteins))
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
 # NCBI Gene to UniProt translation
-getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE){
+.getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE){
     .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkBoolean(detailedMapping, 'detailedMapping')
@@ -389,10 +371,8 @@ getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMappi
             return(.getNCBI2UniProtAux(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
                                        byIdenticalProteins = byIdenticalProteins))
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
@@ -413,14 +393,14 @@ getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMappi
 
 .getNCBI2KEGGTUP <- function(ncbiId, ncbiDB, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
     upIDs <- switch (ncbiDB,
-                     'protein' = getNCBIProtein2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping = FALSE, byIdenticalProteins = byIdenticalProteins),
-                     'nucleotide' = getNCBINucleotide2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping =FALSE, byIdenticalProteins = byIdenticalProteins),
-                     'gene' = getNCBIGene2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping = FALSE, byIdenticalProteins = byIdenticalProteins),
+                     'protein' = suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getNCBIProtein2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping = FALSE, byIdenticalProteins = byIdenticalProteins))),
+                     'nucleotide' = suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getNCBINucleotide2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping =FALSE, byIdenticalProteins = byIdenticalProteins))),
+                     'gene' = suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getNCBIGene2UniProt(ncbiId, exhaustiveMapping = exhaustiveMapping, detailedMapping = FALSE, byIdenticalProteins = byIdenticalProteins))),
     )
     translations <- list()
 
     for(upId in upIDs){
-        keggId <- getUniProt2KEGG(upId, exhaustiveMapping = exhaustiveMapping, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)
+        keggId <- suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getUniProt2KEGG(upId, exhaustiveMapping = exhaustiveMapping, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)))
         if(length(keggId)>0){
             translations <- .mergeNamedLists(translations, keggId)
         }
@@ -476,7 +456,7 @@ getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMappi
     return(result)
 }
 
-getNCBIProtein2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
+.getNCBIProtein2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkBoolean(detailedMapping, 'detailedMapping')
     .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
@@ -487,14 +467,12 @@ getNCBIProtein2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMappi
             return(.getNCBI2KEGG(ncbiId, 'protein', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
                                  byIdenticalProteins = byIdenticalProteins, bySimilarGenes = bySimilarGenes))
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
-getNCBINucleotide2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
+.getNCBINucleotide2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkBoolean(detailedMapping, 'detailedMapping')
     .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
@@ -505,14 +483,12 @@ getNCBINucleotide2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMa
             return(.getNCBI2KEGG(ncbiId, 'nucleotide', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
                                  byIdenticalProteins = byIdenticalProteins, bySimilarGenes = bySimilarGenes))
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
-getNCBIGene2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
+.getNCBIGene2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE){
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkBoolean(detailedMapping, 'detailedMapping')
     .checkBoolean(byIdenticalProteins, 'byIdenticalProteins')
@@ -523,10 +499,8 @@ getNCBIGene2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping 
             return(.getNCBI2KEGG(ncbiId, 'gene', exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping,
                                  byIdenticalProteins = byIdenticalProteins, bySimilarGenes = bySimilarGenes))
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
@@ -535,8 +509,7 @@ getNCBIGene2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping 
 # NCBI databases to CARD #
 ##########################
 
-getNCBIProtein2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
-    .checkIfCARDIsDownloaded()
+.getNCBIProtein2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
 
     tryCatch(
@@ -545,7 +518,7 @@ getNCBIProtein2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
 
             ncbiId <- strsplit(ncbiId,'.', fixed = TRUE)[[1]][[1]]
 
-            aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
+            aroIndex <- .loadAROIndex()
             aroAccession <- aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == ncbiId, "ARO.Accession"]
             if(exhaustiveMapping){
                 return(aroAccession)
@@ -553,15 +526,12 @@ getNCBIProtein2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
                 return(if(length(aroAccession>0)) aroAccession[[1]] else aroAccession)
             }
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
-getNCBINucleotide2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
-    .checkIfCARDIsDownloaded()
+.getNCBINucleotide2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
 
     tryCatch(
@@ -570,7 +540,7 @@ getNCBINucleotide2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
 
             ncbiId <- strsplit(ncbiId,'.', fixed = TRUE)[[1]][[1]]
 
-            aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
+            aroIndex <- .loadAROIndex()
             aroAccession <- aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == ncbiId, "ARO.Accession"]
             if(exhaustiveMapping){
                 return(aroAccession)
@@ -578,15 +548,12 @@ getNCBINucleotide2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
                 return(if(length(aroAccession>0)) aroAccession[[1]] else aroAccession)
             }
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
 
-getNCBIGene2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
-    .checkIfCARDIsDownloaded()
+.getNCBIGene2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
 
     tryCatch(
@@ -595,15 +562,15 @@ getNCBIGene2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
 
             ncbiId <- strsplit(ncbiId,'.', fixed = TRUE)[[1]][[1]]
 
-            proteinId <- getNCBIGene2NCBIProtein(ncbiId, exhaustiveMapping = TRUE)
+            proteinId <- suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getNCBIGene2NCBIProtein(ncbiId, exhaustiveMapping = TRUE)))
 
             result <- character(0)
-            aroIndex <- read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t')
+            aroIndex <- .loadAROIndex()
             for(auxId in proteinId){
                 result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == auxId, "ARO.Accession"])
             }
             if(length(result)==0){
-                nucleotideId <- getNCBIGene2NCBINucleotide(ncbiId, exhaustiveMapping = TRUE)
+                nucleotideId <- suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getNCBIGene2NCBINucleotide(ncbiId, exhaustiveMapping = TRUE)))
                 for(auxId in nucleotideId){
                     result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == auxId, "ARO.Accession"])
                 }
@@ -614,9 +581,193 @@ getNCBIGene2CARD <- function(ncbiId, exhaustiveMapping = FALSE){
                 return(if(length(result>0)) unique(result)[[1]] else unique(result))
             }
         },
-        error = function(e) {
-            warning(conditionMessage(e), "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-            return(NULL)
-        }
+        error = function(e) {return(.errorMessageHandler(e))},
+        warning = function(e) {return(.warningMessageHandler(e))}
     )
 }
+
+########################
+# Functions interfaces #
+########################
+
+getNCBIGene2NCBIProtein <- function(id, exhaustiveMapping = FALSE) {
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(id, exhaustiveMapping = FALSE) {
+                return(.retryHandler(f, id, exhaustiveMapping))})
+        })(.getNCBIGene2NCBIProtein), vectorize.args = c('id'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(id, exhaustiveMapping = FALSE) {
+        return(.resultParser(vectorizedFunc(id, exhaustiveMapping)))
+    })(id, exhaustiveMapping))
+}
+
+getNCBIProtein2NCBIGene <- function(id, exhaustiveMapping = FALSE) {
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(id, exhaustiveMapping = FALSE) {
+                return(.retryHandler(f, id, exhaustiveMapping))})
+        })(.getNCBIProtein2NCBIGene), vectorize.args = c('id'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(id, exhaustiveMapping = FALSE) {
+        return(.resultParser(vectorizedFunc(id, exhaustiveMapping)))
+    })(id, exhaustiveMapping))
+}
+
+getNCBIProtein2NCBINucleotide <- function(id, exhaustiveMapping = FALSE) {
+    .checkIfCARDIsDownloaded()
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(id, exhaustiveMapping = FALSE) {
+                return(.retryHandler(f, id, exhaustiveMapping))})
+        })(.getNCBIProtein2NCBINucleotide), vectorize.args = c('id'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(id, exhaustiveMapping = FALSE) {
+        return(.resultParser(vectorizedFunc(id, exhaustiveMapping)))
+    })(id, exhaustiveMapping))
+}
+
+getNCBINucleotide2NCBIProtein <- function(id, exhaustiveMapping = FALSE) {
+    .checkIfCARDIsDownloaded()
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(id, exhaustiveMapping = FALSE) {
+                return(.retryHandler(f, id, exhaustiveMapping))})
+        })(.getNCBINucleotide2NCBIProtein), vectorize.args = c('id'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(id, exhaustiveMapping = FALSE) {
+        return(.resultParser(vectorizedFunc(id, exhaustiveMapping)))
+    })(id, exhaustiveMapping))
+}
+
+getNCBIGene2NCBINucleotide <- function(id, exhaustiveMapping = FALSE) {
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(id, exhaustiveMapping = FALSE) {
+                return(.retryHandler(f, id, exhaustiveMapping))})
+        })(.getNCBIGene2NCBINucleotide), vectorize.args = c('id'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(id, exhaustiveMapping = FALSE) {
+        return(.resultParser(vectorizedFunc(id, exhaustiveMapping)))
+    })(id, exhaustiveMapping))
+}
+
+getNCBINucleotide2NCBIGene <- function(id, exhaustiveMapping = FALSE) {
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(id, exhaustiveMapping = FALSE) {
+                return(.retryHandler(f, id, exhaustiveMapping))})
+        })(.getNCBINucleotide2NCBIGene), vectorize.args = c('id'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(id, exhaustiveMapping = FALSE) {
+        return(.resultParser(vectorizedFunc(id, exhaustiveMapping)))
+    })(id, exhaustiveMapping))
+}
+
+getNCBIIdenticalProteins <- function(ncbiId, format = 'ids') {
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(ncbiId, format = 'ids') {
+                return(.retryHandler(f, ncbiId, format))})
+        })(.getNCBIIdenticalProteins), vectorize.args = c('ncbiId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(ncbiId, format = 'ids') {
+        return(.resultParser(vectorizedFunc(ncbiId, format)))
+    })(ncbiId, format))
+}
+
+getNCBIProtein2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE) {
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE) {
+                return(.retryHandler(f, ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins))})
+        })(.getNCBIProtein2UniProt), vectorize.args = c('ncbiId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE) {
+        return(.resultParser(vectorizedFunc(ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins)))
+    })(ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins))
+}
+
+getNCBINucleotide2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE) {
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE) {
+                return(.retryHandler(f, ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins))})
+        })(.getNCBINucleotide2UniProt), vectorize.args = c('ncbiId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE) {
+        return(.resultParser(vectorizedFunc(ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins)))
+    })(ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins))
+}
+
+getNCBIGene2UniProt <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE) {
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE) {
+                return(.retryHandler(f, ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins))})
+        })(.getNCBIGene2UniProt), vectorize.args = c('ncbiId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE) {
+        return(.resultParser(vectorizedFunc(ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins)))
+    })(ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins))
+}
+
+getNCBIProtein2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE) {
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE) {
+                return(.retryHandler(f, ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins, bySimilarGenes))})
+        })(.getNCBIProtein2KEGG), vectorize.args = c('ncbiId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE) {
+        return(.resultParser(vectorizedFunc(ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins, bySimilarGenes)))
+    })(ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins, bySimilarGenes))
+}
+
+getNCBINucleotide2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE) {
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE) {
+                return(.retryHandler(f, ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins, bySimilarGenes))})
+        })(.getNCBINucleotide2KEGG), vectorize.args = c('ncbiId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE) {
+        return(.resultParser(vectorizedFunc(ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins, bySimilarGenes)))
+    })(ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins, bySimilarGenes))
+}
+
+getNCBIGene2KEGG <- function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE) {
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE) {
+                return(.retryHandler(f, ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins, bySimilarGenes))})
+        })(.getNCBIGene2KEGG), vectorize.args = c('ncbiId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE) {
+        return(.resultParser(vectorizedFunc(ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins, bySimilarGenes)))
+    })(ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins, bySimilarGenes))
+}
+
+getNCBIProtein2CARD <- function(ncbiId, exhaustiveMapping = FALSE) {
+    .checkIfCARDIsDownloaded()
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(ncbiId, exhaustiveMapping = FALSE) {
+                return(.retryHandler(f, ncbiId, exhaustiveMapping))})
+        })(.getNCBIProtein2CARD), vectorize.args = c('ncbiId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(ncbiId, exhaustiveMapping = FALSE) {
+        return(.resultParser(vectorizedFunc(ncbiId, exhaustiveMapping)))
+    })(ncbiId, exhaustiveMapping))
+}
+
+getNCBINucleotide2CARD <- function(ncbiId, exhaustiveMapping = FALSE) {
+    .checkIfCARDIsDownloaded()
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(ncbiId, exhaustiveMapping = FALSE) {
+                return(.retryHandler(f, ncbiId, exhaustiveMapping))})
+        })(.getNCBINucleotide2CARD), vectorize.args = c('ncbiId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(ncbiId, exhaustiveMapping = FALSE) {
+        return(.resultParser(vectorizedFunc(ncbiId, exhaustiveMapping)))
+    })(ncbiId, exhaustiveMapping))
+}
+
+getNCBIGene2CARD <- function(ncbiId, exhaustiveMapping = FALSE) {
+    .checkIfCARDIsDownloaded()
+    vectorizedFunc <- Vectorize(
+        (function(f){
+            return(function(ncbiId, exhaustiveMapping = FALSE) {
+                return(.retryHandler(f, ncbiId, exhaustiveMapping))})
+        })(.getNCBIGene2CARD), vectorize.args = c('ncbiId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    return((function(ncbiId, exhaustiveMapping = FALSE) {
+        return(.resultParser(vectorizedFunc(ncbiId, exhaustiveMapping)))
+    })(ncbiId, exhaustiveMapping))
+}
+

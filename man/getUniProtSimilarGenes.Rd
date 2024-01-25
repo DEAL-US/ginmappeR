@@ -20,8 +20,12 @@ Depending on parameter 'clusterNames': if TRUE it will return a named list
 with cluster names as keys and a vector of gene IDs as values, empty list if no
 clusters were found; if FALSE, returns a vector of UniProt IDs of the cluster
 genes, empty vector if no clusters or UniProt IDs were found.
+If an error occurs, returns NULL.
 }
 \examples{
-# Get UniProt IDs of 50\% identical genes to UniProt gene 'G0L217'
+# Get UniProt IDs of 50\% identical genes of UniProt gene 'G0L217'
 getUniProtSimilarGenes('G0L217', clusterIdentity = '0.5')
+
+# Get UniProt IDs of 50\% identical genes of UniProt genes 'G0L217' and 'A0SNL9'
+getUniProtSimilarGenes(c('G0L217', 'A0SNL9'), clusterIdentity = '0.5')
 }
