@@ -23,10 +23,9 @@ it returns a list instead of character vector to avoid mixing the identifiers or
 dataframes.
 }
 \examples{
-\donttest{
 # Get IDs on identical proteins to the one with ID 'AHA80958'
 getNCBIIdenticalProteins('AHA80958', format = 'ids')
-
+\donttest{
 # Get IDs on identical proteins to the ones with IDs 'AHA80958' and 'CAA76794'
 getNCBIIdenticalProteins(c('AHA80958', 'CAA76794'), format = 'ids')
 }

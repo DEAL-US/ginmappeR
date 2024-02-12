@@ -15,7 +15,6 @@ getCARD2NCBINucleotide(cardId)
 A vector of NCBI Nucleotide IDs.
 }
 \examples{
-\donttest{
 # Translate CARD ID '3002535' to NCBI Nucleotide
 getCARD2NCBINucleotide('3002535')
 
@@ -24,5 +23,4 @@ getCARD2NCBINucleotide('ARO:3002535')
 
 # Translate CARD IDs '3002535' and '3003988' to NCBI Nucleotide
 getCARD2NCBINucleotide(c('3002535', '3003988'))
-}
 }

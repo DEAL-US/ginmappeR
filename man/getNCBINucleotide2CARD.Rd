@@ -19,10 +19,9 @@ A character vector of the same length as \code{ncbiId}. If parameter
 character vector to avoid mixing the identifiers.
 }
 \examples{
-\donttest{
 # Translate NCBI Nucleotide ID 'AY034138' to CARD
 getNCBINucleotide2CARD('AY034138')
-
+\donttest{
 # Translate NCBI Nucleotide IDs 'AY034138' and 'X54723.1' to CARD
 getNCBINucleotide2CARD(c('AY034138', 'X54723.1'))
 

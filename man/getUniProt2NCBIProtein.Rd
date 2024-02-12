@@ -33,8 +33,8 @@ character vector to avoid mixing the identifiers.
 }
 \examples{
 \donttest{
-# Translate UniProt ID 'A0SNL9' to NCBI Protein
-getUniProt2NCBIProtein('A0SNL9')
+# Translate UniProt ID 'G9JVE6' to NCBI Protein
+getUniProt2NCBIProtein('G9JVE6')
 
 # Translate UniProt IDs 'A0SNL9' and 'G9JVE6' to NCBI Protein
 getUniProt2NCBIProtein(c('A0SNL9', 'G9JVE6'))
@@ -42,5 +42,4 @@ getUniProt2NCBIProtein(c('A0SNL9', 'G9JVE6'))
 # Get all possible translations of IDs 'A0SNL9', 'G9JVE6' with detailed origin
 getUniProt2NCBIProtein(c('A0SNL9', 'G9JVE6'), detailedMapping = TRUE,
 exhaustiveMapping = TRUE)
-}
-}
+}}

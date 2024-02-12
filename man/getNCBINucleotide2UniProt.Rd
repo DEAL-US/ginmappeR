@@ -31,10 +31,9 @@ A character vector of the same length as \code{ncbiId}. If parameter
 character vector to avoid mixing the identifiers.
 }
 \examples{
-\donttest{
 # Translate NCBI Nucleotide ID 'AY536519' to UniProt
 getNCBINucleotide2UniProt('AY536519')
-
+\donttest{
 # Translate NCBI Nucleotide IDs 'AY536519' and 'X54723.1' to UniProt
 getNCBINucleotide2UniProt(c('AY536519', 'X54723.1'))
 

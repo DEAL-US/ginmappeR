@@ -19,9 +19,9 @@ A character vector of the same length as \code{cardId}. If parameter
 character vector to avoid mixing the identifiers.
 }
 \examples{
+# Translate CARD ID '3002525' to NCBI Gene
+getCARD2NCBIGene('3002525')
 \donttest{
-# Translate CARD ID '3002524' to NCBI Gene
-getCARD2NCBIGene('3002524')
 # Translate CARD IDs '3002524' and '3002525' to NCBI Gene
 getCARD2NCBIGene(c('3002524', '3002525'))
 

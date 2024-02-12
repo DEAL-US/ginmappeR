@@ -36,10 +36,9 @@ A character vector of the same length as \code{ncbiId}. If parameter
 character vector to avoid mixing the identifiers.
 }
 \examples{
-\donttest{
 # Translate NCBI Gene ID '76524190' to KEGG
 getNCBIGene2KEGG('76524190')
-
+\donttest{
 # Translate NCBI Gene IDs '76524190' and 'AFU38919' to KEGG
 getNCBIGene2KEGG(c('76524190', 'AFU38919'))
 

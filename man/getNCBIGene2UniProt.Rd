@@ -31,15 +31,13 @@ A character vector of the same length as \code{ncbiId}. If parameter
 character vector to avoid mixing the identifiers.
 }
 \examples{
-\donttest{
 # Translate NCBI Gene ID '76524190' to UniProt
 getNCBIGene2UniProt('76524190')
-
+\donttest{
 # Translate NCBI Gene IDs '76524190' and '1272' to UniProt
 getNCBIGene2UniProt(c('76524190', '1272'))
 
 # Get all possible translations of IDs '76524190', '1272' with detailed origin
 getNCBIGene2UniProt(c('76524190', '1272'), detailedMapping = TRUE,
 exhaustiveMapping = TRUE)
-}
-}
+}}

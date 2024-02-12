@@ -33,15 +33,13 @@ A character vector of the same length as \code{upId}. If parameter
 character vector to avoid mixing the identifiers.
 }
 \examples{
+# Translate UniProt ID 'G9JVE6' to NCBI Nucleotide
+getUniProt2NCBINucleotide('G9JVE6')
 \donttest{
-# Translate UniProt ID 'A0SNL9' to NCBI Nucleotide
-getUniProt2NCBINucleotide('A0SNL9')
-
 # Translate UniProt IDs 'A0SNL9' and 'G9JVE6' to NCBI Nucleotide
 getUniProt2NCBINucleotide(c('A0SNL9', 'G9JVE6'))
 
 # Get all possible translations of IDs 'A0SNL9', 'G9JVE6' with detailed origin
 getUniProt2NCBINucleotide(c('A0SNL9', 'G9JVE6'), detailedMapping = TRUE,
 exhaustiveMapping = TRUE)
-}
-}
+}}

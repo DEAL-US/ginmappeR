@@ -33,15 +33,13 @@ character vector to avoid mixing the identifiers.
 }
 
 \examples{
-\donttest{
 # Translate UniProt ID 'G9JVE6' to KEGG
 getUniProt2KEGG('G9JVE6')
-
+\donttest{
 # Translate UniProt IDs 'A0A1S7BGS4' and 'G9JVE6' to KEGG
 getUniProt2KEGG(c('A0A1S7BGS4', 'G9JVE6'))
 
 # Get all possible translations of ID 'A0A2R4PHC7' with detailed origin
 getUniProt2KEGG(c('test_id', 'A0A2R4PHC7'), detailedMapping = TRUE,
 exhaustiveMapping = TRUE)
-}
-}
+}}

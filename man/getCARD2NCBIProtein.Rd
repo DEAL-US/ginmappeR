@@ -14,7 +14,6 @@ getCARD2NCBIProtein(cardId)
 A vector of NCBI Protein IDs.
 }
 \examples{
-\donttest{
 # Translate CARD ID '3002535' to NCBI Protein
 getCARD2NCBIProtein('3002535')
 
@@ -23,5 +22,4 @@ getCARD2NCBIProtein('ARO:3002535')
 
 # Translate CARD IDs '3002535' and '3003988' to NCBI Protein
 getCARD2NCBIProtein(c('3002535', '3003988'))
-}
 }

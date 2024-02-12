@@ -32,10 +32,9 @@ A character vector of the same length as \code{upId}. If parameter
 character vector to avoid mixing the identifiers.
 }
 \examples{
-\donttest{
 # Translate UniProt ID 'A0A1S7BGS4' to CARD
 getUniProt2CARD('A0A1S7BGS4')
-
+\donttest{
 # Translate UniProt IDs 'A0A1S7BGS4' and 'A0A6H2TXZ6' to CARD
 getUniProt2CARD(c('A0A1S7BGS4', 'A0A6H2TXZ6'))
 

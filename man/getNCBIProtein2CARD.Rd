@@ -19,15 +19,13 @@ A character vector of the same length as \code{ncbiId}. If parameter
 character vector to avoid mixing the identifiers.
 }
 \examples{
-\donttest{
 # Translate NCBI Protein ID 'AAK64581' to CARD
 getNCBIProtein2CARD('AAK64581')
-
+\donttest{
 # Translate NCBI Protein IDs 'AAK64581' and 'WP_010896559.1' to CARD
 getNCBIProtein2CARD(c('AAK64581', 'WP_010896559.1'))
 
 # Get all possible translations of IDs 'AAK64581', 'WP_010896559.1'
 getNCBIProtein2CARD(c('AAK64581', 'WP_010896559.1'), exhaustiveMapping = TRUE)
-
 }
 }

@@ -26,10 +26,9 @@ A character vector of the same length as \code{cardId}. If parameter
 character vector to avoid mixing the identifiers.
 }
 \examples{
-\donttest{
 # Translate CARD ID '3002867' to UniProt
 getCARD2UniProt('3002867')
-
+\donttest{
 # Translate CARD IDs '3002867' and '3002535' to UniProt
 getCARD2UniProt(c('3002867', '3002535'))
 

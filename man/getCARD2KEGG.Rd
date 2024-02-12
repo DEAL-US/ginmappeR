@@ -36,9 +36,9 @@ A character vector of the same length as \code{cardId}. If parameter
 character vector to avoid mixing the identifiers.
 }
 \examples{
-\donttest{
 # Translate CARD ID '3000938' to KEGG
 getCARD2KEGG('3000938')
+\donttest{
 # Translate CARD IDs '3000938' and '3002557' to KEGG
 getCARD2KEGG(c('3000938', '3002557'))
 

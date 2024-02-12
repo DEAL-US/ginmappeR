@@ -32,10 +32,9 @@ A character vector of the same length as \code{keggId}. If parameter
 character vector to avoid mixing the identifiers.
 }
 \examples{
-\donttest{
 # Translate KEGG ID 'llo:LLO_2673' to NCBI Protein
 getKEGG2NCBIProtein('llo:LLO_2673')
-
+\donttest{
 # Translate KEGG IDs 'llo:LLO_2673' and 'abh:M3Q_2831' to NCBI Protein
 getKEGG2NCBIProtein(c('llo:LLO_2673', 'abh:M3Q_2831'))
 

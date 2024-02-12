@@ -23,10 +23,9 @@ a vector of IDs, it returns a list instead of character vector to avoid
 mixing the identifiers.
 }
 \examples{
-\donttest{
 # Get UniProt IDs of 50\% identical genes of UniProt gene 'G0L217'
 getUniProtSimilarGenes('G0L217', clusterIdentity = '0.5')
-
+\donttest{
 # Get UniProt IDs of 50\% identical genes of UniProt genes 'G0L217' and 'A0SNL9'
 getUniProtSimilarGenes(c('G0L217', 'A0SNL9'), clusterIdentity = '0.5')
 }
