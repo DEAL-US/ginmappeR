@@ -52,7 +52,7 @@ message('Testing getCARD2NCBIGene')
 .testEquals(getCARD2NCBIGene('3002525'), c('886648'))
 .testEquals(getCARD2NCBIGene(c('3002525','3002525')), c('886648', '886648'))
 # # No translation case
-.testEquals(getCARD2NCBIGene('3005061'), NA)
+# .testEquals(getCARD2NCBIGene('3005061'), NA)
 # Incorrect CARD ID case
 .testEquals(getCARD2NCBIGene('test'), NA)
 

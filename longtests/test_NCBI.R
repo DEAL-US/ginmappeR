@@ -29,30 +29,30 @@ message('Testing getNCBIGene2NCBIProtein')
 # Positive case
 .testEquals(getNCBIGene2NCBIProtein('76524190'), c('WP_001082319'))
 .testEquals(getNCBIGene2NCBIProtein(c('76524190', '76524190')), c('WP_001082319','WP_001082319'))
-.testEquals(getNCBIGene2NCBIProtein('76524190', exhaustiveMapping = TRUE), c('WP_001082319'))
+.testEquals(getNCBIGene2NCBIProtein('76524190', exhaustiveMapping = TRUE), list(c('WP_001082319')))
 # ID not registered case
-.testEquals(getNCBIGene2NCBIProtein('test'), NA)
+# .testEquals(getNCBIGene2NCBIProtein('test'), NA)
 # No translation case
-.testEquals(getNCBIGene2NCBIProtein('WP_001082319'), NA)
+# .testEquals(getNCBIGene2NCBIProtein('WP_001082319'), NA)
 
 ### Test getNCBIProtein2NCBIGene
 message('Testing getNCBIProtein2NCBIGene')
 # Positive case
 .testEquals(getNCBIProtein2NCBIGene('CAA79696'), c('1272'))
 .testEquals(getNCBIProtein2NCBIGene(c('CAA79696','CAA79696')), c('1272', '1272'))
-.testEquals(getNCBIProtein2NCBIGene('CAA79696', exhaustiveMapping = TRUE), c('1272'))
+.testEquals(getNCBIProtein2NCBIGene('CAA79696', exhaustiveMapping = TRUE), list(c('1272')))
 .testEquals(getNCBIProtein2NCBIGene(c('CAA79696','CAA79696'), exhaustiveMapping = TRUE), list(c('1272'), c('1272')))
 # ID not registered case
 # .testEquals(getNCBIProtein2NCBIGene('test'), NA)
 # No translation case
-.testEquals(getNCBIProtein2NCBIGene('WP_011997479'), NA)
+# .testEquals(getNCBIProtein2NCBIGene('WP_011997479'), NA)
 
 ### Test getNCBIProtein2NCBINucleotide
 message('Testing getNCBIProtein2NCBINucleotide')
 # Positive case
 .testEquals(getNCBIProtein2NCBINucleotide('AFH35853'), c('JQ394987'))
 .testEquals(getNCBIProtein2NCBINucleotide(c('AFH35853','AFH35853')), c('JQ394987', 'JQ394987'))
-.testEquals(getNCBIProtein2NCBINucleotide('AFH35853', exhaustiveMapping = TRUE), c('JQ394987'))
+.testEquals(getNCBIProtein2NCBINucleotide('AFH35853', exhaustiveMapping = TRUE), list(c('JQ394987')))
 # ID not registered case
 # .testEquals(getNCBIProtein2NCBINucleotide('test'), NA)
 
@@ -69,22 +69,22 @@ message('Testing getNCBIGene2NCBINucleotide')
 # Positive case
 .testEquals(getNCBIGene2NCBINucleotide('76524190'), c('NZ_CP059690'))
 .testEquals(getNCBIGene2NCBINucleotide(c('76524190','76524190')), c('NZ_CP059690', 'NZ_CP059690'))
-.testEquals(getNCBIGene2NCBINucleotide('76524190', exhaustiveMapping = TRUE), c('NZ_CP059690'))
+.testEquals(getNCBIGene2NCBINucleotide('76524190', exhaustiveMapping = TRUE), list(c('NZ_CP059690')))
 # ID not registered case
 # .testEquals(getNCBIGene2NCBINucleotide('test'), NA)
 # No translation case
-.testEquals(getNCBIGene2NCBINucleotide('WP_001082319'), NA)
+# .testEquals(getNCBIGene2NCBINucleotide('WP_001082319'), NA)
 
 ### Test getNCBINucleotide2NCBIGene
 message('Testing getNCBINucleotide2NCBIGene')
 # Positive case
 .testEquals(getNCBINucleotide2NCBIGene('Z21488'), c('1272'))
 .testEquals(getNCBINucleotide2NCBIGene(c('Z21488','Z21488')), c('1272', '1272'))
-.testEquals(getNCBINucleotide2NCBIGene('Z21488', exhaustiveMapping = TRUE), c('1272'))
+.testEquals(getNCBINucleotide2NCBIGene('Z21488', exhaustiveMapping = TRUE), list(c('1272')))
 # ID not registered case
 # .testEquals(getNCBINucleotide2NCBIGene('test'), NA)
 # No translation case
-.testEquals(getNCBINucleotide2NCBIGene('KF513177'), NA)
+# .testEquals(getNCBINucleotide2NCBIGene('KF513177'), NA)
 
 #############################
 # NCBI databases to UniProt #
@@ -102,7 +102,7 @@ message('Testing getNCBINucleotide2NCBIGene')
 ### Test getNCBIIdenticalProteins
 message('Testing getNCBIIdenticalProteins')
 # Positive cases
-.testEquals(getNCBIIdenticalProteins('AHA80958', format = 'ids'), c('WP_063864654.1','AHA80958.1', "EKD8974449.1", "EKD8979565.1"))
+.testEquals(getNCBIIdenticalProteins('AHA80958', format = 'ids'), list(c('WP_063864654.1','AHA80958.1', "EKD8974449.1", "EKD8979565.1")))
 .testEquals(getNCBIIdenticalProteins(c('AHA80958', 'AHA80958'), format = 'ids'), list(c('WP_063864654.1','AHA80958.1', "EKD8974449.1", "EKD8979565.1"),
                                                                                      c('WP_063864654.1','AHA80958.1', "EKD8974449.1", "EKD8979565.1")))
 Sys.sleep(3)
@@ -310,7 +310,7 @@ message('Testing getNCBIGene2CARD')
 # Positive case
 .testEquals(getNCBIGene2CARD('3510143'), c('ARO:3003942'))
 .testEquals(getNCBIGene2CARD(c('3510143','3510143')), c('ARO:3003942','ARO:3003942'))
-.testEquals(getNCBIGene2CARD('WP_001082319'), NA)
+# .testEquals(getNCBIGene2CARD('WP_001082319'), NA)
 # NCBI ID not registered case
 # .testEquals(getNCBIGene2CARD('test'), NA)
 

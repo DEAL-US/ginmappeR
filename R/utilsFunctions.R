@@ -269,11 +269,14 @@ changeCARDPath <- function(path=tempdir()){
     }else{
         # If the input vector has only 1 id
         if(is.null(result) || (is.vector(result) && !is.data.frame(result) && is.null(names(result)) && length(result) == 0)){
-            return(NA)
+            result <- NA
         }
         if(!isDataFrame){
             result[sapply(result, is.null)] <- NA
             result <- .replaceCharacter0WithNA(result)
+            if(isTRUE(exhaustiveMapping)){
+                result <- list(result)
+            }
         }
     }
     return(result)

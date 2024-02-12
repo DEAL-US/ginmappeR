@@ -14,13 +14,12 @@ getNCBIIdenticalProteins(ncbiId, format='ids')
     proteins}
 }
 \value{
-Depending on parameter \code{format}, it will return a vector of identical NCBI
-Protein IDs or a dataframe containing different information about the identical
-proteins found: \code{Id}, \code{Source}, \code{Nucleotide.Accession},
-\code{Start}, \code{Stop}, \code{Strand}, \code{Protein}, \code{Protein.Name},
-\code{Organism}, \code{Strain} and \code{Assembly}. If provided a vector of IDs,
-it returns a list instead of character vector to avoid mixing the identifiers or
-dataframes.
+Depending on parameter \code{format}, it will return a list of same legth as
+\code{ncbiId} with identical NCBI Protein IDs or with dataframes containing
+different information about the identical proteins found: \code{Id},
+\code{Source}, \code{Nucleotide.Accession}, \code{Start}, \code{Stop},
+\code{Strand}, \code{Protein}, \code{Protein.Name}, \code{Organism},
+\code{Strain} and \code{Assembly}.
 }
 \examples{
 # Get IDs on identical proteins to the one with ID 'AHA80958'

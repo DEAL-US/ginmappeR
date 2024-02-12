@@ -138,6 +138,8 @@ in the code's documentation. Let's see an example employing these parameters:
 </p>
 
 ```{r}
+# Note that when using exhaustiveMapping = TRUE, it returns a list instead
+# of a character vector, to avoid mixing the result identifiers
 getCARD2UniProt('3002372', exhaustiveMapping = TRUE, detailedMapping = TRUE)
 ```
 

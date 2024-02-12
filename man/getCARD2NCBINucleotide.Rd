@@ -12,7 +12,7 @@ getCARD2NCBINucleotide(cardId)
   \item{cardId}{valid CARD database ARO ID or a vector of them}
 }
 \value{
-A vector of NCBI Nucleotide IDs.
+A character vector of the same length as \code{cardId}.
 }
 \examples{
 # Translate CARD ID '3002535' to NCBI Nucleotide

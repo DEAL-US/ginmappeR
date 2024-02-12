@@ -17,10 +17,8 @@ getUniProtSimilarGenes(upId, clusterIdentity = '1.0', clusterNames = FALSE)
     names are retrieved}
 }
 \value{
-A character vector of the same length as \code{upId}. If parameter
-\code{clusterNames} is \code{TRUE} it will return a named vector. If provided
-a vector of IDs, it returns a list instead of character vector to avoid
-mixing the identifiers.
+A list of the same length as \code{upId}. If parameter \code{clusterNames} is
+\code{TRUE} it will return a named list.
 }
 \examples{
 # Get UniProt IDs of 50\% identical genes of UniProt gene 'G0L217'

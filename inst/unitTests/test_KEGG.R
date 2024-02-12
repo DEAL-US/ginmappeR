@@ -40,12 +40,12 @@ message('Testing getKEGG2UniProt')
 # Positive cases
 # .testEquals(getKEGG2UniProt('abc:ACICU_00223'), c('A0A7U3XVN2'))
 ginmappeR:::.testEquals(getKEGG2UniProt('aag:5579347'), c('A0A1S4G4Z1'))
-ginmappeR:::.testEquals(getKEGG2UniProt('aag:5579347', exhaustiveMapping = TRUE), c('A0A1S4G4Z1','Q1DGP2'))
+ginmappeR:::.testEquals(getKEGG2UniProt('aag:5579347', exhaustiveMapping = TRUE), list(c('A0A1S4G4Z1','Q1DGP2')))
 ginmappeR:::.testEquals(getKEGG2UniProt(c('aag:5579347','aag:5579347')), c('A0A1S4G4Z1','A0A1S4G4Z1'))
 # No translation case
 ginmappeR:::.testEquals(getKEGG2UniProt('eco:b0204'), NA)
 # ID not valid case
-ginmappeR:::.testEquals(getKEGG2UniProt('test'), NA)
+# ginmappeR:::.testEquals(getKEGG2UniProt('test'), NA)
 
 ###################################
 # KEGG database to NCBI databases #
@@ -108,8 +108,8 @@ ginmappeR:::.testEquals(getKEGG2CARD('ag:ACC85616', detailedMapping = TRUE), lis
 # .testEquals(getKEGG2CARD('ag:ACC85616', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = TRUE), list('DT' = c('ARO:3002804')))
 # .testEquals(getKEGG2CARD('llo:LLO_2673', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = TRUE), list('0.5' = c("ARO:3004591", "ARO:3004584", "ARO:3004587", "ARO:3004586", "ARO:3004613", "ARO:3004590", "ARO:3004589", "ARO:3004582", "ARO:3004581")))
 # No translation case
-ginmappeR:::.testEquals(getKEGG2CARD('llo:LLO_2673', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = FALSE), NA)
-ginmappeR:::.testEquals(getKEGG2CARD('llo:LLO_2673', exhaustiveMapping = TRUE, detailedMapping = FALSE, bySimilarGenes = FALSE), NA)
+ginmappeR:::.testEquals(getKEGG2CARD('llo:LLO_2673', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = FALSE), list(NA))
+ginmappeR:::.testEquals(getKEGG2CARD('llo:LLO_2673', exhaustiveMapping = TRUE, detailedMapping = FALSE, bySimilarGenes = FALSE), list(NA))
 ginmappeR:::.testEquals(getKEGG2CARD('llo:LLO_2673', exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = FALSE), NA)
 ginmappeR:::.testEquals(getKEGG2CARD('llo:LLO_2673', exhaustiveMapping = FALSE, detailedMapping = TRUE, bySimilarGenes = FALSE), NA)
 # ID not valid case

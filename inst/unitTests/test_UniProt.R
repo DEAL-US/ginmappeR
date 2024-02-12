@@ -46,19 +46,19 @@ cardPath <<- tempdir()
 ### Test getUniProtSimilarGenes
 message('Testing getUniProtSimilarGenes')
 # Positive cases
-RUnit::checkTrue(length(getUniProtSimilarGenes('G0L217', clusterIdentity = '0.5', clusterNames = TRUE)$UniRef50_A0A6L9EH79)==3)
+RUnit::checkTrue(length(getUniProtSimilarGenes('G0L217', clusterIdentity = '0.5', clusterNames = TRUE)[[1]]$UniRef50_A0A6L9EH79)==3)
 # checkTrue(length(getUniProtSimilarGenes('G9JVE6', clusterIdentity = '1.0', clusterNames = TRUE)$UniRef100_G9JVE6)==10)
 # checkTrue(length(getUniProtSimilarGenes('G9JVE6', clusterIdentity = '1.0'))==10)
 # No similar genes case
-ginmappeR:::.testEquals(getUniProtSimilarGenes('G0L217', clusterIdentity = '1.0', clusterNames = TRUE), list('UniRef100_G0L217'=NA))
+ginmappeR:::.testEquals(getUniProtSimilarGenes('G0L217', clusterIdentity = '1.0', clusterNames = TRUE), list(list('UniRef100_G0L217'=NA)))
 ginmappeR:::.testEquals(getUniProtSimilarGenes(c('G0L217','G0L217'), clusterIdentity = '1.0', clusterNames = TRUE), list(list('UniRef100_G0L217'=NA),list('UniRef100_G0L217'=NA)))
 ginmappeR:::.testEquals(getUniProtSimilarGenes(c('G0L217','G0L217'), clusterIdentity = '0.5', clusterNames = TRUE),
                         list(list('UniRef50_A0A6L9EH79'=c("A0A6L9EH79","A0A967B2L0","A0A7X3D206")), list('UniRef50_A0A6L9EH79'=c("A0A6L9EH79","A0A967B2L0","A0A7X3D206"))))
-ginmappeR:::.testEquals(getUniProtSimilarGenes('G0L217', clusterIdentity = '1.0'), NA)
+ginmappeR:::.testEquals(getUniProtSimilarGenes('G0L217', clusterIdentity = '1.0'), list(NA))
 # Invalid cluster identity provided
 RUnit::checkException(getUniProtSimilarGenes('G9JVE6','test'))
 # ID not valid case
-ginmappeR:::.testEquals(getUniProtSimilarGenes('test'), NA)
+ginmappeR:::.testEquals(getUniProtSimilarGenes('test'), list(NA))
 
 ### Test .getUniProt2KEGGSGT
 # message('Testing .getUniProt2KEGGSGT')
@@ -84,21 +84,21 @@ message('Testing getUniProt2KEGG')
 ginmappeR:::.testEquals(getUniProt2KEGG('P0ZTUH2'), NA)
 
 ginmappeR:::.testEquals(getUniProt2KEGG(c('Q6R7P5')), NA)
-ginmappeR:::.testEquals(getUniProt2KEGG(c('Q6R7P5'), exhaustiveMapping = TRUE), NA)
+ginmappeR:::.testEquals(getUniProt2KEGG(c('Q6R7P5'), exhaustiveMapping = TRUE), list(NA))
 ginmappeR:::.testEquals(getUniProt2KEGG(c('Q6R7P5'), detailedMapping = TRUE, exhaustiveMapping = FALSE), NA)
-ginmappeR:::.testEquals(getUniProt2KEGG(c('Q6R7P5'), detailedMapping = TRUE, exhaustiveMapping = TRUE), NA)
+ginmappeR:::.testEquals(getUniProt2KEGG(c('Q6R7P5'), detailedMapping = TRUE, exhaustiveMapping = TRUE), list(NA))
 
 ginmappeR:::.testEquals(getUniProt2KEGG(c('test')), NA)
 ginmappeR:::.testEquals(getUniProt2KEGG(c('test'), detailedMapping = TRUE), NA)
-ginmappeR:::.testEquals(getUniProt2KEGG(c('test'), exhaustiveMapping = TRUE), NA)
-ginmappeR:::.testEquals(getUniProt2KEGG(c('test'), detailedMapping = TRUE, exhaustiveMapping = TRUE), NA)
+ginmappeR:::.testEquals(getUniProt2KEGG(c('test'), exhaustiveMapping = TRUE), list(NA))
+ginmappeR:::.testEquals(getUniProt2KEGG(c('test'), detailedMapping = TRUE, exhaustiveMapping = TRUE), list(NA))
 
 ginmappeR:::.testEquals(getUniProt2KEGG(c('A0A2R4PHC7')), c("fcs:TRV642_2906"))
-ginmappeR:::.testEquals(getUniProt2KEGG(c('A0A2R4PHC7'), exhaustiveMapping = TRUE), c("fcs:TRV642_2906", "fcr:HYN56_14615",
-                                                                                    "fls:GLV81_10715", "ffl:HYN86_12595"))
+ginmappeR:::.testEquals(getUniProt2KEGG(c('A0A2R4PHC7'), exhaustiveMapping = TRUE), list(c("fcs:TRV642_2906", "fcr:HYN56_14615",
+                                                                                    "fls:GLV81_10715", "ffl:HYN86_12595")))
 ginmappeR:::.testEquals(getUniProt2KEGG(c('A0A2R4PHC7'), detailedMapping = TRUE), list('0.5'="fcs:TRV642_2906"))
 ginmappeR:::.testEquals(getUniProt2KEGG(c('A0A2R4PHC7'), detailedMapping = TRUE, exhaustiveMapping = TRUE),
-                       list('0.5'=c("fcs:TRV642_2906", "fcr:HYN56_14615","fls:GLV81_10715", "ffl:HYN86_12595")))
+                       list(list('0.5'=c("fcs:TRV642_2906", "fcr:HYN56_14615","fls:GLV81_10715", "ffl:HYN86_12595"))))
 
 ginmappeR:::.testEquals(getUniProt2KEGG(c('Q6R7P5', 'test','A0A2R4PHC7')), c(NA,NA, "fcs:TRV642_2906"))
 ginmappeR:::.testEquals(getUniProt2KEGG(c('Q6R7P5', 'test','A0A2R4PHC7'), exhaustiveMapping = TRUE), list(NA, NA,
@@ -132,8 +132,8 @@ ginmappeR:::.testEquals(getUniProt2KEGG(c('Q6R7P5', 'test','A0A2R4PHC7'), detail
 message('Testing getUniProt2NCBIProtein, getUniProt2NCBINucleotide, getUniProt2NCBIGene')
 # Positive cases
 
-ginmappeR:::.testEquals(length(getUniProt2NCBIProtein('A0A6H2TXZ6', exhaustiveMapping = TRUE, detailedMapping = TRUE)$`0.5`), 10)
-ginmappeR:::.testEquals(length(getUniProt2NCBINucleotide('A0A6H2TXZ6', exhaustiveMapping = TRUE, detailedMapping = TRUE)$`0.5`), 1)
+ginmappeR:::.testEquals(length(getUniProt2NCBIProtein('A0A6H2TXZ6', exhaustiveMapping = TRUE, detailedMapping = TRUE)[[1]]$`0.5`), 10)
+ginmappeR:::.testEquals(length(getUniProt2NCBINucleotide('A0A6H2TXZ6', exhaustiveMapping = TRUE, detailedMapping = TRUE)[[1]]$`0.5`), 1)
 ginmappeR:::.testEquals(length(getUniProt2NCBINucleotide(c('A0A6H2TXZ6', 'A0A6H2TXZ6'), exhaustiveMapping = TRUE, detailedMapping = TRUE)[[1]]$`0.5`), 1)
 ginmappeR:::.testEquals(getUniProt2NCBINucleotide(c('A0A6H2TXZ6', 'A0A6H2TXZ6'), exhaustiveMapping = FALSE, detailedMapping = FALSE), c('NZ_CP013692.1','NZ_CP013692.1'))
 # ginmappeR:::.testEquals(getUniProt2NCBIProtein('A0SNL9', exhaustiveMapping = FALSE, detailedMapping = FALSE), c('ABH10964.1'))

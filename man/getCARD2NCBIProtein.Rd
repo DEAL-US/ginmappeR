@@ -11,7 +11,7 @@ getCARD2NCBIProtein(cardId)
   \item{cardId}{valid CARD database ARO ID or a vector of them}
 }
 \value{
-A vector of NCBI Protein IDs.
+A character vector of the same length as \code{cardId}.
 }
 \examples{
 # Translate CARD ID '3002535' to NCBI Protein
