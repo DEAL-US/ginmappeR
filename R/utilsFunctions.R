@@ -119,7 +119,7 @@ utils::globalVariables('cardPath')
     return(result)
 }
 
-testEquals <- function(testFunction, result){
+.testEquals <- function(testFunction, result){
     tryCatch(
         {RUnit::checkEquals(testFunction, result)},
         error = function(e){
@@ -159,8 +159,8 @@ updateCARDDataBase <- function(){
             .downloadAndExtractCARD()
             message('CARD database downloaded successfully!\nLocated at ', getOption("cardPath"),'/card-data')
         },
-        error = function(e) {return(message('The download of CARD database failed, please try again.\n', "\n"))},
-        warning = function(e) {return(message('The download of CARD database failed, please try again.\n', "\n"))}
+        error = function(e) {return(message('The download of CARD database failed, please try again.\nIf the error persists consider using changeCARDPath() function.', "\n"))},
+        warning = function(e) {return(message('The download of CARD database failed, please try again.\nIf the error persists consider using changeCARDPath() function.', "\n"))}
     )
 }
 
@@ -221,12 +221,62 @@ changeCARDPath <- function(path=tempdir()){
     }
 }
 
-.resultParser <- function(result){
-    if (length(result) == 1) {
-        return(result[[1]])
+# .resultParser <- function(result){
+#     if (length(result) == 1) {
+#         return(result[[1]])
+#     } else {
+#         return(result)
+#     }
+# }
+
+.replaceCharacter0WithNA <- function(lst) {
+    if (is.list(lst)) {
+        lapply(lst, .replaceCharacter0WithNA)
+    } else if (identical(lst, character(0))) {
+        NA
     } else {
-        return(result)
+        lst
     }
+}
+
+.resultParser <- function(inputVector, exhaustiveMapping, result, isDataFrame = FALSE){
+    # Unwrap result from Vectorize
+    if(length(result)==1){
+        result <- result[[1]]
+    }
+
+    # Check if input is a vector of IDs and if it has several ids
+    if(is.vector(inputVector) && !is.list(inputVector) && length(inputVector)>1) {
+
+        # For simple mapping functions, just merge results in a vector
+        if(is.null(exhaustiveMapping)){
+            result[sapply(result, is.null)] <- NA
+            result <- unlist(result, use.names = FALSE)
+        }else{
+            # For functions that may obtain several ids for mapping one id
+
+            # Check that the result is not a dataframe so we dont flat it
+            if(!isDataFrame){
+                result[sapply(result, is.null)] <- NA
+                result <- lapply(result, function(a) if (is.vector(a) && !is.data.frame(a) && is.null(names(a)) && length(a) == 0) NA else a)
+                result <- .replaceCharacter0WithNA(result)
+
+                if(isFALSE(exhaustiveMapping)){
+                    result <- unlist(result, use.names = TRUE)
+                }
+            }
+        }
+    }else{
+        # If the input vector has only 1 id
+        if(is.null(result) || (is.vector(result) && !is.data.frame(result) && is.null(names(result)) && length(result) == 0)){
+            return(NA)
+        }
+        if(!isDataFrame){
+            result[sapply(result, is.null)] <- NA
+            result <- .replaceCharacter0WithNA(result)
+        }
+    }
+    return(result)
 }
 
 .retryHandler <- function(f, ...){

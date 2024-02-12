@@ -3,24 +3,29 @@
 \title{Translates a CARD database ID to NCBI Gene database}
 \description{
 Retrieves the ID translation of an specific instance of CARD database ID to
-the NCBI Gene database. It returns a vector of the translations or an
-empty vector if no translation is found.}
+the NCBI Gene database.}
 \usage{
 getCARD2NCBIGene(cardId, exhaustiveMapping = FALSE)
 }
 \arguments{
   \item{cardId}{valid CARD database ARO ID or a vector of them}
-  \item{exhaustiveMapping}{logical value (TRUE or FALSE) indicating to retrieve
-  all possible translations or only the first and fastest one}
+  \item{exhaustiveMapping}{logical value (\code{TRUE} or \code{FALSE})
+  indicating to retrieve all possible translations or only the first and
+  fastest one.}
 }
 \value{
-A vector of NCBI Gene IDs, empty if no translations were found.
-If an error occurs, returns NULL.
+A character vector of the same length as \code{cardId}. If parameter
+\code{exhaustiveMapping} is \code{TRUE}, it will return a list instead of a
+character vector to avoid mixing the identifiers.
 }
 \examples{
+\donttest{
 # Translate CARD ID '3002524' to NCBI Gene
 getCARD2NCBIGene('3002524')
-
 # Translate CARD IDs '3002524' and '3002525' to NCBI Gene
 getCARD2NCBIGene(c('3002524', '3002525'))
+
+# Get all possible translations of IDs '3005061' and '3002524'
+getCARD2NCBIGene(c('3005061', '3002524'), exhaustiveMapping = TRUE)
+}
 }

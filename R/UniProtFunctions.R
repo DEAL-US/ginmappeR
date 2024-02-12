@@ -441,7 +441,7 @@ getUniProtSimilarGenes <- function(upId, clusterIdentity = '1.0', clusterNames =
                 return(.retryHandler(f, upId, clusterIdentity, clusterNames))})
         })(.getUniProtSimilarGenes), vectorize.args = c("upId", "clusterIdentity"), USE.NAMES = FALSE, SIMPLIFY = FALSE)
     return((function(upId, clusterIdentity = '1.0', clusterNames = FALSE) {
-        return(.resultParser(vectorizedFunc(upId, clusterIdentity, clusterNames)))
+        return(.resultParser(upId, TRUE, vectorizedFunc(upId, clusterIdentity, clusterNames)))
     })(upId, clusterIdentity, clusterNames))
 }
 
@@ -452,7 +452,7 @@ getUniProt2KEGG <- function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TR
                 return(.retryHandler(f, upId, exhaustiveMapping, bySimilarGenes, detailedMapping))})
         })(.getUniProt2KEGG), vectorize.args = c("upId"), USE.NAMES = FALSE, SIMPLIFY = FALSE)
     return((function(upId, exhaustiveMapping = FALSE, bySimilarGenes = TRUE, detailedMapping = FALSE) {
-        return(.resultParser(vectorizedFunc(upId, exhaustiveMapping, bySimilarGenes, detailedMapping)))
+        return(.resultParser(upId, exhaustiveMapping, vectorizedFunc(upId, exhaustiveMapping, bySimilarGenes, detailedMapping)))
     })(upId, exhaustiveMapping, bySimilarGenes, detailedMapping))
 }
 
@@ -463,7 +463,7 @@ getUniProt2NCBIProtein <- function(upId, exhaustiveMapping = FALSE, detailedMapp
                 return(.retryHandler(f, upId, exhaustiveMapping, detailedMapping, bySimilarGenes))})
         })(.getUniProt2NCBIProtein), vectorize.args = c("upId"), USE.NAMES = FALSE, SIMPLIFY = FALSE)
     return((function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
-        return(.resultParser(vectorizedFunc(upId, exhaustiveMapping, detailedMapping, bySimilarGenes)))
+        return(.resultParser(upId, exhaustiveMapping, vectorizedFunc(upId, exhaustiveMapping, detailedMapping, bySimilarGenes)))
     })(upId, exhaustiveMapping, detailedMapping, bySimilarGenes))
 }
 
@@ -474,7 +474,7 @@ getUniProt2NCBINucleotide <- function(upId, exhaustiveMapping = FALSE, detailedM
                 return(.retryHandler(f, upId, exhaustiveMapping, detailedMapping, bySimilarGenes))})
         })(.getUniProt2NCBINucleotide), vectorize.args = c("upId"), USE.NAMES = FALSE, SIMPLIFY = FALSE)
     return((function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
-        return(.resultParser(vectorizedFunc(upId, exhaustiveMapping, detailedMapping, bySimilarGenes)))
+        return(.resultParser(upId, exhaustiveMapping, vectorizedFunc(upId, exhaustiveMapping, detailedMapping, bySimilarGenes)))
     })(upId, exhaustiveMapping, detailedMapping, bySimilarGenes))
 }
 
@@ -485,7 +485,7 @@ getUniProt2NCBIGene <- function(upId, exhaustiveMapping = FALSE, detailedMapping
                 return(.retryHandler(f, upId, exhaustiveMapping, detailedMapping, bySimilarGenes))})
         })(.getUniProt2NCBIGene), vectorize.args = c("upId"), USE.NAMES = FALSE, SIMPLIFY = FALSE)
     return((function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
-        return(.resultParser(vectorizedFunc(upId, exhaustiveMapping, detailedMapping, bySimilarGenes)))
+        return(.resultParser(upId, exhaustiveMapping, vectorizedFunc(upId, exhaustiveMapping, detailedMapping, bySimilarGenes)))
     })(upId, exhaustiveMapping, detailedMapping, bySimilarGenes))
 }
 
@@ -497,7 +497,7 @@ getUniProt2CARD <- function(upId, exhaustiveMapping = FALSE, detailedMapping = F
                 return(.retryHandler(f, upId, exhaustiveMapping, detailedMapping, bySimilarGenes))})
         })(.getUniProt2CARD), vectorize.args = c("upId"), USE.NAMES = FALSE, SIMPLIFY = FALSE)
     return((function(upId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
-        return(.resultParser(vectorizedFunc(upId, exhaustiveMapping, detailedMapping, bySimilarGenes)))
+        return(.resultParser(upId, exhaustiveMapping, vectorizedFunc(upId, exhaustiveMapping, detailedMapping, bySimilarGenes)))
     })(upId, exhaustiveMapping, detailedMapping, bySimilarGenes))
 }
 

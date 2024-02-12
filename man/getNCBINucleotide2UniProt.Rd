@@ -10,28 +10,37 @@ detailedMapping = FALSE, byIdenticalProteins = TRUE)
 }
 \arguments{
   \item{ncbiId}{valid NCBI Nucleotide database ID or a vector of them}
-  \item{exhaustiveMapping}{logical value (TRUE or FALSE) indicating to retrieve
-  all possible translations or only the first and fastest one}
-  \item{detailedMapping}{logical value (TRUE or FALSE) indicating whether to
-  return a vector of UniProt IDs if FALSE, or a named list if TRUE. This named
-  list details the origin of the translated IDs, dividing them in 'DT', if it
-  is a Direct Translation, or '1.0' (100\% identity), if it has been retrieved
-  through Identical Proteins database. See examples below for further
-  understanding}
-  \item{byIdenticalProteins}{logical value (TRUE or FALSE) indicating to
-  retrieve translations of NCBI Identical Proteins to the given identifier.}
+  \item{exhaustiveMapping}{logical value (\code{TRUE} or \code{FALSE})
+  indicating to retrieve all possible translations or only the first and
+  fastest one.}
+  \item{detailedMapping}{logical value (\code{TRUE} or \code{FALSE}) indicating
+  to return a vector of UniProt IDs if \code{FALSE}, or a named vector if
+  \code{TRUE}. This named vector details the origin of the translated IDs,
+  dividing them in \code{DT}, if it is a Direct Translation, or \code{1.0},
+  \code{0.9} or \code{0.5}, if it has been retrieved through any of the
+  identical gene clusters.
+  }
+  \item{byIdenticalProteins}{logical value (\code{TRUE} or \code{FALSE})
+  indicating to translate also through NCBI Identical Proteins. \code{TRUE}
+  value could mean higher translation time and \code{FALSE}, fewer chances to
+  translate the ID}
 }
 \value{
-Depending on parameter 'detailedMapping': if TRUE it will return a named list
-dividing UniProt IDs in 'DT', if it is a Direct Translation, or '1.0', if it
-has been retrieved through NCBI Identical Protein database , or empty list if
-no translations were found; if FALSE, returns a vector of UniProt IDs, empty
-vector if no translations were found.
-If an error occurs, returns NULL.}
+A character vector of the same length as \code{ncbiId}. If parameter
+\code{exhaustiveMapping} is \code{TRUE}, it will return a list instead of a
+character vector to avoid mixing the identifiers.
+}
 \examples{
+\donttest{
 # Translate NCBI Nucleotide ID 'AY536519' to UniProt
 getNCBINucleotide2UniProt('AY536519')
 
 # Translate NCBI Nucleotide IDs 'AY536519' and 'X54723.1' to UniProt
 getNCBINucleotide2UniProt(c('AY536519', 'X54723.1'))
+
+# Get all possible translations of IDs 'AY536519', 'X54723.1'
+# with detailed origin
+getNCBINucleotide2UniProt(c('AY536519', 'X54723.1'), detailedMapping = TRUE,
+exhaustiveMapping = TRUE)
+}
 }

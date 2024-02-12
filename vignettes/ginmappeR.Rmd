@@ -5,7 +5,7 @@ css: mystyle.css
 title: "ginmappeR"
 author: "Fernando Sola, Daniel Ayala, Marina Pulido, Rafael Ayala, Lorena 
 López-Cerero, Inma Hernández, David Ruiz"
-date: "January 26, 2024"
+date: "February 12, 2024"
 output: 
   BiocStyle::html_document
 vignette: |
@@ -142,12 +142,12 @@ getCARD2UniProt('3002372', exhaustiveMapping = TRUE, detailedMapping = TRUE)
 ```
 
 <p style="font-size:110%">
-All the functions in ginmappeR are vectorized, that is, can map a vector of 
+All the functions in ginmappeR are vectorized, that is, they can map a vector of 
 identifiers, for example:
 </p>
 
 ```{r}
-getCARD2NCBIProtein(c('3003955', '3002535'))
+getCARD2NCBIProtein(c('3003955', 'wrong_id', '3002535'))
 ```
 
 <br>

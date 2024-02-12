@@ -3,8 +3,7 @@
 \title{Translates a CARD database ID to NCBI Nucleotide database}
 \description{
 Retrieves the ID translation of an specific instance of CARD database ID to
-the NCBI Nucleotide database. It returns a vector of the translations or an
-empty vector if no translation is found. Note that, due to the nature of
+the NCBI Nucleotide database. Note that, due to the nature of
 NCBI Nucleotide database, a complete genome is often retrieved.}
 \usage{
 getCARD2NCBINucleotide(cardId)
@@ -13,10 +12,10 @@ getCARD2NCBINucleotide(cardId)
   \item{cardId}{valid CARD database ARO ID or a vector of them}
 }
 \value{
-A vector of NCBI Nucleotide IDs, empty if no translations were found.
-If an error occurs, returns NULL.
+A vector of NCBI Nucleotide IDs.
 }
 \examples{
+\donttest{
 # Translate CARD ID '3002535' to NCBI Nucleotide
 getCARD2NCBINucleotide('3002535')
 
@@ -25,4 +24,5 @@ getCARD2NCBINucleotide('ARO:3002535')
 
 # Translate CARD IDs '3002535' and '3003988' to NCBI Nucleotide
 getCARD2NCBINucleotide(c('3002535', '3003988'))
+}
 }

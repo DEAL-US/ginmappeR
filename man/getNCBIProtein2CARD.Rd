@@ -3,24 +3,31 @@
 \title{Translates a NCBI Protein database ID to CARD database}
 \description{
 Retrieves the ID translation of an specific instance of NCBI Protein database
-ID to the CARD database. It returns a vector of the translations or an
-empty vector if no translation is found.}
+ID to the CARD database.}
 \usage{
 getNCBIProtein2CARD(ncbiId, exhaustiveMapping = FALSE)
 }
 \arguments{
   \item{ncbiId}{valid NCBI Protein database ID or a vector of them}
-  \item{exhaustiveMapping}{logical value (TRUE or FALSE) indicating to retrieve
-  all possible translations or only the first and fastest one}
+  \item{exhaustiveMapping}{logical value (\code{TRUE} or \code{FALSE})
+  indicating to retrieve all possible translations or only the first and
+  fastest one.}
 }
 \value{
-A vector of CARD IDs, empty if no translations were found.
-If an error occurs, returns NULL.
+A character vector of the same length as \code{ncbiId}. If parameter
+\code{exhaustiveMapping} is \code{TRUE}, it will return a list instead of a
+character vector to avoid mixing the identifiers.
 }
 \examples{
+\donttest{
 # Translate NCBI Protein ID 'AAK64581' to CARD
 getNCBIProtein2CARD('AAK64581')
 
 # Translate NCBI Protein IDs 'AAK64581' and 'WP_010896559.1' to CARD
 getNCBIProtein2CARD(c('AAK64581', 'WP_010896559.1'))
+
+# Get all possible translations of IDs 'AAK64581', 'WP_010896559.1'
+getNCBIProtein2CARD(c('AAK64581', 'WP_010896559.1'), exhaustiveMapping = TRUE)
+
+}
 }

@@ -130,9 +130,10 @@ getCARD2NCBIProtein <- function(cardId) {
             })
         })(.getCARD2NCBIAux), vectorize.args = c('cardId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
     # Third, we return the vectorised function, expliciting the original function parameters', default
-    # values and parsing the result (gets the value if the result list is of size 1)
+    # values and parsing the result (.resultParser receives the input IDs, the exhaustiveMapping variable
+    # if exists, if not, a NULL, and the vectorizedFunc result)
     return((function(cardId) {
-        return(.resultParser(vectorizedFunc(cardId)))
+        return(.resultParser(cardId, NULL, vectorizedFunc(cardId)))
     })(cardId))
 }
 
@@ -144,7 +145,7 @@ getCARD2NCBINucleotide <- function(cardId) {
                 return(.retryHandler(f, cardId)$DNA.Accession)})
         })(.getCARD2NCBIAux), vectorize.args = c('cardId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
     return((function(cardId) {
-        return(.resultParser(vectorizedFunc(cardId)))
+        return(.resultParser(cardId, NULL, vectorizedFunc(cardId)))
     })(cardId))
 }
 
@@ -156,7 +157,7 @@ getCARD2NCBIGene <- function(cardId, exhaustiveMapping = FALSE) {
                 return(.retryHandler(f, cardId, exhaustiveMapping))})
         })(.getCARD2NCBIGene), vectorize.args = c('cardId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
     return((function(cardId, exhaustiveMapping = FALSE) {
-        return(.resultParser(vectorizedFunc(cardId, exhaustiveMapping)))
+        return(.resultParser(cardId, exhaustiveMapping, vectorizedFunc(cardId, exhaustiveMapping)))
     })(cardId, exhaustiveMapping))
 }
 
@@ -168,7 +169,7 @@ getCARD2UniProt <- function(cardId, exhaustiveMapping = FALSE, detailedMapping =
                 return(.retryHandler(f, cardId, exhaustiveMapping, detailedMapping))})
         })(.getCARD2UniProt), vectorize.args = c('cardId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
     return((function(cardId, exhaustiveMapping = FALSE, detailedMapping = FALSE) {
-        return(.resultParser(vectorizedFunc(cardId, exhaustiveMapping, detailedMapping)))
+        return(.resultParser(cardId, exhaustiveMapping, vectorizedFunc(cardId, exhaustiveMapping, detailedMapping)))
     })(cardId, exhaustiveMapping, detailedMapping))
 }
 
@@ -180,6 +181,6 @@ getCARD2KEGG <- function(cardId, exhaustiveMapping = FALSE, detailedMapping = FA
                 return(.retryHandler(f, cardId, exhaustiveMapping, detailedMapping, byIdenticalProteins, bySimilarGenes))})
         })(.getCARD2KEGG), vectorize.args = c('cardId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
     return((function(cardId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, bySimilarGenes = TRUE) {
-        return(.resultParser(vectorizedFunc(cardId, exhaustiveMapping, detailedMapping, byIdenticalProteins, bySimilarGenes)))
+        return(.resultParser(cardId, exhaustiveMapping, vectorizedFunc(cardId, exhaustiveMapping, detailedMapping, byIdenticalProteins, bySimilarGenes)))
     })(cardId, exhaustiveMapping, detailedMapping, byIdenticalProteins, bySimilarGenes))
 }
