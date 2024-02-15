@@ -32,6 +32,9 @@ message('Testing getCARD2NCBIProtein')
 # Incorrect CARD ID case
 .testEquals(getCARD2NCBIProtein('test'), NA)
 .testEquals(getCARD2NCBIProtein(c('test', 'test')), c(NA, NA))
+.testEquals(getCARD2NCBIProtein(character(0)), character(0))
+.testEquals(getCARD2NCBIProtein(c(character(0), '3002535')), c('CAA38525.1'))
+
 
 
 ### Test getCARD2NCBINucleotide

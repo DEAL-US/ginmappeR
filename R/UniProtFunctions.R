@@ -322,26 +322,10 @@ source("R/utilsFunctions.R")
 .getUniProt2CARDexhaustiveMappingAux <- function(upId, ncbiDB, bySimilarGenes){
     aroIndex <- .loadAROIndex()
 
-    # This function translates a bunch of NCBI ids to CARD
-    .auxNCBI2CARD <- function(translations, ncbiDB){
-        if(identical(ncbiDB, 'protein')){
-            translations <- lapply(translations, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
-                auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
-                return(aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == auxId, "ARO.Accession"])
-            })))
-        }else{
-            translations <- lapply(translations, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
-                auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
-                return(aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == auxId, "ARO.Accession"])
-            })))
-        }
-        return(translations)
-    }
-
     # Direct translation
     translationsDT <- .getUniProt2NCBIDT(upId)
     if(!identical(translationsDT, character(0))){
-        translationsDT <- lapply(.auxNCBI2CARD(list('DT' = translationsDT),ncbiDB), unique)
+        translationsDT <- lapply(.auxNCBI2CARD(list('DT' = translationsDT),ncbiDB, aroIndex), unique)
         translationsDT <- translationsDT[lengths(translationsDT) > 0]
         if(length(translationsDT[['DT']]) > 0){
             return(translationsDT)
@@ -352,7 +336,7 @@ source("R/utilsFunctions.R")
     if(bySimilarGenes){
         translationsTUP <- .getUniProt2NCBISGT(upId, exhaustiveMapping = TRUE,  ncbiDB)
         if(length(translationsTUP)>0){
-            translationsTUP <- lapply(.auxNCBI2CARD(translationsTUP, ncbiDB), unique)
+            translationsTUP <- lapply(.auxNCBI2CARD(translationsTUP, ncbiDB, aroIndex), unique)
             translationsTUP <- translationsTUP[lengths(translationsTUP) > 0]
             if(length(translationsTUP)>0){
                 return(translationsTUP)

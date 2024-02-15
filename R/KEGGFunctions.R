@@ -5,6 +5,7 @@ source("R/utilsFunctions.R")
 ############################
 
 .getKEGG2UniProt <- function(keggId, exhaustiveMapping = FALSE){
+    .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
 
     tryCatch(
         {
@@ -164,26 +165,10 @@ source("R/utilsFunctions.R")
 .getKEGG2CARDexhaustiveMappingAux <- function(keggId, ncbiDB, bySimilarGenes){
     aroIndex <- .loadAROIndex()
 
-    # This function translates a bunch of NCBI ids to CARD
-    .auxNCBI2CARD <- function(translations, ncbiDB){
-        if(identical(ncbiDB, 'protein')){
-            translations <- lapply(translations, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
-                auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
-                return(aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == auxId, "ARO.Accession"])
-            })))
-        }else{
-            translations <- lapply(translations, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
-                auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
-                return(aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == auxId, "ARO.Accession"])
-            })))
-        }
-        return(translations)
-    }
-
     # Direct translation
     translationsDT <- .getKEGG2NCBIDT(keggId)
     if(!identical(translationsDT, character(0))){
-        translationsDT <- lapply(.auxNCBI2CARD(list('DT' = translationsDT),ncbiDB), unique)
+        translationsDT <- lapply(.auxNCBI2CARD(list('DT' = translationsDT),ncbiDB, aroIndex), unique)
         translationsDT <- translationsDT[lengths(translationsDT) > 0]
         if(length(translationsDT[['DT']]) > 0){
             return(translationsDT)
@@ -193,7 +178,7 @@ source("R/utilsFunctions.R")
     # Through UniProt
     translationsTUP <- .getKEGG2NCBITUP(keggId, ncbiDB, exhaustiveMapping = TRUE, bySimilarGenes = bySimilarGenes)
     if(length(translationsTUP)>0){
-        translationsTUP <- lapply(.auxNCBI2CARD(translationsTUP, ncbiDB), unique)
+        translationsTUP <- lapply(.auxNCBI2CARD(translationsTUP, ncbiDB, aroIndex), unique)
         translationsTUP <- translationsTUP[lengths(translationsTUP) > 0]
         if(length(translationsTUP)>0){
             return(translationsTUP)

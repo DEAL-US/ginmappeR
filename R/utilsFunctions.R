@@ -197,6 +197,21 @@ changeCARDPath <- function(path=tempdir()){
     return(read.csv(paste(options("cardPath")[[1]],'/card-data/aro_index.tsv',sep=''), sep='\t'))
 }
 
+# This function translates a bunch of NCBI ids to CARD
+.auxNCBI2CARD <- function(translations, ncbiDB, aroIndex){
+    if(identical(ncbiDB, 'protein')){
+        translations <- lapply(translations, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
+            auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
+            return(aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == auxId, "ARO.Accession"])
+        })))
+    }else{
+        translations <- lapply(translations, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
+            auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
+            return(aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == auxId, "ARO.Accession"])
+        })))
+    }
+    return(translations)
+}
 
 ###########################################
 #  Functions for caching and vectorizing  #
@@ -221,67 +236,6 @@ changeCARDPath <- function(path=tempdir()){
     }
 }
 
-# .resultParser <- function(result){
-#     if (length(result) == 1) {
-#         return(result[[1]])
-#     } else {
-#         return(result)
-#     }
-# }
-
-.replaceCharacter0WithNA <- function(lst) {
-    if (is.list(lst)) {
-        lapply(lst, .replaceCharacter0WithNA)
-    } else if (identical(lst, character(0))) {
-        NA
-    } else {
-        lst
-    }
-}
-
-.resultParser <- function(inputVector, exhaustiveMapping, result, isDataFrame = FALSE){
-    # Unwrap result from Vectorize
-    if(length(result)==1){
-        result <- result[[1]]
-    }
-
-    # Check if input is a vector of IDs and if it has several ids
-    if(is.vector(inputVector) && !is.list(inputVector) && length(inputVector)>1) {
-
-        # For simple mapping functions, just merge results in a vector
-        if(is.null(exhaustiveMapping)){
-            result[sapply(result, is.null)] <- NA
-            result <- unlist(result, use.names = FALSE)
-        }else{
-            # For functions that may obtain several ids for mapping one id
-
-            # Check that the result is not a dataframe so we dont flat it
-            if(!isDataFrame){
-                result[sapply(result, is.null)] <- NA
-                result <- lapply(result, function(a) if (is.vector(a) && !is.data.frame(a) && is.null(names(a)) && length(a) == 0) NA else a)
-                result <- .replaceCharacter0WithNA(result)
-
-                if(isFALSE(exhaustiveMapping)){
-                    result <- unlist(result, use.names = TRUE)
-                }
-            }
-        }
-    }else{
-        # If the input vector has only 1 id
-        if(is.null(result) || (is.vector(result) && !is.data.frame(result) && is.null(names(result)) && length(result) == 0)){
-            result <- NA
-        }
-        if(!isDataFrame){
-            result[sapply(result, is.null)] <- NA
-            result <- .replaceCharacter0WithNA(result)
-            if(isTRUE(exhaustiveMapping)){
-                result <- list(result)
-            }
-        }
-    }
-    return(result)
-}
-
 .retryHandler <- function(f, ...){
     res <- NULL
     counter <- 0
@@ -297,11 +251,83 @@ changeCARDPath <- function(path=tempdir()){
     return(res)
 }
 
+# .resultParser <- function(result){
+#     if (length(result) == 1) {
+#         return(result[[1]])
+#     } else {
+#         return(result)
+#     }
+# }
+
+.replaceCharacter0WithNULL <- function(lst) {
+    if (is.list(lst)) {
+        lapply(lst, .replaceCharacter0WithNULL)
+    } else if (identical(lst, character(0))) {
+        NULL
+    } else {
+        lst
+    }
+}
+
+.resultParser <- function(inputVector, exhaustiveMapping, result, isDataFrame = FALSE){
+    # Unwrap result from Vectorize
+    if(length(result)==1){
+        result <- result[[1]]
+    }
+
+    # Check if input is a vector of IDs and if it has several ids
+    # If it is character(0)
+    if ((is.vector(inputVector) && !is.list(inputVector) && length(inputVector)==0)){
+        if(isTRUE(exhaustiveMapping)){result <- list()
+        }else{result <- character(0)}
+    }
+    # If it has more than 1 value
+    else if (is.vector(inputVector) && !is.list(inputVector) && length(inputVector)>1) {
+
+        # For simple mapping functions, just merge results in a vector
+        if(is.null(exhaustiveMapping)){
+            result[sapply(result, is.null)] <- NA
+            result <- unlist(result, use.names = FALSE)
+        }else{
+            # For functions that may obtain several ids for mapping one id
+
+            # Check that the result is not a dataframe so we dont flat it
+            if(!isDataFrame){
+                # Depending of exhaustiveMapping, we return a list or a vector and treat missing values consequently, NA for vector, NULL for list
+                if(isFALSE(exhaustiveMapping)){
+                    result[sapply(result, is.null)] <- NA
+                    result <- lapply(result, function(a) if (is.vector(a) && !is.data.frame(a) && is.null(names(a)) && length(a) == 0) NA else a)
+                    result <- unlist(result, use.names = TRUE)
+                }else{
+                    result <- .replaceCharacter0WithNULL(result)
+                    result <- lapply(result, function(a) if (is.vector(a) && !is.data.frame(a) && is.null(names(a)) && length(a) == 0) NULL else a)
+                }
+            }
+        }
+    }else{# If the input vector has only 1 id
+
+        # If error or no translation, return NA if exhaustiveMapping = FALSE, list(NULL) otherwise
+        if(is.null(result) || (is.vector(result) && !is.data.frame(result) && is.null(names(result)) && length(result) == 0)){
+            result <- NA
+            if(isTRUE(exhaustiveMapping)){
+                result <- list(NULL)
+            }
+        }else{ # If there's no error and there are translations
+            if(!isDataFrame && isTRUE(exhaustiveMapping)){
+                # Get the result in a list if exhaustiveMapping is set to TRUE
+                result <- .replaceCharacter0WithNULL(result)
+                result <- list(result)
+            }
+        }
+    }
+    return(result)
+}
+
 .errorMessageHandler <- function(e){
     if(grepl("given ID", e)){
         message(e$message)
     }else{
-        message('One of the web APIs failed, please try again.\n')
+        # message('One of the web APIs failed, please try again.\n')
     }
     # message('One of the web APIs failed, please try again.\n', ifelse(grepl("given ID", e), e, ""), "\n")
     return(list(NA, .getCache()$keys()))
@@ -310,7 +336,7 @@ changeCARDPath <- function(path=tempdir()){
 .warningMessageHandler <- function(e){
     # strsplit(conditionMessage(e), '\n', fixed=T)
     # warning('One of the web APIs failed, please try again.\n', "\n", call. = FALSE, noBreaks. = TRUE, immediate. = TRUE)
-    message('One of the web APIs failed, please try again.\n')
+    # message('One of the web APIs failed, please try again.\n')
     return(list(NA, .getCache()$keys()))
 }
 

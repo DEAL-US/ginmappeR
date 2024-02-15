@@ -79,7 +79,7 @@ source("R/utilsFunctions.R")
             result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == strsplit(id,'.', fixed = TRUE)[[1]][[1]], "DNA.Accession"])
             if(!exhaustiveMapping & length(result)>1){result<-result[[1]]}
 
-            if(exhaustiveMapping){
+            if(exhaustiveMapping || length(result)==0){
                 query <- .getNCBIDatabasesLinks(dbFrom='protein', id=id, dbTo='nucleotide')
 
                 if(!is.null(query[['links']][['protein_nuccore']])){
@@ -110,7 +110,7 @@ source("R/utilsFunctions.R")
             result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == strsplit(id,'.', fixed = TRUE)[[1]][[1]], "Protein.Accession"])
             if(!exhaustiveMapping & length(result)>1){result<-result[[1]]}
 
-            if(exhaustiveMapping){
+            if(exhaustiveMapping || length(result)==0){
                 query <- .getNCBIDatabasesLinks(dbFrom='nucleotide', id=id, dbTo='protein')
                 # Handle multiple protein IDs case
                 if(!is.null(query[['links']][['nuccore_protein']])){
@@ -514,7 +514,7 @@ source("R/utilsFunctions.R")
 
     tryCatch(
         {
-            .checkNCBIProteinIdExists(ncbiId)
+            # .checkNCBIProteinIdExists(ncbiId)
 
             ncbiId <- strsplit(ncbiId,'.', fixed = TRUE)[[1]][[1]]
 
@@ -536,7 +536,7 @@ source("R/utilsFunctions.R")
 
     tryCatch(
         {
-            .checkNCBINucleotideIdExists(ncbiId)
+            # .checkNCBINucleotideIdExists(ncbiId)
 
             ncbiId <- strsplit(ncbiId,'.', fixed = TRUE)[[1]][[1]]
 

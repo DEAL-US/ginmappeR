@@ -27,11 +27,13 @@ source("R/utilsFunctions.R")
             aroIndex <- .loadAROIndex()
             nucleotideId <- aroIndex[aroIndex$ARO.Accession == (if (grepl("^ARO:", cardId)) cardId else paste0("ARO:", cardId)),]$DNA.Accession
             proteinId <- aroIndex[aroIndex$ARO.Accession == (if (grepl("^ARO:", cardId)) cardId else paste0("ARO:", cardId)),]$Protein.Accession
+            result <- suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getNCBIProtein2NCBIGene(proteinId, exhaustiveMapping = exhaustiveMapping)))
 
-            result <- unique(c(getNCBIProtein2NCBIGene(proteinId, exhaustiveMapping = exhaustiveMapping), getNCBINucleotide2NCBIGene(nucleotideId, exhaustiveMapping = exhaustiveMapping)))
-
-            if(!exhaustiveMapping & length(result)>0){
-                return(result[1])
+            if(exhaustiveMapping | length(result)==0){
+                result <- unique(c(result, suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getNCBINucleotide2NCBIGene(nucleotideId, exhaustiveMapping = exhaustiveMapping)))))
+                if(!exhaustiveMapping && length(result)>0){
+                    result <- result[[1]]
+                }
             }
             return(result)
         },

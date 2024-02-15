@@ -108,8 +108,8 @@ ginmappeR:::.testEquals(getKEGG2CARD('ag:ACC85616', detailedMapping = TRUE), lis
 # .testEquals(getKEGG2CARD('ag:ACC85616', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = TRUE), list('DT' = c('ARO:3002804')))
 # .testEquals(getKEGG2CARD('llo:LLO_2673', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = TRUE), list('0.5' = c("ARO:3004591", "ARO:3004584", "ARO:3004587", "ARO:3004586", "ARO:3004613", "ARO:3004590", "ARO:3004589", "ARO:3004582", "ARO:3004581")))
 # No translation case
-ginmappeR:::.testEquals(getKEGG2CARD('llo:LLO_2673', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = FALSE), list(NA))
-ginmappeR:::.testEquals(getKEGG2CARD('llo:LLO_2673', exhaustiveMapping = TRUE, detailedMapping = FALSE, bySimilarGenes = FALSE), list(NA))
+ginmappeR:::.testEquals(getKEGG2CARD('llo:LLO_2673', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = FALSE), list(NULL))
+ginmappeR:::.testEquals(getKEGG2CARD('llo:LLO_2673', exhaustiveMapping = TRUE, detailedMapping = FALSE, bySimilarGenes = FALSE), list(NULL))
 ginmappeR:::.testEquals(getKEGG2CARD('llo:LLO_2673', exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = FALSE), NA)
 ginmappeR:::.testEquals(getKEGG2CARD('llo:LLO_2673', exhaustiveMapping = FALSE, detailedMapping = TRUE, bySimilarGenes = FALSE), NA)
 # ID not valid case

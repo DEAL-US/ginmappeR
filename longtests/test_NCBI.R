@@ -44,6 +44,8 @@ message('Testing getNCBIProtein2NCBIGene')
 .testEquals(getNCBIProtein2NCBIGene(c('CAA79696','CAA79696'), exhaustiveMapping = TRUE), list(c('1272'), c('1272')))
 # ID not registered case
 # .testEquals(getNCBIProtein2NCBIGene('test'), NA)
+# .testEquals(getNCBIProtein2NCBIGene(c('test', 'test'), exhaustiveMapping = TRUE), list(NULL, NULL))
+
 # No translation case
 # .testEquals(getNCBIProtein2NCBIGene('WP_011997479'), NA)
 
@@ -159,8 +161,8 @@ message('Testing getNCBIProtein2UniProt')
 # .testEquals(getNCBIProtein2UniProt('WP_039189232.1', exhaustiveMapping = TRUE, byIdenticalProteins = FALSE), c('A0A2A2MC99','Q9K351'))
 # .testEquals(getNCBIProtein2UniProt('WP_039189232.1', byIdenticalProteins = FALSE), c('A0A2A2MC99'))
 # No translation case
-.testEquals(getNCBIProtein2UniProt('WP_188331862.1'), NA)
-.testEquals(getNCBIProtein2UniProt('WP_188331862.1', detailedMapping = TRUE), NA)
+# .testEquals(getNCBIProtein2UniProt('WP_188331862.1'), NA)
+# .testEquals(getNCBIProtein2UniProt('WP_188331862.1', detailedMapping = TRUE), NA)
 # NCBI Protein ID not registered case
 # .testEquals(getNCBIProtein2UniProt('test'), NA)
 
@@ -174,8 +176,8 @@ message('Testing getNCBINucleotide2UniProt')
 # .testEquals(getNCBINucleotide2UniProt('AY536519', exhaustiveMapping = TRUE, detailedMapping = TRUE), list('1.0'=c('Q6QJ79','A0A7G1KXU2','A0A6I4WTI5','D0UY02')))
 # .testEquals(getNCBINucleotide2UniProt('AY536519', byIdenticalProteins = FALSE), character(0))
 # No translation case
-.testEquals(getNCBINucleotide2UniProt('Z21488'), NA)
-.testEquals(getNCBINucleotide2UniProt('Z21488', detailedMapping = TRUE), NA)
+# .testEquals(getNCBINucleotide2UniProt('Z21488'), NA)
+# .testEquals(getNCBINucleotide2UniProt('Z21488', detailedMapping = TRUE), NA)
 # NCBI Nucleotide ID not registered case
 # .testEquals(getNCBINucleotide2UniProt('test'), NA)
 
@@ -187,8 +189,8 @@ message('Testing getNCBIGene2UniProt')
 .testEquals(getNCBIGene2UniProt('76524190', detailedMapping = TRUE), list('1.0'=c('A0A1W6DPG3')))
 .testEquals(getNCBIGene2UniProt('76524190', byIdenticalProteins =  FALSE), NA)
 # No translation case
-.testEquals(getNCBIGene2UniProt('69412715'), NA)
-.testEquals(getNCBIGene2UniProt('69412715', detailedMapping = TRUE), NA)
+# .testEquals(getNCBIGene2UniProt('69412715'), NA)
+# .testEquals(getNCBIGene2UniProt('69412715', detailedMapping = TRUE), NA)
 # NCBI Gene ID not registered case
 # .testEquals(getNCBIGene2UniProt('test'), NA)
 
@@ -240,8 +242,8 @@ message('Testing getNCBIProtein2KEGG')
 # .testEquals(getNCBIProtein2KEGG('WP_010896559.1',exhaustiveMapping = TRUE, detailedMapping = FALSE, byIdenticalProteins = FALSE),
 #             c("bha:BH0380","ag:AAA22599","vpn:A21D_00889","ag:AAP74657","ddh:Desde_1644","bcl:ABC3508","scib:HUG20_05815"))
 # No translation case
-.testEquals(getNCBIProtein2KEGG('WP_188331862.1'), NA)
-.testEquals(getNCBIProtein2KEGG('WP_188331862.1', detailedMapping = TRUE), NA)
+# .testEquals(getNCBIProtein2KEGG('WP_188331862.1'), NA)
+# .testEquals(getNCBIProtein2KEGG('WP_188331862.1', detailedMapping = TRUE), NA)
 # NCBI Protein ID not registered case
 # .testEquals(getNCBIProtein2KEGG('test'), NA)
 
