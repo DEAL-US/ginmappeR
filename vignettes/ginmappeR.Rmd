@@ -5,7 +5,7 @@ css: mystyle.css
 title: "ginmappeR"
 author: "Fernando Sola, Daniel Ayala, Marina Pulido, Rafael Ayala, Lorena 
 López-Cerero, Inma Hernández, David Ruiz"
-date: "February 15, 2024"
+date: "February 26, 2024"
 output: 
   BiocStyle::html_document
 vignette: |

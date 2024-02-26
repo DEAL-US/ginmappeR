@@ -145,7 +145,7 @@ utils::globalVariables('cardPath')
     unlink(paste(getOption("cardPath"),'/card-data*',sep=''), recursive = TRUE)
 
     # Download CARD zip
-    download.file(url, paste(getOption("cardPath"),'/',localRelativeFilenames,sep=''), quiet = TRUE)
+    download.file(url, paste(getOption("cardPath"),'/',localRelativeFilenames,sep=''), quiet = TRUE, mode = 'wb')
     # Extract it
     zipF<- paste(getOption("cardPath"),'/',localRelativeFilenames, sep='')
     # Unzip the compressed file
