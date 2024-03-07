@@ -12,13 +12,13 @@ cardPath <<- tempdir()
 # GitHub Actions imports
 # source('../../../R/NCBIFunctions.R')
 # source('../../../R/UniProtFunctions.R')
-# source('../../../R/utilsFunctions.R')
+# source('../../../R/00utils.R')
 
 # # Local execution imports
 setwd('../00_pkg_src/ginmappeR/')
 source('R/NCBIFunctions.R')
 source('R/UniProtFunctions.R')
-source('R/utilsFunctions.R')
+source('R/00utils.R')
 
 #####################################
 # NCBI databases inter-translations #

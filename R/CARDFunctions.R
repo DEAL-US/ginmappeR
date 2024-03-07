@@ -1,5 +1,3 @@
-source("R/utilsFunctions.R")
-
 ###################################
 # CARD database to NCBI databases #
 ###################################
@@ -29,7 +27,7 @@ source("R/utilsFunctions.R")
             proteinId <- aroIndex[aroIndex$ARO.Accession == (if (grepl("^ARO:", cardId)) cardId else paste0("ARO:", cardId)),]$Protein.Accession
             result <- suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getNCBIProtein2NCBIGene(proteinId, exhaustiveMapping = exhaustiveMapping)))
 
-            if(exhaustiveMapping | length(result)==0){
+            if(exhaustiveMapping || length(result)==0){
                 result <- unique(c(result, suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getNCBINucleotide2NCBIGene(nucleotideId, exhaustiveMapping = exhaustiveMapping)))))
                 if(!exhaustiveMapping && length(result)>0){
                     result <- result[[1]]
@@ -60,7 +58,7 @@ source("R/utilsFunctions.R")
 
             result <- suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getNCBIProtein2UniProt(proteinId, exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping, byIdenticalProteins = TRUE)))
 
-            if(exhaustiveMapping | length(result)==0){
+            if(exhaustiveMapping || length(result)==0){
                 resultAux <- suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getNCBINucleotide2UniProt(nucleotideId, exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping, byIdenticalProteins = TRUE)))
                 if(!detailedMapping){
                     result <- unique(c(result, resultAux))
@@ -100,7 +98,7 @@ source("R/utilsFunctions.R")
 
             result <- suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getNCBIProtein2KEGG(proteinId, exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping, byIdenticalProteins = byIdenticalProteins, bySimilarGenes = bySimilarGenes)))
 
-            if(exhaustiveMapping | length(result)==0){
+            if(exhaustiveMapping || length(result)==0){
                 aux <- suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getNCBINucleotide2KEGG(nucleotideId, exhaustiveMapping = exhaustiveMapping, detailedMapping = detailedMapping, byIdenticalProteins = byIdenticalProteins, bySimilarGenes = bySimilarGenes)))
                 if(detailedMapping){
                     result <- lapply(.mergeNamedLists(result, aux), unique)

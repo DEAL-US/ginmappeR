@@ -1,5 +1,3 @@
-source("R/utilsFunctions.R")
-
 ############################
 # KEGG database to UniProt #
 ############################
@@ -12,7 +10,7 @@ source("R/utilsFunctions.R")
             .checkKEGGIdExists(keggId)
 
             query <- keggConv('uniprot', keggId)
-            if(identical(query, character(0))|identical(query, "")){
+            if(identical(query, character(0)) || identical(query, "")){
                 return(character(0))
             }else{
                 splittedQuery <- strsplit(query,':')
@@ -48,7 +46,7 @@ source("R/utilsFunctions.R")
         splittedQuery <- unique(c(splittedQuery, aux))
     }
 
-    if(identical(splittedQuery, character(0))|is.null(splittedQuery)|identical(splittedQuery, "")){
+    if(identical(splittedQuery, character(0)) || is.null(splittedQuery) || identical(splittedQuery, "")){
         return(character(0))
     }else{
         return(splittedQuery)

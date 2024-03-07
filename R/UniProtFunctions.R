@@ -1,17 +1,14 @@
-source("R/utilsFunctions.R")
-
 ############################
 # UniProt database to KEGG #
 ############################
 
 # Direct translation method
 .getUniProt2KEGGDT <- function(upId){
-    keggId <- paste(keggConv("genes", sprintf('uniprot:%s', upId)), collapse = ';')
-    if(identical(keggId, character(0))|identical(keggId, "")){
+    keggId <- keggConv("genes", sprintf('uniprot:%s', upId))
+    if(length(keggId) == 0){
         return(character(0))
-    }else{
-        return(c(strsplit(keggId,';',fixed = TRUE)[[1]]))
     }
+    return(keggId[[1]])
 }
 
 # Method to retrieve similar genes by clusters of a % of identity
@@ -184,7 +181,7 @@ source("R/utilsFunctions.R")
         query=c(upId),
         columns=c('accession')
     ))$To)
-    if(identical(logical(0),query)|identical(NULL,query)){
+    if(identical(logical(0),query) || identical(NULL,query)){
         return(character(0))
     }
     return(query)

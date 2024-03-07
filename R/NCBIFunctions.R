@@ -1,5 +1,3 @@
-source("R/utilsFunctions.R")
-
 #####################################
 # NCBI databases inter-translations #
 #####################################
@@ -9,7 +7,7 @@ source("R/utilsFunctions.R")
     attempts <- 0
     # entrez_link fails randomly and returns character(0) from time to time, to avoid that,
     # retry has been added for a maximum of 10 times
-    while(!length(query[['links']])>0 & attempts < 10){
+    while(!length(query[['links']])>0 && attempts < 10){
         Sys.sleep(3)
         try(
             query <- entrez_link(dbfrom=dbFrom, id=id, db=dbTo, config = httr::config(timeout = 10))
@@ -77,7 +75,7 @@ source("R/utilsFunctions.R")
 
             aroIndex <- .loadAROIndex()
             result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$Protein.Accession) == strsplit(id,'.', fixed = TRUE)[[1]][[1]], "DNA.Accession"])
-            if(!exhaustiveMapping & length(result)>1){result<-result[[1]]}
+            if(!exhaustiveMapping && length(result)>1){result<-result[[1]]}
 
             if(exhaustiveMapping || length(result)==0){
                 query <- .getNCBIDatabasesLinks(dbFrom='protein', id=id, dbTo='nucleotide')
@@ -108,7 +106,7 @@ source("R/utilsFunctions.R")
 
             aroIndex <- .loadAROIndex()
             result <- c(result, aroIndex[gsub("\\..*", "", aroIndex$DNA.Accession) == strsplit(id,'.', fixed = TRUE)[[1]][[1]], "Protein.Accession"])
-            if(!exhaustiveMapping & length(result)>1){result<-result[[1]]}
+            if(!exhaustiveMapping && length(result)>1){result<-result[[1]]}
 
             if(exhaustiveMapping || length(result)==0){
                 query <- .getNCBIDatabasesLinks(dbFrom='nucleotide', id=id, dbTo='protein')
@@ -202,7 +200,7 @@ source("R/utilsFunctions.R")
         query=c(ncbiId),
         columns=c('accession')
     ))$Entry)
-    if(identical(logical(0),query)|identical(NULL,query)){
+    if(identical(logical(0),query) || identical(NULL,query)){
         return(character(0))
     }
     return(query)
@@ -234,7 +232,7 @@ source("R/utilsFunctions.R")
                     identicalProteins <- entrez_fetch(db = 'ipg', id = auxId, rettype = 'native')
                 }
                 identicalProteins <- read.csv(text=identicalProteins, sep = '\t')
-                identicalProteins <- identicalProteins[which(identicalProteins$Source=='RefSeq' | identicalProteins$Source=='INSDC'),]
+                identicalProteins <- identicalProteins[which(identicalProteins$Source=='RefSeq' || identicalProteins$Source=='INSDC'),]
                 switch(format,
                        'ids'= return(c(identicalProteins$Protein)),
                        'dataframe' = return(identicalProteins))
@@ -286,7 +284,7 @@ source("R/utilsFunctions.R")
     if(nrow(identicalProteins)>0){
         translationsRefSeq <- .getNCBI2UniProtBatch(identicalProteins[which(identicalProteins$Source=='RefSeq'),] ,"RefSeq_Protein" )
         translationsCds <- .getNCBI2UniProtBatch(identicalProteins[which(identicalProteins$Source=='INSDC'),],"EMBL-GenBank-DDBJ_CDS" )
-        if(nrow(translationsRefSeq)>0 & nrow(translationsCds)>0){
+        if(nrow(translationsRefSeq)>0 && nrow(translationsCds)>0){
             translations <- unique(rbind(translationsRefSeq, translationsCds)$Entry)
             return(c(translations))
         }else{
@@ -315,12 +313,12 @@ source("R/utilsFunctions.R")
     if(!detailedMapping){
         result <- unique(unlist(result, recursive = FALSE, use.names = FALSE))
         if(is.null(result)){result <- character(0)}
-        if(length(result)>0&!exhaustiveMapping){result <- result[[1]]}
+        if(length(result)>0 && !exhaustiveMapping){result <- result[[1]]}
     }else{
         result <- lapply(result, unique)
         result <- result[lengths(result) > 0]
         if(length(result)==0){result <- list()}
-        if(length(result)>0&!exhaustiveMapping){result <- lapply(result,"[[",1)[1]}
+        if(length(result)>0 && !exhaustiveMapping){result <- lapply(result,"[[",1)[1]}
     }
     return(result)
 }
@@ -384,7 +382,7 @@ source("R/utilsFunctions.R")
 .getNCBI2KEGGDT <- function(ncbiId){
     query <- keggConv("genes", paste('ncbi-proteinid:', strsplit(ncbiId,'.', fixed = TRUE)[[1]], sep=''))
 
-    if(!identical(query, character(0))&!identical(query, NULL)&!identical(query, NA)){
+    if(!identical(query, character(0)) && !identical(query, NULL) && !identical(query, NA)){
         return(c(query[[1]]))
     }else{
         return(character(0))

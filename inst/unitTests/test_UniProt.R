@@ -11,12 +11,12 @@ cardPath <<- tempdir()
 
 # GitHub Actions imports
 # source('../../../R/UniProtFunctions.R')
-# source('../../../R/utilsFunctions.R')
+# source('../../../R/00utils.R')
 
 # # Local execution imports
 # setwd('../00_pkg_src/ginmappeR/')
 # source('../00_pkg_src/ginmappeR/R/UniProtFunctions.R')
-# source('../00_pkg_src/ginmappeR/R/utilsFunctions.R')
+# source('../00_pkg_src/ginmappeR/R/00utils.R')
 
 ######################################
 # UniProt database auxiliar function #

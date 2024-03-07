@@ -11,12 +11,12 @@ cardPath <<- tempdir()
 
 # GitHub Actions imports
 # source('../../../R/KEGGFunctions.R')
-# source('../../../R/utilsFunctions.R')
+# source('../../../R/00utils.R')
 
 # # Local execution imports
 
 # source('../R/KEGGFunctions.R')
-# source('../R/utilsFunctions.R')
+# source('../R/00utils.R')
 
 ###################################
 # KEGG database auxiliar function #
