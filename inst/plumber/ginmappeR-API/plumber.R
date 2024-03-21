@@ -3,6 +3,23 @@ library(ginmappeR)
 
 #* @apiTitle ginmappeR API
 
+#* @filter cors
+cors <- function(req, res) {
+
+    res$setHeader("Access-Control-Allow-Origin", "*")
+
+    if (req$REQUEST_METHOD == "OPTIONS") {
+        res$setHeader("Access-Control-Allow-Methods","*")
+        res$setHeader("Access-Control-Allow-Headers", req$HTTP_ACCESS_CONTROL_REQUEST_HEADERS)
+        res$status <- 200
+        return(list())
+    } else {
+        plumber::forward()
+    }
+
+}
+
+
 ##############################################
 #        Error handler helper function       #
 ##############################################
@@ -58,10 +75,12 @@ function(cardId, exhaustiveMapping = FALSE, res){
 
 #* Translate CARD to UniProt
 #* @param exhaustiveMapping:bool
+#* @param detailedMapping:bool
 #* @get /card/<cardId>/uniprot
-function(cardId, exhaustiveMapping = FALSE, res){
+function(cardId, exhaustiveMapping = FALSE, detailedMapping = FALSE, res){
     if (exhaustiveMapping %in% c("TRUE", "FALSE")){exhaustiveMapping <- as.logical(exhaustiveMapping)} else {exhaustiveMapping <- FALSE}
-    errorHandler(func = ginmappeR:::getCARD2UniProt, res = res, cardId, exhaustiveMapping)
+    if (detailedMapping %in% c("TRUE", "FALSE")){detailedMapping <- as.logical(detailedMapping)} else {detailedMapping <- FALSE}
+    errorHandler(func = ginmappeR:::getCARD2UniProt, res = res, cardId, exhaustiveMapping, detailedMapping)
 }
 
 #* Translate CARD to KEGG
@@ -83,9 +102,11 @@ function(cardId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdentical
 ###################################
 
 #* Translate KEGG to UniProt
+#* @param exhaustiveMapping:bool
 #* @get /kegg/<keggId>/uniprot
-function(keggId, res){
-    errorHandler(func = ginmappeR:::getKEGG2UniProt, res = res, keggId)
+function(keggId, exhaustiveMapping = FALSE, res){
+    if (exhaustiveMapping %in% c("TRUE", "FALSE")){exhaustiveMapping <- as.logical(exhaustiveMapping)} else {exhaustiveMapping <- FALSE}
+    errorHandler(func = ginmappeR:::getKEGG2UniProt, res = res, keggId, exhaustiveMapping)
 }
 
 #* Translate KEGG to NCBI Protein
@@ -198,33 +219,38 @@ function(ncbiId, format = 'ids'){
 
 #* Translate NCBI Protein to UniProt
 #* @param exhaustiveMapping:bool
+#* @param detailedMapping:bool
 #* @param byIdenticalProteins:bool
 #* @get /ncbiProtein/<ncbiId>/uniprot
-function(ncbiId, exhaustiveMapping = FALSE, byIdenticalProteins = TRUE, res){
+function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, res){
     if (exhaustiveMapping %in% c("TRUE", "FALSE")){exhaustiveMapping <- as.logical(exhaustiveMapping)} else {exhaustiveMapping <- FALSE}
+    if (detailedMapping %in% c("TRUE", "FALSE")){detailedMapping <- as.logical(detailedMapping)} else {detailedMapping <- FALSE}
     if (byIdenticalProteins %in% c("TRUE", "FALSE")){byIdenticalProteins <- as.logical(byIdenticalProteins)} else {byIdenticalProteins <- TRUE}
-    errorHandler(func = ginmappeR:::getNCBIProtein2UniProt, res = res, ncbiId, exhaustiveMapping, byIdenticalProteins)
+    errorHandler(func = ginmappeR:::getNCBIProtein2UniProt, res = res, ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins)
 }
 
 #* Translate NCBI Nucleotide to UniProt
 #* @param exhaustiveMapping:bool
+#* @param detailedMapping:bool
 #* @param byIdenticalProteins:bool
 #* @get /ncbiNucleotide/<ncbiId>/uniprot
-function(ncbiId, exhaustiveMapping = FALSE, byIdenticalProteins = TRUE, res){
+function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, res){
     if (exhaustiveMapping %in% c("TRUE", "FALSE")){exhaustiveMapping <- as.logical(exhaustiveMapping)} else {exhaustiveMapping <- FALSE}
+    if (detailedMapping %in% c("TRUE", "FALSE")){detailedMapping <- as.logical(detailedMapping)} else {detailedMapping <- FALSE}
     if (byIdenticalProteins %in% c("TRUE", "FALSE")){byIdenticalProteins <- as.logical(byIdenticalProteins)} else {byIdenticalProteins <- TRUE}
-    errorHandler(func = ginmappeR:::getNCBINucleotide2UniProt, res = res, ncbiId, exhaustiveMapping, byIdenticalProteins)
+    errorHandler(func = ginmappeR:::getNCBINucleotide2UniProt, res = res, ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins)
 }
 
 #* Translate NCBI Gene to UniProt
 #* @param exhaustiveMapping:bool
+#* @param detailedMapping:bool
 #* @param byIdenticalProteins:bool
 #* @get /ncbiGene/<ncbiId>/uniprot
-function(ncbiId, exhaustiveMapping = FALSE, byIdenticalProteins = TRUE, res){
+function(ncbiId, exhaustiveMapping = FALSE, detailedMapping = FALSE, byIdenticalProteins = TRUE, res){
     if (exhaustiveMapping %in% c("TRUE", "FALSE")){exhaustiveMapping <- as.logical(exhaustiveMapping)} else {exhaustiveMapping <- FALSE}
+    if (detailedMapping %in% c("TRUE", "FALSE")){detailedMapping <- as.logical(detailedMapping)} else {detailedMapping <- FALSE}
     if (byIdenticalProteins %in% c("TRUE", "FALSE")){byIdenticalProteins <- as.logical(byIdenticalProteins)} else {byIdenticalProteins <- TRUE}
-    ginmappeR:::getNCBIGene2UniProt(ncbiId, exhaustiveMapping, byIdenticalProteins)
-    errorHandler(func = ginmappeR:::getNCBIGene2UniProt, res = res, ncbiId, exhaustiveMapping, byIdenticalProteins)
+    errorHandler(func = ginmappeR:::getNCBIGene2UniProt, res = res, ncbiId, exhaustiveMapping, detailedMapping, byIdenticalProteins)
 }
 
 #* Translate NCBI Protein to KEGG

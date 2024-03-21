@@ -232,7 +232,7 @@
                     identicalProteins <- entrez_fetch(db = 'ipg', id = auxId, rettype = 'native')
                 }
                 identicalProteins <- read.csv(text=identicalProteins, sep = '\t')
-                identicalProteins <- identicalProteins[which(identicalProteins$Source=='RefSeq' || identicalProteins$Source=='INSDC'),]
+                identicalProteins <- identicalProteins[which(identicalProteins$Source=='RefSeq' | identicalProteins$Source=='INSDC'),]
                 switch(format,
                        'ids'= return(c(identicalProteins$Protein)),
                        'dataframe' = return(identicalProteins))
