@@ -46,14 +46,18 @@ cardPath <<- tempdir()
 ### Test getUniProtSimilarGenes
 message('Testing getUniProtSimilarGenes')
 # Positive cases
-RUnit::checkTrue(length(getUniProtSimilarGenes('G0L217', clusterIdentity = '0.5', clusterNames = TRUE)[[1]]$UniRef50_A0A6L9EH79)==3)
+RUnit::checkTrue(length(getUniProtSimilarGenes('G0L217', clusterIdentity = '0.5', clusterNames = TRUE)[[1]]$UniRef50_A0A7W2S061)==15)
 # checkTrue(length(getUniProtSimilarGenes('G9JVE6', clusterIdentity = '1.0', clusterNames = TRUE)$UniRef100_G9JVE6)==10)
 # checkTrue(length(getUniProtSimilarGenes('G9JVE6', clusterIdentity = '1.0'))==10)
 # No similar genes case
 ginmappeR:::.testEquals(getUniProtSimilarGenes('G0L217', clusterIdentity = '1.0', clusterNames = TRUE), list(list('UniRef100_G0L217'=NULL)))
 ginmappeR:::.testEquals(getUniProtSimilarGenes(c('G0L217','G0L217'), clusterIdentity = '1.0', clusterNames = TRUE), list(list('UniRef100_G0L217'=NULL),list('UniRef100_G0L217'=NULL)))
 ginmappeR:::.testEquals(getUniProtSimilarGenes(c('G0L217','G0L217'), clusterIdentity = '0.5', clusterNames = TRUE),
-                        list(list('UniRef50_A0A6L9EH79'=c("A0A6L9EH79","A0A967B2L0","A0A7X3D206")), list('UniRef50_A0A6L9EH79'=c("A0A6L9EH79","A0A967B2L0","A0A7X3D206"))))
+                        list(
+                            list('UniRef50_A0A7W2S061'=c("A0A3A1NPH9", "A0A7W2S061", "A0A1V3RER4", "A0A0A7K5H4", "A0A5S3PNY9", "A0A1G7CSI2", "A0A1M6PAC0", "A0A326RZ60",
+                                                          "A0A1M6JMW1", "A0A7H9ALR5", "A0A2N0FXQ1", "A0A7K0EBF2", "A0A3B0C1L2", "A0A3G2L3R6", "A0AA89CM91")),
+                            list('UniRef50_A0A7W2S061'=c("A0A3A1NPH9", "A0A7W2S061", "A0A1V3RER4", "A0A0A7K5H4", "A0A5S3PNY9", "A0A1G7CSI2", "A0A1M6PAC0", "A0A326RZ60",
+                                                          "A0A1M6JMW1", "A0A7H9ALR5", "A0A2N0FXQ1", "A0A7K0EBF2", "A0A3B0C1L2", "A0A3G2L3R6", "A0AA89CM91"))))
 ginmappeR:::.testEquals(getUniProtSimilarGenes('G0L217', clusterIdentity = '1.0'), list(NULL))
 # Invalid cluster identity provided
 RUnit::checkException(getUniProtSimilarGenes('G9JVE6','test'))
