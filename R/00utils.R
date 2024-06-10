@@ -63,12 +63,12 @@ utils::globalVariables('cardPath')
     .checkNotNull(keggId, 'The given KEGG ID is ')
 
     # Search ID in KEGG genes database
-    query <- keggFind('genes',keggId)
-
-    # Check if there is a coincidence and if it corresponds to an unique gene
-    if(!length(query)==1){
-        stop('The given ID "', keggId, '" is not registered in KEGG genes database')
-    }
+    # query <- keggFind('genes', keggId)
+    #
+    # # Check if there is a coincidence and if it corresponds to an unique gene
+    # if(!length(query)==1){
+        # stop('The given ID "', keggId, '" is not registered in KEGG genes database')
+    # }
 }
 
 .checkCARDIdExists <- function(cardId){

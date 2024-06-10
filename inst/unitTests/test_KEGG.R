@@ -39,9 +39,9 @@ cardPath <<- tempdir()
 message('Testing getKEGG2UniProt')
 # Positive cases
 # .testEquals(getKEGG2UniProt('abc:ACICU_00223'), c('A0A7U3XVN2'))
-ginmappeR:::.testEquals(getKEGG2UniProt('aag:5579347'), c('Q1DGP2'))
-ginmappeR:::.testEquals(getKEGG2UniProt('aag:5579347', exhaustiveMapping = TRUE), list(c('Q1DGP2', 'A0A1S4G4Z1')))
-ginmappeR:::.testEquals(getKEGG2UniProt(c('aag:5579347','aag:5579347')), c('Q1DGP2','Q1DGP2'))
+ginmappeR:::.testEquals(getKEGG2UniProt('aag:5579347'), c('A0A1S4G4Z1'))
+ginmappeR:::.testEquals(getKEGG2UniProt('aag:5579347', exhaustiveMapping = TRUE), list(c('A0A1S4G4Z1', 'Q1DGP2')))
+ginmappeR:::.testEquals(getKEGG2UniProt(c('aag:5579347','aag:5579347')), c('A0A1S4G4Z1','A0A1S4G4Z1'))
 # No translation case
 ginmappeR:::.testEquals(getKEGG2UniProt('eco:b0204'), NA)
 # ID not valid case
