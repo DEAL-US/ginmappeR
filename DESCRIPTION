@@ -1,7 +1,7 @@
 Package: ginmappeR
 Type: Package
 Title: Gene Identifier Mapper
-Version: 1.0.1
+Version: 1.1.0
 Authors@R: c(
     person("Fernando", "Sola", email = "fsola@us.es", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-1685-3270")),
     person("Daniel", "Ayala", email = "dayala1@us.es", role = "aut", comment = c(ORCID = "0000-0003-2095-1009")),
