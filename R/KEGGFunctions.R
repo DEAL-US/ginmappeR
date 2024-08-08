@@ -4,6 +4,8 @@
 
 .getKEGG2UniProt <- function(keggId, exhaustiveMapping = FALSE){
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
+    .updateProgressBar("Connecting to KEGG web services")
+    .updateProgressBar(paste("Connecting to KEGG API and translating id ", keggId," to Uniprot", sep=""))
 
     tryCatch(
         {
@@ -59,15 +61,15 @@
 .getKEGG2NCBITUP <- function(keggId, ncbiDB, exhaustiveMapping = FALSE, bySimilarGenes = TRUE){
 
     result <- list()
-    upIDs <- suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getKEGG2UniProt(keggId)))
+    upIDs <- .suppressOutput(.cacheErrorHandler(raiseError=TRUE, .getKEGG2UniProt(keggId)))
 
     if(length(upIDs)>0){
 
         for(upId in upIDs){
             ncbiIDs <- switch (ncbiDB,
-                 'protein' = suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getUniProt2NCBIProtein(upId, exhaustiveMapping = exhaustiveMapping, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes))),
-                 'nucleotide' = suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getUniProt2NCBINucleotide(upId, exhaustiveMapping = exhaustiveMapping, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes))),
-                 'gene' = suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getUniProt2NCBIGene(upId, exhaustiveMapping = exhaustiveMapping, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)))
+                 'protein' = .suppressOutput(.cacheErrorHandler(raiseError=TRUE, .getUniProt2NCBIProtein(upId, exhaustiveMapping = exhaustiveMapping, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes))),
+                 'nucleotide' = .suppressOutput(.cacheErrorHandler(raiseError=TRUE, .getUniProt2NCBINucleotide(upId, exhaustiveMapping = exhaustiveMapping, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes))),
+                 'gene' = .suppressOutput(.cacheErrorHandler(raiseError=TRUE, .getUniProt2NCBIGene(upId, exhaustiveMapping = exhaustiveMapping, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)))
             )
 
             if(length(ncbiIDs)>0){
@@ -85,6 +87,8 @@
     translationsDT <- .getKEGG2NCBIDT(keggId)
     translationsDT <- translationsDT[which(sapply(translationsDT, .checkIdInNCBIDataBase, ncbiDB=ncbiDB))]
 
+    .updateProgressBar(paste("Trying to get a direct translation for KEGG id ", keggId," to NCBI", sep=""))
+
     # First, try to retrieve a direct translation
     if(!identical(translationsDT, character(0))){
         if(!exhaustiveMapping){
@@ -98,6 +102,8 @@
             result[['DT']] <- translationsDT
         }
     }
+
+    .updateProgressBar(paste("Translating KEGG id ", keggId," to NCBI through similar genes strategy", sep=""))
 
     # Then, try to translate through UniProt database
     result <- .mergeNamedLists(result, .getKEGG2NCBITUP(keggId, ncbiDB, exhaustiveMapping = exhaustiveMapping,
@@ -163,6 +169,8 @@
 .getKEGG2CARDexhaustiveMappingAux <- function(keggId, ncbiDB, bySimilarGenes){
     aroIndex <- .loadAROIndex()
 
+    .updateProgressBar(paste("Trying to get a direct translation for KEGG id ", keggId," to CARD", sep=""))
+
     # Direct translation
     translationsDT <- .getKEGG2NCBIDT(keggId)
     if(!identical(translationsDT, character(0))){
@@ -172,6 +180,8 @@
             return(translationsDT)
         }
     }
+
+    .updateProgressBar(paste("Translating KEGG id ", keggId," to CARD through similar genes strategy", sep=""))
 
     # Through UniProt
     translationsTUP <- .getKEGG2NCBITUP(keggId, ncbiDB, exhaustiveMapping = TRUE, bySimilarGenes = bySimilarGenes)
@@ -193,6 +203,8 @@
     .checkBoolean(exhaustiveMapping, 'exhaustiveMapping')
     .checkBoolean(detailedMapping, 'detailedMapping')
     .checkBoolean(bySimilarGenes, 'bySimilarGenes')
+
+    .updateProgressBar("Searching CARD database and translating to KEGG")
 
     tryCatch(
         {
@@ -216,7 +228,7 @@
                 }
             }else{
                 # Handle exhaustiveMapping case, trying to retrieve all possible cases
-                proteinId <- suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getKEGG2NCBIProtein(keggId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)))
+                proteinId <- .suppressOutput(.cacheErrorHandler(raiseError=TRUE, .getKEGG2NCBIProtein(keggId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)))
                 if(length(proteinId)>0){
                     result <- lapply(proteinId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
                         auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
@@ -225,7 +237,7 @@
                     result <- result[lengths(result) > 0]
                 }
 
-                nucleotideId <- suppressMessages(.cacheErrorHandler(raiseError=TRUE, .getKEGG2NCBINucleotide(keggId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)))
+                nucleotideId <- .suppressOutput(.cacheErrorHandler(raiseError=TRUE, .getKEGG2NCBINucleotide(keggId, exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = bySimilarGenes)))
                 if(length(nucleotideId)>0){
                     nucleotideId <- lapply(nucleotideId, FUN = function(x) unlist(sapply(x, USE.NAMES = FALSE, FUN = function(auxId){
                         auxId <- strsplit(auxId,'.', fixed = TRUE)[[1]][[1]]
@@ -257,50 +269,73 @@
 ########################
 
 getKEGG2UniProt <- function(keggId, exhaustiveMapping = FALSE) {
+    .initializeProgressBar(100)
+    .updateProgressBar("Translating from KEGG to UniProt")
+
     vectorizedFunc <- Vectorize(
         (function(f){
             return(function(keggId, exhaustiveMapping = FALSE) {
                 return(.retryHandler(f, keggId, exhaustiveMapping))})
         })(.getKEGG2UniProt), vectorize.args = c('keggId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
     return((function(keggId, exhaustiveMapping = FALSE) {
-        return(.resultParser(keggId, exhaustiveMapping, vectorizedFunc(keggId, exhaustiveMapping)))
+        result <- .resultParser(keggId, exhaustiveMapping, vectorizedFunc(keggId, exhaustiveMapping))
+        .terminateProgressBar()
+        return(result)
     })(keggId, exhaustiveMapping))
 }
 
 getKEGG2NCBIProtein <- function(keggId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
+    .initializeProgressBar(100)
+    .updateProgressBar("Translating from KEGG to NCBI Protein")
+
     vectorizedFunc <- Vectorize(
         (function(f){
             return(function(keggId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
                 return(.retryHandler(f, keggId, exhaustiveMapping, detailedMapping, bySimilarGenes))})
         })(.getKEGG2NCBIProtein), vectorize.args = c('keggId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
     return((function(keggId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
-        return(.resultParser(keggId, exhaustiveMapping, vectorizedFunc(keggId, exhaustiveMapping, detailedMapping, bySimilarGenes)))
+        result <- .resultParser(keggId, exhaustiveMapping, vectorizedFunc(keggId, exhaustiveMapping, detailedMapping, bySimilarGenes))
+        .terminateProgressBar()
+        return(result)
     })(keggId, exhaustiveMapping, detailedMapping, bySimilarGenes))
 }
 
 getKEGG2NCBINucleotide <- function(keggId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
+    .initializeProgressBar(100)
+    .updateProgressBar("Translating from KEGG to NCBI Nucleotide")
+
     vectorizedFunc <- Vectorize(
         (function(f){
             return(function(keggId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
                 return(.retryHandler(f, keggId, exhaustiveMapping, detailedMapping, bySimilarGenes))})
         })(.getKEGG2NCBINucleotide), vectorize.args = c('keggId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
     return((function(keggId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
-        return(.resultParser(keggId, exhaustiveMapping, vectorizedFunc(keggId, exhaustiveMapping, detailedMapping, bySimilarGenes)))
+        result <- .resultParser(keggId, exhaustiveMapping, vectorizedFunc(keggId, exhaustiveMapping, detailedMapping, bySimilarGenes))
+        .terminateProgressBar()
+        return(result)
     })(keggId, exhaustiveMapping, detailedMapping, bySimilarGenes))
 }
 
 getKEGG2NCBIGene <- function(keggId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
+    .initializeProgressBar(100)
+    .updateProgressBar("Translating from KEGG to NCBI Gene")
+
     vectorizedFunc <- Vectorize(
         (function(f){
             return(function(keggId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
                 return(.retryHandler(f, keggId, exhaustiveMapping, detailedMapping, bySimilarGenes))})
         })(.getKEGG2NCBIGene), vectorize.args = c('keggId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
     return((function(keggId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
-        return(.resultParser(keggId, exhaustiveMapping, vectorizedFunc(keggId, exhaustiveMapping, detailedMapping, bySimilarGenes)))
+        result <- .resultParser(keggId, exhaustiveMapping, vectorizedFunc(keggId, exhaustiveMapping, detailedMapping, bySimilarGenes))
+        .terminateProgressBar()
+        return(result)
     })(keggId, exhaustiveMapping, detailedMapping, bySimilarGenes))
 }
 
 getKEGG2CARD <- function(keggId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
+    .initializeProgressBar(100)
+    .updateProgressBar("Translating from KEGG to CARD")
+
     .checkIfCARDIsDownloaded()
     vectorizedFunc <- Vectorize(
         (function(f){
@@ -308,6 +343,8 @@ getKEGG2CARD <- function(keggId, exhaustiveMapping = FALSE, detailedMapping = FA
                 return(.retryHandler(f, keggId, exhaustiveMapping, detailedMapping, bySimilarGenes))})
         })(.getKEGG2CARD), vectorize.args = c('keggId'), USE.NAMES = FALSE, SIMPLIFY = FALSE)
     return((function(keggId, exhaustiveMapping = FALSE, detailedMapping = FALSE, bySimilarGenes = TRUE) {
-        return(.resultParser(keggId, exhaustiveMapping, vectorizedFunc(keggId, exhaustiveMapping, detailedMapping, bySimilarGenes)))
+        result <- .resultParser(keggId, exhaustiveMapping, vectorizedFunc(keggId, exhaustiveMapping, detailedMapping, bySimilarGenes))
+        .terminateProgressBar()
+        return(result)
     })(keggId, exhaustiveMapping, detailedMapping, bySimilarGenes))
 }

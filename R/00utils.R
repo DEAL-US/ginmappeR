@@ -2,12 +2,16 @@ utils::globalVariables('cardPath')
 
 .checkNotNull <- function(variable, message="The given ID is "){
     if(identical(variable, "")){
+        .terminateProgressBar()
         stop(message, "empty")
     }else if(is.null(variable)){
+        .terminateProgressBar()
         stop(message, "NULL")
     }else if(is.nan(variable)){
+        .terminateProgressBar()
         stop(message, "NaN")
     }else if(is.na(variable)){
+        .terminateProgressBar()
         stop(message, "NA")
     }
 }
@@ -18,6 +22,7 @@ utils::globalVariables('cardPath')
     # [ACCN] means we look for an Accesion Number OR [UID] Unique number assigned to publication
     invisible(capture.output(query <- entrez_search(db='protein', term=paste(proteinId,'[ACCN] OR ', proteinId, '[UID]',sep=''))))
     if(!length(query[['ids']])>0) {
+        .terminateProgressBar()
         stop('The given ID "', proteinId, '" is not registered in NCBI Protein database')
     }
 }
@@ -27,6 +32,7 @@ utils::globalVariables('cardPath')
     # Example id: HM036080.1
     invisible(capture.output(query <- entrez_search(db='nucleotide', term=paste(nucleotideId,'[ACCN] OR ', nucleotideId, '[UID]',sep=''))))
     if(!length(query[['ids']])>0) {
+        .terminateProgressBar()
         stop('The given ID "', nucleotideId, '" is not registered in NCBI Nucleotide database')
     }
 }
@@ -36,6 +42,7 @@ utils::globalVariables('cardPath')
     # Example id: WP_001082319
     invisible(capture.output(query <- entrez_search(db='gene', term=paste(geneId,'[ACCN] OR ', geneId, '[UID]',sep=''))))
     if(!length(query[['ids']])>0) {
+        .terminateProgressBar()
         stop('The given ID "', geneId, '" is not registered in NCBI Gene database')
     }
 }
@@ -54,6 +61,7 @@ utils::globalVariables('cardPath')
             )))
         },
         error = function(e) {
+            .terminateProgressBar()
             stop('The given ID "', upId, '" is not registered in UniProt database')
         })
 }
@@ -67,7 +75,8 @@ utils::globalVariables('cardPath')
     #
     # # Check if there is a coincidence and if it corresponds to an unique gene
     # if(!length(query)==1){
-        # stop('The given ID "', keggId, '" is not registered in KEGG genes database')
+    # .terminateProgressBar()
+    # stop('The given ID "', keggId, '" is not registered in KEGG genes database')
     # }
 }
 
@@ -79,18 +88,21 @@ utils::globalVariables('cardPath')
     aroIndex <- .loadAROIndex()
 
     if(!checkedCardId %in% aroIndex$ARO.Accession) {
+        .terminateProgressBar()
         stop('The given ID "', cardId, '" is not registered in CARD database')
     }
 }
 
 .checkClusterIdentity <- function(clusterIdentity){
     if(!clusterIdentity %in% c('1.0','0.9','0.5')){
+        .terminateProgressBar()
         stop('The requested cluster identity "', clusterIdentity, '" is not valid')
     }
 }
 
 .checkBoolean <- function(value, name){
     if(!value %in% c(TRUE, FALSE)){
+        .terminateProgressBar()
         stop(name, ' variable value must be TRUE or FALSE, value given: ', value)
     }
 }
@@ -129,6 +141,13 @@ utils::globalVariables('cardPath')
     )
 }
 
+.suppressOutput <- function(expr) {
+    capture.output(suppressWarnings(suppressMessages({
+        result <- expr
+    })), file = NULL)
+    return(result)
+}
+
 #####################################
 # CARD database retrieval functions #
 #####################################
@@ -142,11 +161,14 @@ utils::globalVariables('cardPath')
     url <- c('https://card.mcmaster.ca/latest/data')
 
     # Delete previous versions
+    message('Deleting previous versions of CARD if any.', "\n")
     unlink(paste(getOption("cardPath"),'/card-data*',sep=''), recursive = TRUE)
 
     # Download CARD zip
+    message('Downloading latest version', "\n")
     download.file(url, paste(getOption("cardPath"),'/',localRelativeFilenames,sep=''), quiet = TRUE, mode = 'wb')
     # Extract it
+    message('Extracting database', "\n")
     zipF<- paste(getOption("cardPath"),'/',localRelativeFilenames, sep='')
     # Unzip the compressed file
     untar(zipF, exdir = paste(getOption("cardPath"),'/card-data',sep=''))
@@ -158,9 +180,10 @@ updateCARDDataBase <- function(){
             message('Updating CARD database data...')
             .downloadAndExtractCARD()
             message('CARD database downloaded successfully!\nLocated at ', getOption("cardPath"),'/card-data')
+            .getCARDVersionAux()
         },
-        error = function(e) {return(message('The download of CARD database failed, please try again.\nIf the error persists consider using changeCARDPath() function.', "\n"))},
-        warning = function(e) {return(message('The download of CARD database failed, please try again.\nIf the error persists consider using changeCARDPath() function.', "\n"))}
+        error = function(e) {return(message('The download of CARD database failed, please try again.\nIf the error persists try using changeCARDPath() to refresh CARD folder location.\nIf not, consider downloading and extracting it manually. Then, use changeCARDPath() function to indicate the folder where it is located.', "\n"))},
+        warning = function(e) {return(message('The download of CARD database failed, please try again.\nIf the error persists try using changeCARDPath() to refresh CARD folder location.\nIf not, consider downloading and extracting it manually. Then, use changeCARDPath() function to indicate the folder where it is located.', "\n"))}
     )
 }
 
@@ -412,4 +435,257 @@ changeCARDPath <- function(path=tempdir()){
     # --- UniProt to CARD ----
     # .getUniProt2CARDexhaustiveMappingAux <<- memoise::memoise(.getUniProt2CARDexhaustiveMappingAux, cache = .getCache())
     .getUniProt2CARD <<- memoise::memoise(.getUniProt2CARD, cache = .getCache())
+}
+
+######################################
+# Progress bar management functions  #
+######################################
+
+# Function to initialize the progress bar
+.initializeProgressBar <- function(total_steps) {
+    .global_step_counter <<- 0
+}
+
+# Function to clear the console line after updating the progress bar
+.clearConsoleLine <- function() {
+    # Redirect output to the console
+    sink(file = stdout(), type = "output")
+    sink(file = stderr(), type = "message")
+    cat("\r", strrep(" ", getOption("width")), "\r")
+    flush.console()
+        # Reset the output redirection
+    if (sink.number(type = "output") > 0) {
+        sink(type = "output")
+    }
+    if (sink.number(type = "message") > 0) {
+        sink(type = "message")
+    }
+}
+
+# Function to update the progress bar
+.updateProgressBar <- function(message) {
+    .global_step_counter <<- .global_step_counter + 1
+    .clearConsoleLine()
+
+    # Calculate the number of steps left
+    fixed_size <- 30
+    current_step <- .global_step_counter %% fixed_size
+    stepsLeft <- fixed_size - current_step
+
+    # Redirect output to the console
+    sink(file = stdout(), type = "output")
+    sink(file = stderr(), type = "message")
+
+    # Print the progress bar
+    cat(paste(c("\r  |",
+                rep.int('=', current_step),
+                rep.int(".", stepsLeft),
+                sprintf("| Step %3d: %s", .global_step_counter, message),
+                "\r"
+                ), collapse=""), file = "")
+
+    flush.console()
+        # Reset the output redirection
+    if (sink.number(type = "output") > 0) {
+        sink(type = "output")
+    }
+    if (sink.number(type = "message") > 0) {
+        sink(type = "message")
+    }
+}
+
+.terminateProgressBar <- function() {
+    .clearConsoleLine()
+    .global_step_counter <<- 0
+}
+
+.initializeProgressBarOnLoad <- function(){
+    # Global variable for progress bar step counter
+    .global_step_counter <<- 0
+}
+
+
+###########################################
+#  Databases versions printing functions  #
+###########################################
+
+.getCARDVersionAux <- function(){
+
+    # Verify it has been downloaded and print version
+    if(file.exists(paste(getOption("cardPath"),'/card-data/aro_index.tsv',sep=''))){
+
+        # Read the JSON file as a text
+        json_text <- readLines(paste(options("cardPath")[[1]],'/card-data/card.json',sep=''), warn = FALSE)
+
+        # Combine the lines into a single string
+        json_string <- paste(json_text, collapse = "")
+
+        # Extract the _version value using regular expressions
+        version <- sub('.*"_version":\\s*"([^"]*)".*', '\\1', json_string)
+
+        # Extract the _timestamp value using regular expressions
+        timestamp <- sub('.*"_timestamp":\\s*"([^"]*)".*', '\\1', json_string)
+        date_part <- strsplit(timestamp, "T")[[1]][1]
+
+        return(message(paste("CARD database version ", version, " (",date_part,")", sep="")))
+    }
+}
+
+getCARDVersion <- function(){
+
+    # Check if CARD is downloaded, do it if not
+    if(!file.exists(paste(getOption("cardPath"),'/card-data/aro_index.tsv',sep=''))){
+        updateCARDDataBase()
+    } else {
+        .getCARDVersionAux()
+    }
+}
+
+getUniProtVersion <- function(){
+
+    # URL to fetch the JSON data
+    url <- "https://rest.uniprot.org/release-notes/search?query=*&sort=release_date+desc"
+
+    # Use tryCatch to handle potential errors
+    tryCatch({
+        # Fetch the JSON content from the URL
+        response <- httr::GET(
+            url,
+            httr::add_headers(
+                `User-Agent` = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+            )
+        )
+
+        # Check if the request was successful
+        if (httr::status_code(response) == 200) {
+        # Parse the JSON content
+        json_data <- jsonlite::fromJSON(httr::content(response, "text", encoding = "UTF-8"), simplifyVector = FALSE)
+
+        # Extract the first element in the results array
+        first_result <- json_data$results[[2]]
+
+        # Extract the title and releaseDate
+        title <- first_result$title
+        release_date <- first_result$releaseDate
+
+        # Print the title and releaseDate
+        message(paste(title, " (",release_date,")", sep=""))
+
+        } else {
+            message("Couldn't reach UniProt server, please try again.")
+        }
+    }, error = function(e) {
+        message("Couldn't reach UniProt server, please try again.")
+    })
+}
+
+getKEGGVersion <- function() {
+    # URLs to fetch the HTML data
+    url1 <- "https://www.genome.jp/kegg/docs/relnote.html"
+    url2 <- "https://www.kegg.jp/kegg/rest/"
+
+    # Function to fetch and parse the KEGG release version
+    .fetchKEGGReleaseVersion <- function(url) {
+        tryCatch({
+            # Fetch the HTML content from the URL
+            page <- httr::GET(url)
+
+            # Check if the request was successful
+            if (httr::status_code(page) == 200) {
+                # Parse the HTML content using rvest
+                content <- httr::content(page, as = "text", encoding = "UTF-8")
+                html <- rvest::read_html(content)
+
+                # Extract the release information
+                release_info <- rvest::html_text(
+                    rvest::html_node(
+                        html,
+                        xpath = "//h4[text()='Current release']/following-sibling::text()[1]"
+                    ),
+                    trim = TRUE
+                )
+
+                # Check if release information was found
+                if (length(release_info) > 0) {
+                    return(release_info)
+                } else {
+                    return(NULL)
+                }
+            } else {
+                return(NULL)
+            }
+        }, error = function(e) {
+            return(NULL)
+        })
+    }
+
+    # Function to fetch and parse the KEGG API version
+    .fetchKEGGAPIVersion <- function(url) {
+        tryCatch({
+            # Fetch the HTML content from the URL
+            page <- httr::GET(url)
+
+            # Check if the request was successful
+            if (httr::status_code(page) == 200) {
+                # Parse the HTML content using rvest
+                content <- httr::content(page, as = "text", encoding = "UTF-8")
+                html <- rvest::read_html(content)
+
+                # Extract the update history information
+                api_version_info <- rvest::html_text(
+                    rvest::html_nodes(
+                        html,
+                        xpath = "//b[contains(text(), 'Update history')]/following-sibling::div/table/tr[1]/td[1]"
+                    ),
+                    trim = TRUE
+                )
+
+                # Check if API version information was found
+                if (length(api_version_info) > 0) {
+                    return(api_version_info)
+                } else {
+                    return(NULL)
+                }
+            } else {
+                return(NULL)
+            }
+        }, error = function(e) {
+            return(NULL)
+        })
+    }
+
+    # Fetch and print the KEGG release version
+    release_version <- .fetchKEGGReleaseVersion(url1)
+    if (!is.null(release_version)) {
+        message("KEGG database ", release_version)
+    } else {
+        message("Couldn't find the KEGG release information.")
+    }
+
+    # Fetch and print the KEGG API version
+    api_version <- .fetchKEGGAPIVersion(url2)
+    if (!is.null(api_version)) {
+        message("KEGG API version ", api_version)
+    } else {
+        message("Couldn't find the KEGG API version information.")
+    }
+}
+
+
+getNCBIVersion <- function() {
+    # Helper function to extract and print the required fields
+    .print_summary <- function(summary) {
+        description <- summary[[2]]
+        db_build <- summary[[4]]
+        last_update <- sub(" .*", "", summary[[6]])  # Remove the hour part
+
+        message('NCBI ', description, ' database ', db_build ,' (',last_update,')' , sep='')
+    }
+
+    # Fetch and print summaries for each database
+    dbs <- c("protein", "gene", "nucleotide", "ipg")
+    for (db in dbs) {
+        summary <- entrez_db_summary(db)
+        .print_summary(summary)
+    }
 }

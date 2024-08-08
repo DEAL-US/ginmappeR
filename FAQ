@@ -1,0 +1,5 @@
+Frequently Asked Questions
+==========================
+
+-- CARD Database manual download
+If the user has limited access to its machine or CARD automatic download fails, it can be manually downloaded from the CARD website (https://card.mcmaster.ca/download) and extracted. The extracted files can be placed in any folder as with function changeCARDPath() the user can specify the path to them.
