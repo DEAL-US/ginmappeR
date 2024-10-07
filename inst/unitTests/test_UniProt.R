@@ -127,19 +127,19 @@ ginmappeR:::.testEquals(getUniProt2KEGG(c(character(0)), detailedMapping = TRUE)
 ginmappeR:::.testEquals(getUniProt2KEGG(c(character(0)), exhaustiveMapping = TRUE), list())
 ginmappeR:::.testEquals(getUniProt2KEGG(c(character(0)), detailedMapping = TRUE, exhaustiveMapping = TRUE), list())
 
-ginmappeR:::.testEquals(getUniProt2KEGG(c('A0A2R4PHC7')), c("fcs:TRV642_2906"))
-ginmappeR:::.testEquals(getUniProt2KEGG(c('A0A2R4PHC7'), exhaustiveMapping = TRUE), list(c("fcs:TRV642_2906", "ffl:HYN86_12595", "fcr:HYN56_14615",
+ginmappeR:::.testEquals(getUniProt2KEGG(c('A0A2R4PHC7')), c("ffl:HYN86_12595"))
+ginmappeR:::.testEquals(getUniProt2KEGG(c('A0A2R4PHC7'), exhaustiveMapping = TRUE), list(c("ffl:HYN86_12595", "fcs:TRV642_2906", "fcr:HYN56_14615",
                                                                                            "fls:GLV81_10715")))
-ginmappeR:::.testEquals(getUniProt2KEGG(c('A0A2R4PHC7'), detailedMapping = TRUE), list('0.5'="fcs:TRV642_2906"))
+ginmappeR:::.testEquals(getUniProt2KEGG(c('A0A2R4PHC7'), detailedMapping = TRUE), list('0.5'="ffl:HYN86_12595"))
 ginmappeR:::.testEquals(getUniProt2KEGG(c('A0A2R4PHC7'), detailedMapping = TRUE, exhaustiveMapping = TRUE),
-                        list(list('0.5'=c("fcs:TRV642_2906", "ffl:HYN86_12595", "fcr:HYN56_14615","fls:GLV81_10715"))))
+                        list(list('0.5'=c("ffl:HYN86_12595", "fcs:TRV642_2906", "fcr:HYN56_14615","fls:GLV81_10715"))))
 
-ginmappeR:::.testEquals(getUniProt2KEGG(c('Q6R7P5', 'test', character(0), 'A0A2R4PHC7')), c(NA, NA, "fcs:TRV642_2906"))
-ginmappeR:::.testEquals(getUniProt2KEGG(c('Q6R7P5', 'test', character(0), 'A0A2R4PHC7'), detailedMapping = TRUE), c(NA,NA,'0.5'="fcs:TRV642_2906"))
+ginmappeR:::.testEquals(getUniProt2KEGG(c('Q6R7P5', 'test', character(0), 'A0A2R4PHC7')), c(NA, NA, "ffl:HYN86_12595"))
+ginmappeR:::.testEquals(getUniProt2KEGG(c('Q6R7P5', 'test', character(0), 'A0A2R4PHC7'), detailedMapping = TRUE), c(NA,NA,'0.5'="ffl:HYN86_12595"))
 ginmappeR:::.testEquals(getUniProt2KEGG(c('Q6R7P5', 'test', character(0),'A0A2R4PHC7'), exhaustiveMapping = TRUE), list(NULL, NULL,
-                                                                                c("fcs:TRV642_2906", "ffl:HYN86_12595", "fcr:HYN56_14615","fls:GLV81_10715")))
+                                                                                c("ffl:HYN86_12595", "fcs:TRV642_2906", "fcr:HYN56_14615","fls:GLV81_10715")))
 ginmappeR:::.testEquals(getUniProt2KEGG(c('Q6R7P5', 'test', character(0), 'A0A2R4PHC7', character(0)), detailedMapping = TRUE, exhaustiveMapping = TRUE),
-                        list(NULL,NULL, list('0.5'= c("fcs:TRV642_2906", "ffl:HYN86_12595", "fcr:HYN56_14615","fls:GLV81_10715"))))
+                        list(NULL,NULL, list('0.5'= c("ffl:HYN86_12595", "fcs:TRV642_2906", "fcr:HYN56_14615","fls:GLV81_10715"))))
 
 ############################
 # UniProt database to NCBI #
