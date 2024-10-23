@@ -37,7 +37,7 @@ character vector to avoid mixing the identifiers.
 }
 \examples{
 # Translate NCBI Gene ID '76524190' to KEGG
-getNCBIGene2KEGG('76524190')
+getNCBIGene2KEGG('AFU38919', bySimilarGenes = FALSE, byIdenticalProteins = FALSE)
 \donttest{
 # Translate NCBI Gene IDs '76524190' and 'AFU38919' to KEGG
 getNCBIGene2KEGG(c('76524190', 'AFU38919'))

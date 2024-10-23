@@ -37,7 +37,7 @@ character vector to avoid mixing the identifiers.
 }
 \examples{
 # Translate CARD ID '3000938' to KEGG
-getCARD2KEGG('3000938')
+getCARD2KEGG('3000938', byIdenticalProteins = FALSE, bySimilarGenes = FALSE)
 \donttest{
 # Translate CARD IDs '3000938' and '3002557' to KEGG
 getCARD2KEGG(c('3000938', '3002557'))

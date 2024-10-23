@@ -36,9 +36,9 @@ A character vector of the same length as \code{ncbiId}. If parameter
 character vector to avoid mixing the identifiers.
 }
 \examples{
-# Translate NCBI Protein ID 'WP_010896559.1' to KEGG
-getNCBIProtein2KEGG('WP_010896559.1', exhaustiveMapping = FALSE,
-detailedMapping = FALSE, byIdenticalProteins = FALSE)
+# Translate NCBI Protein ID 'AFU38919' to KEGG
+getNCBIProtein2KEGG('AFU38919', exhaustiveMapping = FALSE,
+detailedMapping = FALSE, byIdenticalProteins = FALSE, bySimilarGenes = FALSE)
 \donttest{
 # Translate NCBI Protein IDs 'AFU38919' and 'WP_010896559.1' to KEGG
 getNCBIProtein2KEGG(c('AFU38919', 'WP_010896559.1'),
