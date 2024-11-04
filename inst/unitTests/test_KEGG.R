@@ -45,7 +45,8 @@ message('Testing getKEGG2NCBIProtein, getKEGG2NCBINucleotide, getKEGG2NCBIGene')
 # .testEquals(getKEGG2NCBINucleotide('llo:LLO_2673', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = TRUE),
 #             list('DT'=c('NC_013861.1'), '0.5'=c("NZ_CCVW01000004.1","NZ_LNYO01000024.1","NZ_UGNZ01000001.1","NZ_UASS01000015.1",
 #                                                 "NZ_UGOX01000001.1","NZ_UGGV01000001.1"))) # Takes a long time
-ginmappeR:::.testEquals(getKEGG2NCBINucleotide('llo:LLO_2673', bySimilarGenes = FALSE), c('NC_013861.1'))
+ginmappeR:::.testEquals(getKEGG2NCBIProtein('bha:BH0380', bySimilarGenes = FALSE), c('BAB04099'))
+# ginmappeR:::.testEquals(getKEGG2NCBINucleotide('llo:LLO_2673', bySimilarGenes = FALSE), c('NC_013861.1'))
 # ginmappeR:::.testEquals(getKEGG2NCBINucleotide(c('llo:LLO_2673','llo:LLO_2673'), bySimilarGenes = TRUE), c('NC_013861.1', 'NC_013861.1'))
 # .testEquals(getKEGG2NCBINucleotide('aag:5579347', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = TRUE), list('0.5'='XM_001230804.1'))
 # .testEquals(getKEGG2NCBIGene('aag:5579347', detailedMapping = TRUE, bySimilarGenes = TRUE), list('DT'='5579347'))
