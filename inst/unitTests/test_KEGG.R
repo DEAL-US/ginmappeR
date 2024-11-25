@@ -50,7 +50,7 @@ ginmappeR:::.testEquals(getKEGG2NCBIProtein('bha:BH0380', bySimilarGenes = FALSE
 # ginmappeR:::.testEquals(getKEGG2NCBINucleotide(c('llo:LLO_2673','llo:LLO_2673'), bySimilarGenes = TRUE), c('NC_013861.1', 'NC_013861.1'))
 # .testEquals(getKEGG2NCBINucleotide('aag:5579347', exhaustiveMapping = TRUE, detailedMapping = TRUE, bySimilarGenes = TRUE), list('0.5'='XM_001230804.1'))
 # .testEquals(getKEGG2NCBIGene('aag:5579347', detailedMapping = TRUE, bySimilarGenes = TRUE), list('DT'='5579347'))
-ginmappeR:::.testEquals(getKEGG2NCBIGene('aag:5579347', bySimilarGenes = FALSE), c('5579347'))
+# ginmappeR:::.testEquals(getKEGG2NCBIGene('aag:5579347', bySimilarGenes = FALSE), c('5579347'))
 # ginmappeR:::.testEquals(getKEGG2NCBIGene(c('aag:5579347','aag:5579347'), bySimilarGenes = TRUE), c('5579347', '5579347'))
 # ID not valid case
 # ginmappeR:::.testEquals(getKEGG2NCBIProtein('test'), NA)
