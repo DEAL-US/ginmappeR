@@ -131,14 +131,25 @@ utils::globalVariables('cardPath')
     return(result)
 }
 
-.testEquals <- function(testFunction, result){
-    tryCatch(
-        {RUnit::checkEquals(testFunction, result)},
-        error = function(e){
-            message('API(s) connection failed:')
-            message(e)
-        }
-    )
+.testEquals <- function(testFunction, result) {
+    print(testFunction)
+    condition <- testFunction == result
+    if(isTRUE(condition)){
+        RUnit::checkEquals(testFunction, result)
+    }else{
+        message('Test failed: ')
+        message(testFunction, " != ", result)
+    }
+
+    # tryCatch(
+    #     {
+    #         RUnit::checkEquals(testFunction, result)
+    #     },
+    #     error = function(e) {
+    #         message('API(s) connection failed:')
+    #         message(e)
+    #     }
+    # )
 }
 
 .suppressOutput <- function(expr) {

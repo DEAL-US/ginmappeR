@@ -26,7 +26,7 @@ cardPath <<- tempdir()
 message('Testing getUniProtSimilarGenes')
 # Positive cases
 # RUnit::checkTrue(length(getUniProtSimilarGenes('G0L217', clusterIdentity = '0.5', clusterNames = TRUE)[[1]]$UniRef50_A0A6L9EH79)==3)
-RUnit::checkTrue(names(getUniProtSimilarGenes('G9JVE6', clusterIdentity = '1.0', clusterNames = TRUE)[[1]])=="UniRef100_G9JVE6")
+ginmappeR:::.testEquals(names(getUniProtSimilarGenes('G9JVE6', clusterIdentity = '1.0', clusterNames = TRUE)[[1]]), "UniRef100_G9JVE6")
 # checkTrue(length(getUniProtSimilarGenes('G9JVE6', clusterIdentity = '1.0'))==10)
 # No similar genes case
 # ginmappeR:::.testEquals(getUniProtSimilarGenes('G0L217', clusterIdentity = '1.0', clusterNames = TRUE), list(list('UniRef100_G0L217'=NULL)))
